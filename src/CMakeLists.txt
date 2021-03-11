@@ -1,6 +1,6 @@
 add_library(splitmaker
-    splitmaker.cpp
-    splitmaker.hpp
+    PllTree.cpp
+    PllTree.hpp
 )
 
 set_target_properties(splitmaker PROPERTIES
