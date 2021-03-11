@@ -48,3 +48,11 @@ The important function to apply is the `alignNodeIndices`. This makes sure that 
 way, so that the results make sense.
 
 This example can be found more fleshed out in `test/src/main.cpp`.
+
+# Possibly useful functions from libpll
+
+```
+void pllmod_utree_split_show(pll_split_t split, unsigned int tip_count)
+```
+
+Prints the split.
