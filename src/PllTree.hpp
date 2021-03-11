@@ -1,7 +1,9 @@
 #pragma once
 #include "PllSplits.hpp"
+extern "C" {
 #include "libpll/pll.h"
 #include "libpll/pll_tree.h"
+}
 #include <exception>
 #include <string>
 #include <utility>
@@ -34,6 +36,7 @@ public:
   /*Actually important functions */
 
   PllSplits makeSplits() const;
+  void      alignNodeIndices(const PllTree &other);
 
 private:
   pll_utree_t *_tree;

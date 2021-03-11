@@ -1,7 +1,10 @@
 #pragma once
+extern "C" {
 #include "libpll/pll.h"
 #include "libpll/pll_tree.h"
+}
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -56,7 +59,7 @@ public:
   /* Rule of 5 constructors/destructors */
   ~PllSplits();
   PllSplits(const PllSplits &other);
-  PllSplits(PllSplits &&other) : _splits{std::exchange(other._splits, {})} {}
+  PllSplits(PllSplits &&other) : _splits(std::exchange(other._splits, {})) {}
   PllSplits &operator=(const PllSplits &other) {
     return *this = PllSplits(other);
   };
@@ -65,12 +68,17 @@ public:
     return *this;
   };
 
+  PllSplit operator[](size_t index) const { return _splits[index]; }
+
 private:
   /* Computes the number of bits per split base */
   constexpr size_t computSplitBaseSize() const {
     return sizeof(pll_split_base_t) * 8;
   }
 
+  /* Computes the number of pll_split_base_t's that are needed to store a single
+   * split
+   */
   size_t computeSplitLen() const {
     size_t tip_count = _splits.size() + 3;
     size_t split_len = (tip_count / computSplitBaseSize());

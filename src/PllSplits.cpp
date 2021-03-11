@@ -31,11 +31,15 @@ PllSplits::PllSplits(const PllSplits &other) {
   auto tmp_splits = (pll_split_t)calloc(other.computeSplitArraySize(),
                                         sizeof(pll_split_base_t));
 
-  memcpy(_splits[0](),
+  memcpy(tmp_splits,
          other._splits[0](),
          other.computeSplitArraySize() * sizeof(pll_split_base_t));
 
-  _splits = other._splits;
+  for (size_t i = 0; i < other.computeSplitArraySize(); ++i) {
+    _splits.emplace_back(tmp_splits + (i * other.computeSplitLen()));
+  }
 }
 
-PllSplits::~PllSplits() { free(_splits[0]()); }
+PllSplits::~PllSplits() {
+  if (!_splits.empty()) { free(_splits[0]()); }
+}

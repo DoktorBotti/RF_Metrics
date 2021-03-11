@@ -1,4 +1,4 @@
-add_library(inforf
+add_library(inforf STATIC
     PllTree.cpp
     PllTree.hpp
     PllSplits.cpp
