@@ -8,7 +8,7 @@ git clone --recursive git@codeberg.org:Exelixis-Lab/practical-2021.git
 ```
 
 After that, to build the code run `make && cd build && make`, which will generate the build directory, and then start
-building the code. The that is built is called `libinforf`, and is placed in `bin` after building.
+building the code. The static library that is built is called `libinforf`, and is placed in `bin` after building.
 
 I suggest that you take a look at the code itself, as you will be expected to modify it directly. The 2 header files,
 `src/PllSplits.hpp` and `src/PllTree.hpp` 
