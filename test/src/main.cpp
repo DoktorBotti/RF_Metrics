@@ -10,7 +10,7 @@ int main() {
   std::vector<PllTree> tree_list;
   for (auto t : tree_strings) { tree_list.emplace_back(t); }
 
-  std::vector<PllSplits> splits_list;
+  std::vector<PllSplitList> splits_list;
 
   for (auto &t : tree_list) {
     t.alignNodeIndices(*tree_list.begin());

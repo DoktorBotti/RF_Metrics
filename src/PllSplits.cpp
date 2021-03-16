@@ -16,7 +16,7 @@ uint32_t PllSplit::bitExtract(size_t bit_index) {
          computeMinorIndex(bit_index);
 }
 
-PllSplits::PllSplits(const PllTree &tree) {
+PllSplitList::PllSplitList(const PllTree &tree) {
   auto tmp_splits = pllmod_utree_split_create(
       tree.tree()->vroot, tree.tree()->tip_count, nullptr);
 
@@ -27,7 +27,7 @@ PllSplits::PllSplits(const PllTree &tree) {
   free(tmp_splits);
 }
 
-PllSplits::PllSplits(const PllSplits &other) {
+PllSplitList::PllSplitList(const PllSplitList &other) {
   auto tmp_splits = (pll_split_t)calloc(other.computeSplitArraySize(),
                                         sizeof(pll_split_base_t));
 
@@ -40,6 +40,6 @@ PllSplits::PllSplits(const PllSplits &other) {
   }
 }
 
-PllSplits::~PllSplits() {
+PllSplitList::~PllSplitList() {
   if (!_splits.empty()) { free(_splits[0]()); }
 }

@@ -35,8 +35,8 @@ public:
 
   /*Actually important functions */
 
-  PllSplits makeSplits() const;
-  void      alignNodeIndices(const PllTree &other);
+  PllSplitList makeSplits() const;
+  void         alignNodeIndices(const PllTree &other);
 
 private:
   pll_utree_t *_tree;

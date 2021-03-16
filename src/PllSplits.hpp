@@ -52,18 +52,19 @@ private:
   pll_split_t _split;
 };
 
-class PllSplits {
+class PllSplitList {
 public:
-  PllSplits(const PllTree &tree);
+  PllSplitList(const PllTree &tree);
 
   /* Rule of 5 constructors/destructors */
-  ~PllSplits();
-  PllSplits(const PllSplits &other);
-  PllSplits(PllSplits &&other) : _splits(std::exchange(other._splits, {})) {}
-  PllSplits &operator=(const PllSplits &other) {
-    return *this = PllSplits(other);
+  ~PllSplitList();
+  PllSplitList(const PllSplitList &other);
+  PllSplitList(PllSplitList &&other) :
+      _splits(std::exchange(other._splits, {})) {}
+  PllSplitList &operator=(const PllSplitList &other) {
+    return *this = PllSplitList(other);
   };
-  PllSplits &operator=(PllSplits &&other) {
+  PllSplitList &operator=(PllSplitList &&other) {
     std::swap(_splits, other._splits);
     return *this;
   };
