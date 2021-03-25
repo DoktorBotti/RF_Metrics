@@ -9,4 +9,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(libs)
 add_subdirectory(src)
+add_subdirectory(utils)
 add_subdirectory(test)
