@@ -4,7 +4,7 @@ Skeleton for the 2021 KIT bioinformatics practical. This repository contains the
 distance function on trees using splits. To get started, first clone the repository:
 
 ```
-git clone --recursive git@codeberg.org:Exelixis-Lab/practical-2021.git
+git clone --recursive git@github.com:DoktorBotti/RF_Metrics.git
 ```
 
 After that, to build the code run `make && cd build && make`, which will generate the build directory, and then start

@@ -1,0 +1,91 @@
+# CLion remote docker environment (How to build docker container, run and stop it)
+#
+# Build and run:
+#   docker build -t clion/remote-cpp-env:0.5 -f Dockerfile.remote-cpp-env .
+#   docker run -d --cap-add sys_ptrace -p 127.0.0.1:2222:22 --name clion_remote_env clion/remote-cpp-env:0.5
+#   ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
+#
+# stop:
+#   docker stop clion_remote_env
+# 
+# ssh credentials (test user):
+#   user@password 
+
+FROM ubuntu:20.04
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && apt-get -y install tzdata
+
+RUN apt-get update \
+  && apt-get install -y ssh \
+      build-essential \
+      gcc \
+      g++ \
+      gdb \
+      clang \
+      cmake \
+      rsync \
+      tar \
+	  git \
+      python \
+	  python3-pip \
+	  curl sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo)
+	  
+# Install R-Prerequesites
+RUN apt-get install -y dirmngr \
+		gnupg \
+		apt-transport-https \
+		ca-certificates software-properties-common \
+	&& apt-get clean
+	
+# Add CRAN repository and install R
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
+	&& add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/' \
+	&& apt install -y r-base
+# Install reference installation package
+RUN R -e "install.packages('TreeDist',dependencies=TRUE)"
+
+# Install SoftWipe
+RUN pip3 install numpy scipy compiledb \
+	&& git clone https://github.com/adrianzap/softwipe.git \ 
+	&& apt-get install -y \
+		llvm \
+		clang-tidy \
+		cppcheck \
+	&& apt-get clean
+RUN cd softwipe \
+	&& git clone https://github.com/Kitware/KWStyle.git \
+	&& cd KWStyle \
+	&& cmake . \
+	&& make -j 3 CC="clang" CXX="clang++" CFLAGS="" CXXFLAGS="" CPPFLAGS="" LDFLAGS="" \
+	&& make install
+RUN ln -s softwipe/softwipe.py sw \
+	&& chmod +x sw
+		
+# Install and build alexis reference implementation for standard RF distance
+RUN git clone https://github.com/stamatak/standard-RAxML.git \
+	&& cd standard-RAxML \
+	&& make -f Makefile.AVX.gcc \
+	&& rm *.o
+RUN ln -s standard-RAxML/raxmlHPC-AVX raxml \
+	&& chmod +x raxml
+
+
+# Install own project dependencies
+RUN apt-get install -y bison \
+	flex
+
+# Start SSH-server for remote toolchain config (useful for i.e. CLion)
+RUN ( \
+    echo 'LogLevel DEBUG2'; \
+    echo 'PermitRootLogin yes'; \
+    echo 'PasswordAuthentication yes'; \
+    echo 'Subsystem sftp /usr/lib/openssh/sftp-server'; \
+  ) > /etc/ssh/sshd_config_test_clion \
+  && mkdir /run/sshd
+
+RUN useradd -m user \
+  && yes password | passwd user
+
+RUN usermod -s /bin/bash user
+
+CMD ["/usr/sbin/sshd", "-D", "-e", "-f", "/etc/ssh/sshd_config_test_clion"]
