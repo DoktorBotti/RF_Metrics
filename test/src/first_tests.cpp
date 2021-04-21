@@ -1,6 +1,10 @@
-#include <catch2/catch.hpp>
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
+#include <catch2/catch.hpp>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
 
 TEST_CASE("Catch2 integration", "[useless]"){
@@ -20,4 +24,17 @@ TEST_CASE("sample code", "[useless]"){
     t.alignNodeIndices(*tree_list.begin());
     splits_list.emplace_back(t);
   }
+}
+
+TEST_CASE("read first test tree", "[data]"){
+  std::string temporaryPath = "/home/user/tmpoutput.txt";
+  std::string command = "head -n 1 /rf_data/BS/24 >" +  temporaryPath;
+  //command = "ls /";
+  std::system(command.c_str());
+  std::stringstream ss;
+  auto stream = std::ifstream(temporaryPath);
+  ss << stream.rdbuf();
+  CHECK(stream.is_open());
+  std::string out = ss.str();
+  REQUIRE(out.length() > 0);
 }
