@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="ClanUbuDock_practical (3bca973c-d3d5-42e6-8d19-06bd365ef45d)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/tmp.r7VAan84Ln" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-clanubudock_practical" />
+            <excludedPath local="true" path="$PROJECT_DIR$/bin" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-clanubudock_practical" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
