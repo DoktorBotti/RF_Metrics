@@ -13,3 +13,5 @@ file(COPY
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LOCALDEPS_DIR}/lib)
 
 add_subdirectory(pll-modules)
+add_subdirectory(catch2)
+
