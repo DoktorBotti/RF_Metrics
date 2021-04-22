@@ -14,4 +14,4 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LOCALDEPS_DIR}/lib)
 
 add_subdirectory(pll-modules)
 add_subdirectory(catch2)
-
+add_subdirectory(growt)

@@ -2,8 +2,7 @@
 #
 # Build and run:
 #   docker build -t clion/remote-cpp-env:0.5 -f Dockerfile.remote-cpp-env .
-#   docker run -d --cap-add sys_ptrace -p 127.0.0.1:2222:22 --mount type=bind,source="E:\WIN\Development\practical-2021\data",target=/rf_data --name clion_remote_env clion/remote-cpp-env:0.5 
-#   ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
+#   docker run -d --cap-add sys_ptrace -p 127.0.0.1:2222:22 --mount type=bind,source="E:\WIN\Development\practical-2021\data",target=/rf_data --name clion_remote_env clion/remote-cpp-env:0.5 && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
 #
 # stop:
 #   docker stop clion_remote_env
@@ -82,6 +81,8 @@ RUN ( \
     echo 'Subsystem sftp /usr/lib/openssh/sftp-server'; \
   ) > /etc/ssh/sshd_config_test_clion \
   && mkdir /run/sshd
+
+RUN ( apt-get install -y libtbb-dev && apt-get clean)
 
 RUN useradd -m user \
   && yes password | passwd user

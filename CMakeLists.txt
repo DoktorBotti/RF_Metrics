@@ -14,4 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catc
 
 add_subdirectory(src)
 add_subdirectory(utils)
+
 add_subdirectory(test)
+message(WARNING ${CMAKE_CURRENT_SOURCE_DIR})

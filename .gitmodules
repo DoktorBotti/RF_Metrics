@@ -4,3 +4,6 @@
 [submodule "libs/catch2"]
 	path = libs/catch2
 	url = https://github.com/catchorg/Catch2.git
+[submodule "libs/growt"]
+	path = libs/growt
+	url = https://github.com/TooBiased/growt.git
