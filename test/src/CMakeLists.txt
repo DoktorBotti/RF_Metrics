@@ -3,7 +3,7 @@ add_executable(inforf-example
     main.cpp first_tests.cpp)
 
 target_link_libraries(inforf-example PUBLIC
-        inforf
+        rf_lib
         ${PLLMODULES_LIBRARIES}
         ${PLL_LIBRARIES}
         ${PLLMODULES_LIBRARIES}
