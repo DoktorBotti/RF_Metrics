@@ -3,3 +3,7 @@ build/*
 compile_commands.json
 bin/*
 data/*
+cmake-build-debug
+cmake-build-release
+roberts_paths.txt
+.idea
