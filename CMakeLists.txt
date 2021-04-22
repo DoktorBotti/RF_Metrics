@@ -12,7 +12,8 @@ add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib)
 
-add_subdirectory(src)
+add_subdirectory(src/commandline)
+add_subdirectory(src/rf)
 add_subdirectory(utils)
 
 add_subdirectory(test)
