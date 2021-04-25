@@ -2,7 +2,8 @@
 // Created by Robert Schmoltzi on 22.04.21.
 //
 
-#include <rf/PllTree.hpp>
+#include "PllSplits.hpp"
+#include "PllTree.hpp"
 #include <string>
 #include <vector>
 

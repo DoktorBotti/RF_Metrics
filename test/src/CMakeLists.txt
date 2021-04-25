@@ -1,18 +1,16 @@
 
-add_executable(inforf-example
+add_executable(catch2_tests
     main.cpp first_tests.cpp)
 
-target_link_libraries(inforf-example PUBLIC
+target_link_libraries(catch2_tests PUBLIC
         rf_lib
-        ${PLLMODULES_LIBRARIES}
-        ${PLL_LIBRARIES}
-        ${PLLMODULES_LIBRARIES}
     PRIVATE
         Catch2::Catch2
         )
 include(CTest)
 include(Catch)
-catch_discover_tests(inforf-example)
-target_include_directories(inforf-example PUBLIC
+catch_discover_tests(catch2_tests)
+target_include_directories(catch2_tests PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${LOCALDEPS_DIR}/include>)
+target_compile_options(catch2_tests PRIVATE ${COMPILER_WARNING_FLAGS})

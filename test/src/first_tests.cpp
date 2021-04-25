@@ -1,5 +1,5 @@
-#include "rf/PllSplits.hpp"
-#include "rf/PllTree.hpp"
+#include "PllSplits.hpp"
+#include "PllTree.hpp"
 #include <catch2/catch.hpp>
 #include <cstdlib>
 #include <fstream>
@@ -11,21 +11,19 @@
 static std::string getFirstNTrees(size_t N = 1) {
   assert(N == 1);
   std::string temporaryPath = "/home/user/tmpoutput.txt";
-  std::string command = "head -n 1 /rf_data/BS/24 >" +  temporaryPath;
+  std::string command       = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
   // command = "ls /";
   system(command.c_str());
   std::stringstream ss;
-  auto stream = std::ifstream(temporaryPath);
+  auto              stream = std::ifstream(temporaryPath);
   ss << stream.rdbuf();
   CHECK(stream.is_open());
   std::string out = ss.str();
   return out;
 }
 
-TEST_CASE("Catch2 integration", "[useless]"){
-  REQUIRE(2+2 == 4);
-}
-TEST_CASE("sample code", "[useless]"){
+TEST_CASE("Catch2 integration", "[useless]") { REQUIRE(2 + 2 == 4); }
+TEST_CASE("sample code", "[useless]") {
   std::vector<std::string> tree_strings{
       "(a, b, (c, d));",
       "(a, d, (c, b));",
@@ -41,21 +39,21 @@ TEST_CASE("sample code", "[useless]"){
   }
 }
 
-TEST_CASE("read first test tree", "[data]"){
+TEST_CASE("read first test tree", "[data]") {
   std::string temporaryPath = "/home/user/tmpoutput.txt";
-  std::string command = "head -n 1 /rf_data/BS/24 >" +  temporaryPath;
-  //command = "ls /";
+  std::string command       = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
+  // command = "ls /";
   std::system(command.c_str());
   std::stringstream ss;
-  auto stream = std::ifstream(temporaryPath);
+  auto              stream = std::ifstream(temporaryPath);
   ss << stream.rdbuf();
   CHECK(stream.is_open());
   std::string out = ss.str();
   REQUIRE(out.length() > 0);
 }
 
-TEST_CASE("Print first Split", "[useless]"){
-  std::string firstTree = getFirstNTrees(1);
+TEST_CASE("Print first Split", "[useless]") {
+  std::string          firstTree = getFirstNTrees(1);
   std::vector<PllTree> tree_list;
   tree_list.emplace_back(firstTree);
 

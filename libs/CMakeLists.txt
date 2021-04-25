@@ -13,5 +13,22 @@ file(COPY
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LOCALDEPS_DIR}/lib)
 
 add_subdirectory(pll-modules)
+
+# defining target lib for libpll
+add_library(pll_lib INTERFACE)
+set_target_properties(pll_lib PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(pll_lib INTERFACE ${PLLMODULES_LIBRARIES})
+target_include_directories(pll_lib INTERFACE
+        ${LOCALDEPS_DIR}/include
+        )
+
+# defining target lib for growt
+add_library(growt_lib INTERFACE)
+target_include_directories(growt_lib
+        INTERFACE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt>
+            #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt/allocator>
+        )
+
 add_subdirectory(catch2)
 add_subdirectory(growt)

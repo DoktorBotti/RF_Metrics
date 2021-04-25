@@ -1,9 +1,12 @@
 add_executable(commandline_rf console.cpp)
-target_link_libraries(commandline_rf PRIVATE
+target_link_libraries(commandline_rf rf_lib)
+target_include_directories(commandline_rf
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
         rf_lib
-        ${PLLMODULES_LIBRARIES}
-        ${PLL_LIBRARIES}
-        ${PLLMODULES_LIBRARIES} )
-target_include_directories(commandline_rf PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${LOCALDEPS_DIR}/include>)
+
+        SYSTEM INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        rf_lib
+        )
+target_compile_options(commandline_rf PRIVATE ${COMPILER_WARNING_FLAGS})
