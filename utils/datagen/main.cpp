@@ -40,7 +40,7 @@ private:
 struct cli_options_t {
   cli_option_t<size_t>       trees;
   cli_option_t<size_t>       taxa;
-  cli_option_t<unsigned int> seed;
+  cli_option_t<unsigned> seed;
 };
 
 constexpr size_t ipow(size_t n, size_t e) {
@@ -146,8 +146,7 @@ int main(int argc, char **argv) {
   if (!opts.seed.set()) { opts.seed = std::random_device()(); }
 
   auto labels = generate_labels(opts.taxa);
-
-  std::default_random_engine gen(opts.seed);
+  std::default_random_engine gen(static_cast<unsigned>(opts.seed));
 
   auto newick_cb = [](const pll_unode_t *n) {
     size_t label_len;

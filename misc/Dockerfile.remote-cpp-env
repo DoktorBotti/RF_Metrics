@@ -12,10 +12,11 @@
 
 FROM ubuntu:20.04
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get update && apt-get -y install tzdata
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && TZ="DE" apt-get -y install tzdata
+
 
 RUN apt-get update \
-  && apt-get install -y ssh \
+   && apt-get install -y ssh \
       build-essential \
       gcc \
       g++ \
@@ -27,51 +28,55 @@ RUN apt-get update \
 	  git \
       python \
 	  python3-pip \
-	  curl sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo)
-	  
-# Install R-Prerequesites
-RUN apt-get install -y dirmngr \
-		gnupg \
-		apt-transport-https \
-		ca-certificates software-properties-common \
-	&& apt-get clean
-	
+	  flex \
+	  bison\
+	  libtbb-dev \
+	  r-base \
+	  dirmngr \
+      gnupg \
+      apt-transport-https \
+      ca-certificates software-properties-common \
+	  curl sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo) \
+
 # Add CRAN repository and install R
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
-	&& add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/' \
-	&& apt install -y r-base
+RUN apt-get update && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
+ 	&& add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/'
+
 # Install reference installation package
 RUN R -e "install.packages('TreeDist',dependencies=TRUE)"
 
+# create user for raxml, softwipe, and the ssh connection to CLion
+RUN useradd -m user \
+  && yes password | passwd user
+
+RUN usermod -s /bin/bash user
+
+
 # Install SoftWipe
 RUN pip3 install numpy scipy compiledb \
-	&& git clone https://github.com/adrianzap/softwipe.git \ 
+	&& git clone https://github.com/adrianzap/softwipe.git /home/user/softwipe \
 	&& apt-get install -y \
 		llvm \
 		clang-tidy \
 		cppcheck \
 	&& apt-get clean
-RUN cd softwipe \
+RUN cd /home/user/softwipe \
 	&& git clone https://github.com/Kitware/KWStyle.git \
 	&& cd KWStyle \
 	&& cmake . \
 	&& make -j 3 CC="clang" CXX="clang++" CFLAGS="" CXXFLAGS="" CPPFLAGS="" LDFLAGS="" \
 	&& make install
-RUN ln -s softwipe/softwipe.py sw \
-	&& chmod +x sw
-		
+RUN chmod 755 /home/user/softwipe/softwipe.py && /home/user/softwipe/softwipe.py || true
+RUN ln -s     /home/user/softwipe/softwipe.py /usr/bin/softwipe
+
 # Install and build alexis reference implementation for standard RF distance
-RUN git clone https://github.com/stamatak/standard-RAxML.git \
-	&& cd standard-RAxML \
+RUN git clone https://github.com/stamatak/standard-RAxML.git /home/user/raxml\
+	&& cd /home/user/raxml \
 	&& make -f Makefile.AVX.gcc \
 	&& rm *.o
-RUN ln -s standard-RAxML/raxmlHPC-AVX raxml \
-	&& chmod +x raxml
+RUN chmod 755 /home/user/raxml/raxmlHPC-AVX
+RUN ln -s     /home/user/raxml/raxmlHPC-AVX /usr/bin/raxml
 
-
-# Install own project dependencies
-RUN apt-get install -y bison \
-	flex
 
 # Start SSH-server for remote toolchain config (useful for i.e. CLion)
 RUN ( \
@@ -82,11 +87,5 @@ RUN ( \
   ) > /etc/ssh/sshd_config_test_clion \
   && mkdir /run/sshd
 
-RUN ( apt-get install -y libtbb-dev && apt-get clean)
-
-RUN useradd -m user \
-  && yes password | passwd user
-
-RUN usermod -s /bin/bash user
 
 CMD ["/usr/sbin/sshd", "-D", "-e", "-f", "/etc/ssh/sshd_config_test_clion"]

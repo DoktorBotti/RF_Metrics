@@ -3,6 +3,7 @@ build/*
 compile_commands.json
 bin/*
 data/*
+**/softwipe_*
 cmake-build-debug
 cmake-build-debug-remote-host
 cmake-build-release
