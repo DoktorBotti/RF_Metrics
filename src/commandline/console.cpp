@@ -2,11 +2,12 @@
 // Created by Robert Schmoltzi on 22.04.21.
 //
 
+#include "../../misc/gitVersionHeader.h"
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
+#include <iostream>
 #include <string>
 #include <vector>
-
 int main() {
   std::vector<std::string> tree_strings{
       "(a, b, (c, d));",
@@ -21,4 +22,5 @@ int main() {
     t.alignNodeIndices(*tree_list.begin());
     splits_list.emplace_back(t);
   }
+  std::cout << GIT_REVISION <<std::endl;
 }

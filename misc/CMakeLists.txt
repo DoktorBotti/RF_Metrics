@@ -14,3 +14,21 @@ if(NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*")
 )
 
 endif()
+
+# create target which spills out a header containing the current commit id
+IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
+    FIND_PACKAGE(Git)
+    IF(GIT_FOUND)
+        EXECUTE_PROCESS(
+                COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                OUTPUT_VARIABLE "gitCommit_BUILD_VERSION"
+                ERROR_QUIET
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        MESSAGE(STATUS "Git version: ${gitCommit_BUILD_VERSION}" )
+    ELSE(GIT_FOUND)
+        SET(gitCommit_BUILD_VERSION 0)
+    ENDIF(GIT_FOUND)
+ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/gitVersionHeader.h.in  ${CMAKE_CURRENT_BINARY_DIR}/gitVersionHeader.h @ONLY)

@@ -7,6 +7,24 @@
 #include <sstream>
 #include <string>
 
+std::string getOutputOfBashCommand(const std::string& cmd) {
+
+  std::string data;
+  FILE *      stream;
+  const int   max_buffer = 256;
+  char        buffer[max_buffer];
+  auto manipCommand = cmd;
+  manipCommand.append(" 2>&1");
+
+  stream = popen(manipCommand.c_str(), "r");
+
+  if (stream) {
+    while (!feof(stream))
+      if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+    pclose(stream);
+  }
+  return data;
+}
 // I LIED, its only the first tree!
 static std::string getFirstNTrees(size_t N = 1) {
   assert(N == 1);
@@ -64,4 +82,10 @@ TEST_CASE("Print first Split", "[useless]") {
     splits_list.emplace_back(t);
   }
   pllmod_utree_split_show(splits_list[0][0](), 5);
+}
+
+TEST_CASE("Check CPU output", "[useless]") {
+  const std::string command = "lscpu";
+  INFO(getOutputOfBashCommand(command));
+  REQUIRE(false);
 }
