@@ -1,9 +1,12 @@
 #pragma once
+
 #include "PllSplits.hpp"
+
 extern "C" {
 #include "libpll/pll.h"
 #include "libpll/pll_tree.h"
 }
+
 #include <exception>
 #include <string>
 #include <utility>
@@ -17,27 +20,32 @@ extern "C" {
  */
 class PllTree {
 public:
-  PllTree(const std::string &newick_string);
+    PllTree(const std::string &newick_string);
 
-  /* Rule of 5 constructors/destructors */
-  ~PllTree();
-  PllTree(const PllTree &other);
-  PllTree(PllTree &&other) : _tree{std::exchange(other._tree, nullptr)} {}
-  PllTree &operator=(const PllTree &other) { return *this = PllTree(other); }
-  PllTree &operator=(PllTree &&other) {
-    std::swap(_tree, other._tree);
-    return *this;
-  }
+    /* Rule of 5 constructors/destructors */
+    ~PllTree();
 
-  /* Getters */
+    PllTree(const PllTree &other);
 
-  const pll_utree_t *tree() const { return _tree; }
+    PllTree(PllTree &&other) noexcept: _tree{std::exchange(other._tree, nullptr)} {}
 
-  /*Actually important functions */
+    PllTree &operator=(const PllTree &other) { return *this = PllTree(other); }
 
-  PllSplitList makeSplits() const;
-  void         alignNodeIndices(const PllTree &other);
+    PllTree &operator=(PllTree &&other) noexcept {
+        std::swap(_tree, other._tree);
+        return *this;
+    }
+
+    /* Getters */
+
+    [[nodiscard]] const pll_utree_t *tree() const { return _tree; }
+
+    /*Actually important functions */
+
+    [[nodiscard]] PllSplitList makeSplits() const;
+
+    void alignNodeIndices(const PllTree &other);
 
 private:
-  pll_utree_t *_tree;
+    pll_utree_t *_tree;
 };
