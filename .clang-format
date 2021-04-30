@@ -1,13 +1,13 @@
 ---
-Language:        Cpp
-BasedOnStyle:  LLVM
+Language: Cpp
+BasedOnStyle: LLVM
 AllowShortIfStatementsOnASingleLine: Always
 AllowShortBlocksOnASingleLine: Always
 AllowShortLoopsOnASingleLine: true
 BinPackArguments: false
 BinPackParameters: false
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
 AlignOperands: true
 IndentWidth: 4
 BreakBeforeTernaryOperators: true
