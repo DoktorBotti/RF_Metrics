@@ -19,17 +19,21 @@ extern "C" {
  * functions on many trees.
  */
 class PllTree {
-public:
-    PllTree(const std::string &newick_string);
+  public:
+    explicit PllTree(const std::string &newick_string);
 
     /* Rule of 5 constructors/destructors */
     ~PllTree();
 
     PllTree(const PllTree &other);
 
-    PllTree(PllTree &&other) noexcept: _tree{std::exchange(other._tree, nullptr)} {}
+    PllTree(PllTree &&other) noexcept :
+        _tree{std::exchange(other._tree, nullptr)} {}
 
-    PllTree &operator=(const PllTree &other) { return *this = PllTree(other); }
+    PllTree &operator=(const PllTree &other) {
+        *this = PllTree(other);
+        return *this;
+    }
 
     PllTree &operator=(PllTree &&other) noexcept {
         std::swap(_tree, other._tree);
@@ -46,6 +50,6 @@ public:
 
     void alignNodeIndices(const PllTree &other);
 
-private:
+  private:
     pll_utree_t *_tree;
 };

@@ -1,13 +1,12 @@
+#include "../helpers/Util.h"
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
-#include "../helpers/Util.h"
 #include <catch2/catch.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-
 
 // I LIED, its only the first tree!
 static std::string get_first_n_trees(size_t N = 1) {
@@ -24,12 +23,10 @@ static std::string get_first_n_trees(size_t N = 1) {
     return out;
 }
 
-TEST_CASE("Catch2 integration", "[useless]") { REQUIRE(2 + 2 == 4); }
-
 TEST_CASE("sample code", "[useless]") {
     std::vector<std::string> tree_strings{
-            "(a, b, (c, d));",
-            "(a, d, (c, b));",
+        "(a, b, (c, d));",
+        "(a, d, (c, b));",
     };
     std::vector<PllTree> tree_list;
     for (auto t : tree_strings) { tree_list.emplace_back(t); }

@@ -10,9 +10,9 @@ size_t PllSplit::popcount(size_t len) const {
     for (size_t i = 0; i < len; ++i) {
         // Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
         if constexpr(sizeof(pll_split_base_t) == 4) {
-            popcount += __builtin_popcount(_split[i]);
+            popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
         } else if constexpr(sizeof(pll_split_base_t) == 8) {
-            popcount += __builtin_popcountll(_split[i]);
+            popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
         } else {
             throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
         }
@@ -59,8 +59,8 @@ PllSplitList::PllSplitList(const PllTree &tree) {
 }
 
 PllSplitList::PllSplitList(const PllSplitList &other) {
-    auto tmp_splits = (pll_split_t) calloc(other.computeSplitArraySize(),
-                                           sizeof(pll_split_base_t));
+    auto tmp_splits = static_cast<pll_split_t>( calloc(other.computeSplitArraySize(),
+                                           sizeof(pll_split_base_t)));
 
     memcpy(tmp_splits,
            other._splits[0](),

@@ -29,7 +29,7 @@ class PllTree;
  * iterate over the array to compute the correct value for popcount etc.
  */
 class PllSplit {
-public:
+  public:
     explicit PllSplit(pll_split_t s) : _split{s} {}
 
     pll_split_t operator()() const { return _split; }
@@ -51,7 +51,7 @@ public:
         return sizeof(pll_split_base_t) * 8;
     }
 
-private:
+  private:
     [[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
         return index / splitBitWidth();
     }
@@ -64,7 +64,7 @@ private:
 };
 
 class PllSplitList {
-public:
+  public:
     explicit PllSplitList(const PllTree &tree);
 
     /* Rule of 5 constructors/destructors */
@@ -72,30 +72,31 @@ public:
 
     PllSplitList(const PllSplitList &other);
 
-    PllSplitList(PllSplitList &&other) noexcept:
-            _splits(std::exchange(other._splits, {})) {}
+    PllSplitList(PllSplitList &&other) noexcept :
+        _splits(std::exchange(other._splits, {})) {}
 
     PllSplitList &operator=(const PllSplitList &other) {
-        return *this = PllSplitList(other);
-    };
+        *this = PllSplitList(other);
+        return *this;
+    }
 
-    PllSplitList &operator=(PllSplitList &&other)  noexcept {
+    PllSplitList &operator=(PllSplitList &&other) noexcept {
         std::swap(_splits, other._splits);
         return *this;
-    };
+    }
 
     PllSplit operator[](size_t index) const { return _splits[index]; }
 
     [[nodiscard]] size_t size() const { return _splits.size(); }
 
-private:
+  private:
     /* Computes the number of bits per split base */
     static constexpr size_t computeSplitBaseSize() {
         return sizeof(pll_split_base_t) * 8;
     }
 
-    /* Computes the number of pll_split_base_t's that are needed to store a single
-     * split
+    /* Computes the number of pll_split_base_t's that are needed to store a
+     * single split
      */
     [[nodiscard]] size_t computeSplitLen() const {
         size_t tip_count = _splits.size() + 3;
