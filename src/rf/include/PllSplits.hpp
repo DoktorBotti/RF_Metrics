@@ -30,18 +30,21 @@ class PllTree;
  */
 class PllSplit {
 public:
-    PllSplit(pll_split_t s) : _split{s} {}
+    explicit PllSplit(pll_split_t s) : _split{s} {}
 
     pll_split_t operator()() const { return _split; }
 
     [[nodiscard]] size_t popcount(size_t len) const;
 
-    [[nodiscard]] uint32_t bitExtract(size_t bit_index) const;
+    [[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
+    /* Trivial and operation. Not optimized as of now. */
     void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
 
+    /* Trivial or operation. Not optimized as of now. */
     void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
 
+    /* Trivial xor operation. Not optimized as of now. */
     void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
 
     [[nodiscard]] static constexpr size_t splitBitWidth() {
@@ -62,7 +65,7 @@ private:
 
 class PllSplitList {
 public:
-    PllSplitList(const PllTree &tree);
+    explicit PllSplitList(const PllTree &tree);
 
     /* Rule of 5 constructors/destructors */
     ~PllSplitList();

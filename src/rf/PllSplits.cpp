@@ -2,39 +2,44 @@
 #include "PllTree.hpp"
 
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "Simplify"
 /*  Calculates the Hamming weight of the split. */
 size_t PllSplit::popcount(size_t len) const {
     size_t popcount = 0;
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; ++i) {
         // Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
-        // Add #if directives for distinction between 4 and 8 byte wide pll_split_base_t
-        popcount += __builtin_popcount(_split[i]);
+        if constexpr(sizeof(pll_split_base_t) == 4) {
+            popcount += __builtin_popcount(_split[i]);
+        } else if constexpr(sizeof(pll_split_base_t) == 8) {
+            popcount += __builtin_popcountll(_split[i]);
+        } else {
+            throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
+        }
     }
     return popcount;
 }
+#pragma clang diagnostic pop
 
-uint32_t PllSplit::bitExtract(size_t bit_index) const {
+uint32_t PllSplit::bit_extract(size_t bit_index) const {
     pll_split_base_t split_part = _split[computeMajorIndex(bit_index)];
     return (split_part & (1u << computeMinorIndex(bit_index))) >> computeMinorIndex(bit_index);
 }
 
-/* Trivial and operation. Not optimized as of now. */
 void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *res) {
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; ++i) {
         res[i] = _split[i] & other._split[i];
     }
 }
 
-/* Trivial or operation. Not optimized as of now. */
 void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) {
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; ++i) {
         res[i] = _split[i] | other._split[i];
     }
 }
 
-/* Trivial xor operation. Not optimized as of now. */
 void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) {
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; ++i) {
         res[i] = _split[i] ^ other._split[i];
     }
 }
