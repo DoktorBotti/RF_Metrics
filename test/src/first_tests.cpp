@@ -1,5 +1,6 @@
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
+#include "../helpers/Util.h"
 #include <catch2/catch.hpp>
 #include <cstdlib>
 #include <fstream>
@@ -7,24 +8,7 @@
 #include <sstream>
 #include <string>
 
-std::string getOutputOfBashCommand(const std::string& cmd) {
 
-  std::string data;
-  FILE *      stream;
-  const int   max_buffer = 256;
-  char        buffer[max_buffer];
-  auto manipCommand = cmd;
-  manipCommand.append(" 2>&1");
-
-  stream = popen(manipCommand.c_str(), "r");
-
-  if (stream) {
-    while (!feof(stream))
-      if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
-    pclose(stream);
-  }
-  return data;
-}
 // I LIED, its only the first tree!
 static std::string getFirstNTrees(size_t N = 1) {
   assert(N == 1);
@@ -86,6 +70,6 @@ TEST_CASE("Print first Split", "[useless]") {
 
 TEST_CASE("Check CPU output", "[useless]") {
   const std::string command = "lscpu";
-  INFO(getOutputOfBashCommand(command));
+  INFO(Util::getOutputOfBashCommand(command));
   REQUIRE(false);
 }
