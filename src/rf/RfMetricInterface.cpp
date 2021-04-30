@@ -3,7 +3,7 @@
 //
 
 #include "RfMetricInterface.hpp"
-void RfMetricInterface::performStuffOnTree(PllTree *t) {
-  t->tree();
-  size_t someVal = 1337;
+
+void RfMetricInterface::do_magical_high_performance_stuff(const RfMetricInterface::Params& params) {
+
 }
