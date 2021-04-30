@@ -1,0 +1,42 @@
+
+
+WARNING: RAxML is not checking sequences for duplicate seqs and sites with missing data!
+
+
+
+This is RAxML version 8.2.12 released by Alexandros Stamatakis on May 2018.
+
+With greatly appreciated code contributions by:
+Andre Aberer      (HITS)
+Simon Berger      (HITS)
+Alexey Kozlov     (HITS)
+Kassian Kobert    (HITS)
+David Dao         (KIT and HITS)
+Sarah Lutteropp   (KIT and HITS)
+Nick Pattengale   (Sandia)
+Wayne Pfeiffer    (SDSC)
+Akifumi S. Tanabe (NRIFS)
+Charlie Taylor    (UF)
+
+
+RAxML computation of RF distances for all pairs of trees in a set of trees
+
+
+RAxML was called as follows:
+
+standard-RAxML/./raxmlHPC-AVX -m GTRCAT -f r -z ../Bioinformatics/practical-2021/test/res/data/heads/BS/SmallestTestRobin -n RUN_IDsmol 
+
+
+
+
+Found 2 trees in File ../Bioinformatics/practical-2021/test/res/data/heads/BS/SmallestTestRobin
+
+
+
+Average relative RF in this set: 0.095238
+
+
+Number of unique trees in this tree set: 2
+
+File containing all 1 pair-wise RF distances written to file /home/paincrash/Desktop/Raxml/RAxML_RF-Distances.RUN_IDsmol
+
