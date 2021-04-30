@@ -1,3 +1,5 @@
+add_subdirectory(IO)
+
 add_executable(commandline_rf console.cpp)
 target_link_libraries(commandline_rf rf_lib)
 target_include_directories(commandline_rf

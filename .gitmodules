@@ -7,3 +7,9 @@
 [submodule "libs/growt"]
 	path = libs/growt
 	url = https://github.com/TooBiased/growt.git
+[submodule "src/commandline/IO"]
+	path = src/commandline/IO
+	url = git@github.com:DoktorBotti/RF_Metrics_IO.git
+[submodule "IO"]
+	path = src/commandline/IO
+	url = git@github.com:DoktorBotti/RF_Metrics_IO.git
