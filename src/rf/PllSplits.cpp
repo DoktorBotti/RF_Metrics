@@ -1,18 +1,14 @@
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
 
-// extern "C" int _mm_popcnt_u32(unsigned int a);
 
 /*  Calculates the Hamming weight of the split. */
 size_t PllSplit::popcount(size_t len) const {
-    // Ideas for popcount:
-    // _mm_popcnt_u32() with IFDEFs for fallback -> #include x86intrin.h
-    // __builtin_popcount(), the clang builtin
-
     size_t popcount = 0;
     for (size_t i = 0; i < len; i++) {
+        // Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
+        // Add #if directives for distinction between 4 and 8 byte wide pll_split_base_t
         popcount += __builtin_popcount(_split[i]);
-        //popcount += _mm_popcnt_u32(_split[i]);
     }
     return popcount;
 }
@@ -21,6 +17,30 @@ uint32_t PllSplit::bitExtract(size_t bit_index) const {
     pll_split_base_t split_part = _split[computeMajorIndex(bit_index)];
     return (split_part & (1u << computeMinorIndex(bit_index))) >> computeMinorIndex(bit_index);
 }
+
+/* Trivial and operation. Not optimized as of now. */
+void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *res) {
+    for (size_t i = 0; i < len; i++) {
+        res[i] = _split[i] & other._split[i];
+    }
+}
+
+/* Trivial or operation. Not optimized as of now. */
+void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) {
+    for (size_t i = 0; i < len; i++) {
+        res[i] = _split[i] | other._split[i];
+    }
+}
+
+/* Trivial xor operation. Not optimized as of now. */
+void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) {
+    for (size_t i = 0; i < len; i++) {
+        res[i] = _split[i] ^ other._split[i];
+    }
+}
+
+
+// ------------- PllSplitList -------------
 
 PllSplitList::PllSplitList(const PllTree &tree) {
     auto tmp_splits = pllmod_utree_split_create(

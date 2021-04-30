@@ -7,6 +7,7 @@ data/*
 cmake-build-debug
 cmake-build-debug-remote-host
 cmake-build-release
+cmake-build-relwithdebinfo-remote-host
 roberts_paths.txt
 .idea
 .DS_Store

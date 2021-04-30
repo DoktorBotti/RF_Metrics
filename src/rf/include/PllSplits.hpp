@@ -38,6 +38,12 @@ public:
 
     [[nodiscard]] uint32_t bitExtract(size_t bit_index) const;
 
+    void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+
+    void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
+
+    void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
+
     [[nodiscard]] static constexpr size_t splitBitWidth() {
         return sizeof(pll_split_base_t) * 8;
     }
@@ -70,7 +76,7 @@ public:
         return *this = PllSplitList(other);
     };
 
-    PllSplitList &operator=(PllSplitList &&other) {
+    PllSplitList &operator=(PllSplitList &&other)  noexcept {
         std::swap(_splits, other._splits);
         return *this;
     };
