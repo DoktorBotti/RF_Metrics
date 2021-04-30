@@ -8,13 +8,15 @@
 
 #include <string>
 #include <vector>
+#include <PllSplits.hpp>
 
 class Util {
 public:
     /* Takes a string and executes it as a bash command. The output is returned as string.*/
-    static std::string getOutputOfBashCommand(const std::string& cmd);
+    static std::string get_output_of_bash_command(const std::string& cmd);
     /* Definitely should not be part of any standard library */
-    static std::vector<std::string> split(const std::string& str, const char delim);
+    static std::vector<std::string> split(const std::string& str, char delim);
+    static std::vector<PllSplitList> create_splits(int n, std::string file_name);
 };
 
 
