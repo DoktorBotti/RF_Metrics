@@ -5,14 +5,12 @@
 #ifndef INFORF_RFMETRICINTERFACE_H
 #define INFORF_RFMETRICINTERFACE_H
 
-#include "PllTree.hpp"
-#include <allocator/alignedallocator.hpp>
-#include <data-structures/table_config.hpp>
-
-using hasher_type = utils_tm::hash_tm::murmur2_hash;
-using allocator_type = growt::AlignedAllocator<>;
+#include <cstdio>
+#include <string>
+#include "LoggingBackend.h"
 
 class RfMetricInterface {
+  public:
     struct Params {
         size_t threads;
         std::string input_file_path;
@@ -21,8 +19,11 @@ class RfMetricInterface {
     };
     // This should be our class which we expose to others. Like our commandline
     // module
-    void do_magical_high_performance_stuff(const Params& params);
+    static void do_magical_high_performance_stuff(const Params& params);
 
+    void disable_logging();
+  private:
+    lg::LoggingBackend logging_backend;
 };
 
 #endif // INFORF_RFMETRICINTERFACE_H

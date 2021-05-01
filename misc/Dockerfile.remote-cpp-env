@@ -6,9 +6,9 @@
 #
 # stop:
 #   docker stop clion_remote_env
-# 
+#
 # ssh credentials (test user):
-#   user@password 
+#   user@password
 
 FROM ubuntu:20.04
 
@@ -66,6 +66,7 @@ RUN cd /home/user/softwipe \
 	&& cmake . \
 	&& make -j 3 CC="clang" CXX="clang++" CFLAGS="" CXXFLAGS="" CPPFLAGS="" LDFLAGS="" \
 	&& make install
+
 RUN chmod 755 /home/user/softwipe/softwipe.py && /home/user/softwipe/softwipe.py || true
 RUN ln -s     /home/user/softwipe/softwipe.py /usr/bin/softwipe
 
@@ -76,6 +77,13 @@ RUN git clone https://github.com/stamatak/standard-RAxML.git /home/user/raxml\
 	&& rm *.o
 RUN chmod 755 /home/user/raxml/raxmlHPC-AVX
 RUN ln -s     /home/user/raxml/raxmlHPC-AVX /usr/bin/raxml
+
+# install boost
+RUN cd /usr/local \
+	&& wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2 \
+	&& tar --bzip2 -xf boost_1_76_0.tar.bz2 && rm boost_1_76_0.tar.bz2 \
+	&& cd boost_1_76_0 && ./bootstrap.sh --with-libraries=thread,log --with-toolset=clang \
+	&& ./b2 && ./b2 install
 
 
 # Start SSH-server for remote toolchain config (useful for i.e. CLion)

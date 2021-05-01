@@ -12,6 +12,11 @@ add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib)
 
+
+# find and configure boost in system
+SET(Boost_USE_STATIC_LIBS ON)
+find_package(Boost 1.76.0 COMPONENTS log REQUIRED)
+
 # define compiler warning flags which then can be set for specific targets
 set(COMPILER_WARNING_FLAGS $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
         -Wall -Wunused-parameter

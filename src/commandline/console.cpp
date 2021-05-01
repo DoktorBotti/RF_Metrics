@@ -2,13 +2,11 @@
 // Created by Robert Schmoltzi on 22.04.21.
 //
 
-#include "../../misc/gitVersionHeader.h"
-#include "PllSplits.hpp"
-#include "PllTree.hpp"
-#include "../../test/helpers/Util.h"
-#include <iostream>
-#include <string>
-#include <vector>
+#include "RfMetricInterface.hpp"
+
 int main() {
+    RfMetricInterface interface;
+    RfMetricInterface::Params param;
+    interface.do_magical_high_performance_stuff(param);
     // TODO
 }
