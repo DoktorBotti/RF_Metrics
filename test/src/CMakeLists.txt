@@ -19,6 +19,7 @@ catch_discover_tests(catch2_tests)
 target_include_directories(catch2_tests PUBLIC
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${LOCALDEPS_DIR}/include>
+        ${CMAKE_BINARY_DIR}/misc/include
         rf_io_lib
         )
 target_compile_options(catch2_tests PRIVATE ${COMPILER_WARNING_FLAGS})

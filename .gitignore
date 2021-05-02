@@ -4,10 +4,7 @@ compile_commands.json
 bin/*
 data/*
 **/softwipe_*
-cmake-build-debug
-cmake-build-debug-remote-host
-cmake-build-release
-cmake-build-relwithdebinfo-remote-host
+cmake-build-*
 roberts_paths.txt
 .idea
 .DS_Store

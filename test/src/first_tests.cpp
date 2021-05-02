@@ -11,7 +11,7 @@
 // I LIED, its only the first tree!
 static std::string get_first_n_trees(size_t N = 1) {
     assert(N == 1);
-    std::string temporaryPath = "/home/user/tmpoutput.txt";
+    std::string temporaryPath = "/tmp/tmpoutput.txt";
     std::string command = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
     // command = "ls /";
     system(command.c_str());

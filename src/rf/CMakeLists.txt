@@ -7,6 +7,11 @@ add_library(rf_lib STATIC
         RfMetricInterface.cpp
         LoggingBackend.cpp
         include/LoggingBackend.h
+        include/RfAlgorithmInterface.h
+        StandardRfAlgo.cpp
+        include/StandardRfAlgo.h
+        SymmetricMatrix.cpp
+        include/SymmetricMatrix.h
         )
 
 set_target_properties(rf_lib PROPERTIES
@@ -22,7 +27,7 @@ target_link_libraries(rf_lib PUBLIC
 target_include_directories(rf_lib
         PUBLIC # our includes
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        ${CMAKE_BINARY_DIR}/misc
+        ${CMAKE_BINARY_DIR}/misc/include
         #SYSTEM INTERFACE # includes with (hopefully) no warnings and exported includes for other targets
 
         #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
