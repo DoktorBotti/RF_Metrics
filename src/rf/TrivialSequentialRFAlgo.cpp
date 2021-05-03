@@ -11,14 +11,13 @@ RfMetricInterface::Results TrivialSequentialRFAlgo::calculate(std::vector<PllTre
 		t.alignNodeIndices(*trees.begin());
 	}
 
-    for (size_t row = 0; row < trees.size(); ++row) {
+	for (size_t row = 0; row < trees.size(); ++row) {
 		for (size_t col = 0; col < row; ++col) {
 			result.pairwise_distances.set_at(row, col, rf_dist(trees[row], trees[col]));
 		}
 	}
 
 	return result;
-
 }
 
 size_t TrivialSequentialRFAlgo::rf_dist(const PllTree &t0, const PllTree &t1) {
@@ -36,7 +35,9 @@ size_t TrivialSequentialRFAlgo::rf_dist(const PllTree &t0, const PllTree &t1) {
 	return dist;
 }
 
-bool inline TrivialSequentialRFAlgo::splits_contain(const PllSplitList &splits, const PllSplit &split, size_t len) {
+bool inline TrivialSequentialRFAlgo::splits_contain(const PllSplitList &splits,
+                                                    const PllSplit &split,
+                                                    size_t len) {
 	for (size_t i = 0; i < splits.size(); ++i) {
 		if (splits[i].equals(split, len)) {
 			return false;

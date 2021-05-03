@@ -2,7 +2,6 @@
 // Created by Robert Schmoltzi on 03.05.21.
 //
 
-
 #include <TrivialSequentialRFAlgo.h>
 #include <catch2/catch.hpp>
 #include <iostream>
