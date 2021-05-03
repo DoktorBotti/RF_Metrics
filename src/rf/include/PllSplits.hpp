@@ -30,86 +30,97 @@ class PllTree;
  */
 class PllSplit {
   public:
-    explicit PllSplit(pll_split_t s) : _split{s} {}
+	explicit PllSplit(pll_split_t s) : _split{s} {
+	}
 
-    pll_split_t operator()() const { return _split; }
+	static size_t split_len;
 
-    [[nodiscard]] size_t popcount(size_t len) const;
+	pll_split_t operator()() const {
+		return _split;
+	}
 
-    [[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
+	[[nodiscard]] size_t popcount(size_t len) const;
 
-    /* Trivial and operation. Not optimized as of now. */
-    void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+	[[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
-    /* Trivial or operation. Not optimized as of now. */
-    void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
+	/* Trivial and operation. Not optimized as of now. */
+	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
 
-    /* Trivial xor operation. Not optimized as of now. */
-    void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
+	/* Trivial or operation. Not optimized as of now. */
+	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
 
-    [[nodiscard]] static constexpr size_t splitBitWidth() {
-        return sizeof(pll_split_base_t) * 8;
-    }
+	/* Trivial xor operation. Not optimized as of now. */
+	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
+
+	[[nodiscard]] static constexpr size_t splitBitWidth() {
+		return sizeof(pll_split_base_t) * 8;
+	}
 
   private:
-    [[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
-        return index / splitBitWidth();
-    }
+	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
+		return index / splitBitWidth();
+	}
 
-    [[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
-        return index % splitBitWidth();
-    }
+	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
+		return index % splitBitWidth();
+	}
 
-    pll_split_t _split;
+	pll_split_t _split;
 };
 
 class PllSplitList {
   public:
-    explicit PllSplitList(const PllTree &tree);
+	explicit PllSplitList(const PllTree &tree);
 
-    /* Rule of 5 constructors/destructors */
-    ~PllSplitList();
+	/* Rule of 5 constructors/destructors */
+	~PllSplitList();
 
-    PllSplitList(const PllSplitList &other);
+	PllSplitList(const PllSplitList &other);
 
-    PllSplitList(PllSplitList &&other) noexcept :
-        _splits(std::exchange(other._splits, {})) {}
+	PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})) {
+	}
 
-    PllSplitList &operator=(const PllSplitList &other) {
-        *this = PllSplitList(other);
-        return *this;
-    }
+	PllSplitList &operator=(const PllSplitList &other) {
+		*this = PllSplitList(other);
+		return *this;
+	}
 
-    PllSplitList &operator=(PllSplitList &&other) noexcept {
-        std::swap(_splits, other._splits);
-        return *this;
-    }
+	PllSplitList &operator=(PllSplitList &&other) noexcept {
+		std::swap(_splits, other._splits);
+		return *this;
+	}
 
-    PllSplit operator[](size_t index) const { return _splits[index]; }
+	PllSplit operator[](size_t index) const {
+		return _splits[index];
+	}
 
-    [[nodiscard]] size_t size() const { return _splits.size(); }
+	[[nodiscard]] size_t size() const {
+		return _splits.size();
+	}
+
+	/* Computes the number of pll_split_base_t's that are needed to store a
+	 * single split
+	 */
+	[[nodiscard]] size_t computeSplitLen() const {
+		size_t tip_count = _splits.size() + 3;
+		size_t split_len = (tip_count / computeSplitBaseSize());
+
+		if ((tip_count % computeSplitBaseSize()) > 0) {
+			split_len += 1;
+		}
+
+		return split_len;
+	}
 
   private:
-    /* Computes the number of bits per split base */
-    static constexpr size_t computeSplitBaseSize() {
-        return sizeof(pll_split_base_t) * 8;
-    }
+	/* Computes the number of bits per split base */
+	static constexpr size_t computeSplitBaseSize() {
+		return sizeof(pll_split_base_t) * 8;
+	}
 
-    /* Computes the number of pll_split_base_t's that are needed to store a
-     * single split
-     */
-    [[nodiscard]] size_t computeSplitLen() const {
-        size_t tip_count = _splits.size() + 3;
-        size_t split_len = (tip_count / computeSplitBaseSize());
+	[[nodiscard]] size_t computeSplitArraySize() const {
+		return computeSplitLen() * _splits.size();
+	}
 
-        if ((tip_count % computeSplitBaseSize()) > 0) { split_len += 1; }
-
-        return split_len;
-    }
-
-    [[nodiscard]] size_t computeSplitArraySize() const {
-        return computeSplitLen() * _splits.size();
-    }
-
-    std::vector<PllSplit> _splits;
+	std::vector<PllSplit> _splits;
 };
