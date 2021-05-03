@@ -45,6 +45,16 @@ void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *re
 	}
 }
 
+bool PllSplit::equals(const PllSplit &other, size_t len) const {
+    for (size_t i = 0; i < len; ++i) {
+        if (_split[i] != other._split[i]) {
+			return false;
+		}
+    }
+	return true;
+}
+
+
 // ------------- PllSplitList -------------
 
 PllSplitList::PllSplitList(const PllTree &tree) {

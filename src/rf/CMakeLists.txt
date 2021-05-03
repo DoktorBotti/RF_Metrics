@@ -13,6 +13,8 @@ add_library(rf_lib STATIC
         include/SymmetricMatrix.hpp
         helpers/Util.h
         helpers/Util.cpp
+        TrivialSequentialRFAlgo.cpp
+        include/TrivialSequentialRFAlgo.h
         )
 
 set_target_properties(rf_lib PROPERTIES

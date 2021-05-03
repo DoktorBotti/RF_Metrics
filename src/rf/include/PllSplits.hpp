@@ -43,8 +43,10 @@ class PllSplit {
 
 	[[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
-	/* Trivial and operation. Not optimized as of now. */
-	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+	[[nodiscard]] bool equals(const PllSplit &other, size_t len) const;
+
+    /* Trivial and operation. Not optimized as of now. */
+    void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
 
 	/* Trivial or operation. Not optimized as of now. */
 	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
