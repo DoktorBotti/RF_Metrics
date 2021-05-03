@@ -13,13 +13,14 @@
 #include <vector>
 class RfMetricInterface {
   public:
+    enum Metric { RF, MCI, MSI, SPI };
 	struct Params {
-		size_t threads;
+		size_t threads = 1;
 		std::string input_file_path;
 		std::string output_file_path;
-		enum { RF, MCI, MSI, SPI } metric;
+		Metric metric = Metric::RF;
 	};
-	struct Results {
+    struct Results {
 		explicit Results(size_t num_trees);
 
 		SymmetricMatrix<double> pairwise_distances;
