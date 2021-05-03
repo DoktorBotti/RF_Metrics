@@ -33,7 +33,7 @@ RfMetricInterface::do_magical_high_performance_stuff(const RfMetricInterface::Pa
 	}
 	Results results(tree_list.size());
 	switch (params.metric) {
-		case Params::RF: {
+		case Metric::RF: {
 			StandardRfAlgo standardAlgo;
 			standardAlgo.calculate(tree_list);
 			break;

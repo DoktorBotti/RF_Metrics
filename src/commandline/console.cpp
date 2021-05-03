@@ -66,7 +66,7 @@ std::vector<Flag> flags = {
 int main(int argc, char *argv[]) {
 	try {
 		if (argc == 1) {
-			std::cout << "Super RF metrics in the house. House is full. For details type:\n\n\t"
+			std::cout << "Super RF metrics is in the house. House is full. For details type:\n\n\t"
 			          << argv[0] << " help\n"
 			          << std::endl;
 			return 0;
@@ -103,8 +103,6 @@ int main(int argc, char *argv[]) {
 
 		//auto res = RfMetricInterface::do_magical_high_performance_stuff(params);
 
-		std::cout << "Metric: " << params.metric << std::endl
-		          << "-i" << params.input_file_path << std::endl;
 
 	} catch (const std::exception &err) {
 		std::cerr << "Exception : " << err.what() << std::endl;
