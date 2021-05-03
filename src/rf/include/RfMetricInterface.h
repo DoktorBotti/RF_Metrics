@@ -35,7 +35,6 @@ class RfMetricInterface {
 
   private:
 	lg::LoggingBackend logging_backend;
-	static std::vector<PllTree> create_all_trees(const std::string &file_name);
 };
 
 #endif // INFORF_RFMETRICINTERFACE_H

@@ -18,6 +18,10 @@ class Util {
     static std::vector<std::string> split(const std::string &str, char delim);
     static std::vector<PllSplitList> create_splits(int n, const std::string &file_name);
     static std::vector<PllTree> create_trees(int n, const std::string &file_name);
+    static std::vector<PllTree> create_all_trees(const std::string &file_name);
+
+  private:
+	static std::vector<PllTree> get_tree_from_string_list(std::vector<std::string> &tree_str);
 };
 
 #endif // CONCURRENT_GROWTABLE_UTIL_H
