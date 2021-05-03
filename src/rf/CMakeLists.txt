@@ -13,6 +13,8 @@ add_library(rf_lib STATIC
         include/SymmetricMatrix.hpp
         helpers/Util.h
         helpers/Util.cpp
+        include/HashmapKey.hpp
+        include/HashingFunctor.hpp
         TrivialSequentialRFAlgo.cpp
         include/TrivialSequentialRFAlgo.h
         )
