@@ -2,12 +2,11 @@
 #ifndef INFORF_RFALGORITHMINTERFACE_H
 #define INFORF_RFALGORITHMINTERFACE_H
 #include "PllTree.hpp"
-#include <vector>
 #include "SymmetricMatrix.h"
+#include <vector>
 
-class RfAlgorithmInterface
-{
+class RfAlgorithmInterface {
   public:
-     SymmetricMatrix calculate(const std::vector<PllTree>& trees);
+    virtual SymmetricMatrix calculate(std::vector<PllTree> &trees);
 };
 #endif // INFORF_RFALGORITHMINTERFACE_H

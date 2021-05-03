@@ -1,7 +1,7 @@
 add_library(rf_lib STATIC
         include/PllSplits.hpp
         include/PllTree.hpp
-        include/RfMetricInterface.hpp
+        include/RfMetricInterface.h
         PllTree.cpp
         PllSplits.cpp
         RfMetricInterface.cpp
