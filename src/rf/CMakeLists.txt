@@ -11,6 +11,8 @@ add_library(rf_lib STATIC
         StandardRfAlgo.cpp
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
+        helpers/Util.h
+        helpers/Util.cpp
         )
 
 set_target_properties(rf_lib PROPERTIES

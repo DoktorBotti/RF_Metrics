@@ -5,6 +5,7 @@
 #include "Util.h"
 #include <PllTree.hpp>
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -52,12 +53,25 @@ std::vector<PllTree> Util::create_trees(int n, const std::string & file_name) {
 	auto tree_single_str = get_output_of_bash_command("head -n " + std::to_string(n) + " " + file_name);
 	auto tree_str = Util::split(tree_single_str, '\n');
 
+	return get_tree_from_string_list(tree_str);
+}
+std::vector<PllTree> Util::get_tree_from_string_list(std::vector<std::string> &tree_str) {
 	std::vector<PllTree> trees;
 	trees.reserve(tree_str.size());
 	for (auto s : tree_str) {
 		trees.emplace_back(s);
 	}
-
 	return trees;
 }
+std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {
+    std::ifstream overview(file_name);
+    if (!overview.is_open()) {
 
+    }
+    // read entire file to string
+    std::string file_content((std::istreambuf_iterator<char>(overview)),
+                             (std::istreambuf_iterator<char>()));
+    overview.close();
+    auto tree_str = Util::split(file_content, '\n');
+	return get_tree_from_string_list(tree_str);
+}

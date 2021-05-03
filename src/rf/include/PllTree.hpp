@@ -30,10 +30,10 @@ class PllTree {
     PllTree(PllTree &&other) noexcept :
         _tree{std::exchange(other._tree, nullptr)} {}
 
-    PllTree &operator=(const PllTree &other) {
-        *this = PllTree(other);
-        return *this;
-    }
+//    PllTree &operator=(const PllTree &other) {
+//        *this = PllTree(other);
+//        return *this;
+//    }
 
     PllTree &operator=(PllTree &&other) noexcept {
         std::swap(_tree, other._tree);

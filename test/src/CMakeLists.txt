@@ -3,8 +3,6 @@ add_executable(catch2_tests
         main.cpp
         first_tests.cpp
         PllSplitsTest.cpp
-        ../helpers/Util.cpp
-        ../helpers/Util.h testIO.cpp
         )
 
 target_link_libraries(catch2_tests PUBLIC
