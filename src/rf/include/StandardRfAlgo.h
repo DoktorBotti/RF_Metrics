@@ -8,7 +8,7 @@
 
 class StandardRfAlgo : public RfAlgorithmInterface {
   public:
-    SymmetricMatrix calculate(std::vector<PllTree> &trees) override;
+    SymmetricMatrix<double> calculate(std::vector<PllTree> &trees) override;
 };
 
 #endif // INFORF_STANDARDRFALGO_H
