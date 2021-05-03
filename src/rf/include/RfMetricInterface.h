@@ -7,6 +7,7 @@
 
 #include "LoggingBackend.h"
 #include "PllTree.hpp"
+#include "SymmetricMatrix.hpp"
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -18,15 +19,22 @@ class RfMetricInterface {
 		std::string output_file_path;
 		enum { RF, MCI, MSI, SPI } metric;
 	};
+	struct Results {
+		explicit Results(size_t num_trees);
+
+		SymmetricMatrix<double> pairwise_distances;
+		size_t num_unique_trees = 0;
+		double mean_distance = NAN;
+	};
 	// This should be our class which we expose to others. Like our commandline
 	// module
-	static void do_magical_high_performance_stuff(const Params & params);
+	static Results do_magical_high_performance_stuff(const Params &params);
 
 	void disable_logging();
 
   private:
 	lg::LoggingBackend logging_backend;
-	static std::vector<PllTree> create_all_trees(const std::string & file_name);
+	static std::vector<PllTree> create_all_trees(const std::string &file_name);
 };
 
 #endif // INFORF_RFMETRICINTERFACE_H

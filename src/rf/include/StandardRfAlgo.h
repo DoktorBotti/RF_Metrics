@@ -5,10 +5,11 @@
 #ifndef INFORF_STANDARDRFALGO_H
 #define INFORF_STANDARDRFALGO_H
 #include "RfAlgorithmInterface.h"
-
+#include "PllTree.hpp"
+#include <vector>
 class StandardRfAlgo : public RfAlgorithmInterface {
   public:
-    SymmetricMatrix<double> calculate(std::vector<PllTree> &trees) override;
+	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
 };
 
 #endif // INFORF_STANDARDRFALGO_H
