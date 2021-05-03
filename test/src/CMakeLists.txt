@@ -3,6 +3,8 @@ add_executable(catch2_tests
         main.cpp
         first_tests.cpp
         PllSplitsTest.cpp
+        RFTest.cpp
+        ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
         )
 
 target_link_libraries(catch2_tests PUBLIC
