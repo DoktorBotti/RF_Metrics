@@ -11,7 +11,7 @@ template <typename T>
 class SymmetricMatrix {
   public:
 	explicit SymmetricMatrix(size_t num_elems);
-	void setAt(size_t row, size_t column, T val);
+	void set_at(size_t row, size_t column, T val);
 	T at(size_t row, size_t column);
 	size_t size();
 
@@ -30,8 +30,10 @@ SymmetricMatrix<T>::SymmetricMatrix(size_t num_elems) {
 	}
 }
 
+// Add unsafe_at and unsafe_set_at methods?
+
 template <typename T>
-void SymmetricMatrix<T>::setAt(size_t row, size_t column, T val) {
+void SymmetricMatrix<T>::set_at(size_t row, size_t column, T val) {
 	if (row >= column) {
 		matrix[row][column] = val;
 	} else {
