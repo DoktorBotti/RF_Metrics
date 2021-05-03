@@ -32,7 +32,7 @@ template <typename T>
 SymmetricMatrix<T>::SymmetricMatrix(size_t num_elems) {
 	dim = num_elems;
 	for (size_t i = 0; i < num_elems; ++i) {
-		matrix.emplace_back(i);
+		matrix.emplace_back(i+1); // +1 to contain the diagonal elements
 	}
 }
 

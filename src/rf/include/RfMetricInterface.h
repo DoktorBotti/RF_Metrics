@@ -23,7 +23,7 @@ class RfMetricInterface {
     struct Results {
 		explicit Results(size_t num_trees);
 
-		SymmetricMatrix<double> pairwise_distances;
+		SymmetricMatrix<size_t> pairwise_distances;
 		size_t num_unique_trees = 0;
 		double mean_distance = NAN;
 	};
