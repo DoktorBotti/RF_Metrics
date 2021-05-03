@@ -77,7 +77,7 @@ TEST_CASE("Check CPU output", "[useless]") {
 
 TEST_CASE("Calc standard RF distance", "[RF]") {
 	RfMetricInterface::Params libParams = {
-	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Params::RF};
+	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo;
 	algo.do_magical_high_performance_stuff(libParams);
 }

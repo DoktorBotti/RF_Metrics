@@ -11,8 +11,14 @@ template <typename T>
 class SymmetricMatrix {
   public:
 	explicit SymmetricMatrix(size_t num_elems);
+	/* Sets the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	void set_at(size_t row, size_t column, T val);
-	T at(size_t row, size_t column);
+	/* Sets the value at row, column. Checked, behaves like a symmetric matrix. */
+	void checked_set_at(size_t row, size_t column, T val);
+	/* Retrieves the value at row, column. Unchecked, the caller must guarantee row >= column. */
+	T at(size_t row, size_t column) const;
+	/* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
+	T checked_at(size_t row, size_t column) const;
 	size_t size();
 
   private:
@@ -30,25 +36,34 @@ SymmetricMatrix<T>::SymmetricMatrix(size_t num_elems) {
 	}
 }
 
-// Add unsafe_at and unsafe_set_at methods?
 
 template <typename T>
 void SymmetricMatrix<T>::set_at(size_t row, size_t column, T val) {
+	assert(row >= column);
+	matrix[row][column] = val;
+}
+
+template <typename T>
+T SymmetricMatrix<T>::at(size_t row, size_t column) const {
+	assert(row >= column);
+	return matrix[row][column];
+}
+
+template <typename T>
+size_t SymmetricMatrix<T>::size() {
+	return dim;
+}
+template <typename T>
+void SymmetricMatrix<T>::checked_set_at(size_t row, size_t column, T val) {
 	if (row >= column) {
 		matrix[row][column] = val;
 	} else {
 		matrix[column][row] = val;
 	}
 }
-
 template <typename T>
-T SymmetricMatrix<T>::at(size_t row, size_t column) {
+T SymmetricMatrix<T>::checked_at(size_t row, size_t column) const {
 	return row >= column ? matrix[row][column] : matrix[column][row];
-}
-
-template <typename T>
-size_t SymmetricMatrix<T>::size() {
-	return dim;
 }
 
 #endif // INFORF_SYMMETRICMATRIX_H
