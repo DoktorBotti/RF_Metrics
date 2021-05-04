@@ -5,6 +5,7 @@
 #include "LoggingBackend.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/log/core.hpp>
+#include <boost/core/null_deleter.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>
@@ -57,6 +58,11 @@ LoggingBackend::LoggingBackend() {
     // let only timing messages pass
     sink->set_filter( expressions::has_attr(tag_attr) && tag_attr == "timing");
     core::get()->add_sink(sink);
+
+	sink = boost::make_shared<text_sink>();
+	sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::cout, boost::null_deleter()));
+    sink->set_formatter(fmt);
+	core::get()->add_sink(sink);
 
     // Also adding other common attributes
     add_common_attributes();

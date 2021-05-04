@@ -75,7 +75,8 @@ TEST_CASE("Check CPU output", "[useless]") {
 	REQUIRE(false);
 }
 
-TEST_CASE("Calc standard RF distance", "[RF]") {
+TEST_CASE("Calc_standard_RF_distance", "[RF]") {
+	// ./commandline_rf --metric RF -i /rf_data/BS/125 -o /tmp/myout.txt -t 1
 	RfMetricInterface::Params libParams = {
 	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo;

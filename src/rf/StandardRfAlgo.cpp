@@ -46,22 +46,49 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 
 	BOOST_LOG_SEV(logger, lg::normal) << "PREPARE FOR TEXT-WALL!";
 	for (const auto &el : map) {
-		BOOST_LOG_SEV(logger, lg::normal) << "num ones in bitvect: " << el.second.count();
+		//BOOST_LOG_SEV(logger, lg::normal) << "num ones in bitvect: " << el.second.count();
 	}
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
-	SymmetricMatrix<size_t> num_matches(trees.size());
+	std::vector<std::unordered_map<size_t, size_t>> reduced_map(num_bitvec_entries);
+	// reduce results of hashmap -- does this make sense?
+	size_t count = 0;
 	for (const auto &el : map) {
-		for (size_t i = 0; i < num_bitvec_entries-1; ++i){
-			if (el.second.test(i)){
+        BOOST_LOG_SEV(logger, lg::normal) << "Working on " << ++count << "th element of " << map.size();
+        if (!el.second.any()) {
+			// counter should never be empty
+			assert(false);
+			continue;
+		}
+		for (size_t i = 0; i < num_bitvec_entries; ++i) {
+			if (el.second.test(i)) {
 				continue;
 			}
-            for (size_t j = i+1; j < num_bitvec_entries-1; ++j){
-				if(el.second.test(j)){
+            BOOST_LOG_SEV(logger, lg::normal) << "Inner element "<< i << " of " << num_bitvec_entries;
+
+            auto &inner_map = reduced_map[i];
+			for (size_t j = i + 1; j < num_bitvec_entries - 1; ++j) {
+				if (el.second.test(j)) {
 					continue;
 				}
-				size_t old_val= num_matches.at(j,i);
-				num_matches.set_at(j,i,old_val+2);
+				auto iter = inner_map.find(j);
+				if (iter != inner_map.end()) {
+					iter->second += 1;
+				} else {
+					inner_map.insert(std::make_pair(j, 1));
+				}
 			}
+		}
+	}
+    BOOST_LOG_SEV(logger, lg::normal) << "Creating pairwise matrix";
+    SymmetricMatrix<size_t> num_matches(trees.size());
+
+    // match every tree i to j -- did i loose information by reducing before?
+	for (size_t i = 0; i < num_bitvec_entries - 1; ++i) {
+		const auto& map = reduced_map[i];
+		for(const auto& el : map){
+			auto minEl = (i < el.first)? i : el.first;
+			auto maxEl = (i < el.first)? el.first : i;
+			num_matches.checked_set_at(maxEl, minEl, el.second);
 		}
 	}
 
