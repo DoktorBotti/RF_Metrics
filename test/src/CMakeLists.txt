@@ -4,6 +4,7 @@ add_executable(catch2_tests
         first_tests.cpp
         PllSplitsTest.cpp
         RFTest.cpp
+        testIO.cpp
         ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
         )
 
