@@ -29,16 +29,15 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	const size_t num_bitvec_entries = trees.size() + 1;
 	for (const auto &list_el : splits_list) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
-			HashmapKey key(list_el.getPtrToNthElem(split_num));
+			HashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not const *)
 			auto iter = map.find(key);
 			if (iter != map.end()) {
 				// set the bitvector value at tree_index
-				iter->second.set(list_el.getTreeId());
+				iter->second.set(list_el.getTreeId()); // TODO: Tree id not needed
 			} else {
-				// sets a singular bit to initialize the bitset
-				size_t init_val = 1 << list_el.size();
 				// allcoate bitvetcor and store a single value at tree_index
-				boost::dynamic_bitset<> bits(num_bitvec_entries, init_val);
+				boost::dynamic_bitset<> bits(num_bitvec_entries, 0);
+				bits.set(list_el.getTreeId()); // TODO: push_back not needed -> faster type anywhere?
 				map.insert(std::make_pair(key, std::move(bits)));
 			}
 		}
@@ -48,6 +47,7 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
 	SymmetricMatrix<size_t> pairwise_dst(trees.size());
+	// max_pairwise_dst eq to 2 * (num taxa -3)
 	size_t max_pairwise_dst = 2 * splits_list[0].size();
 	size_t summed_dst = 0;
 	for (size_t i = 0; i < trees.size(); ++i) {
@@ -58,11 +58,10 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 		}
 		for (size_t j = 0; j < i; ++j) {
 			for (const auto &el : map) {
-				if (!el.second.test(j) || !el.second.test(i)) {
-					continue;
+				if (el.second.test(j) && el.second.test(i)) {
+                    size_t old_val = pairwise_dst.at(i, j);
+                    pairwise_dst.set_at(i, j, old_val - 2);
 				}
-				size_t old_val = pairwise_dst.at(i, j);
-				pairwise_dst.set_at(i, j, old_val - 2);
 			}
 			summed_dst += pairwise_dst.at(i, j);
 		}
