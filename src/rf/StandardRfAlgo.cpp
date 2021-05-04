@@ -29,7 +29,8 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	const size_t num_bitvec_entries = trees.size() + 1;
 	for (const auto &list_el : splits_list) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
-			HashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not const *)
+			HashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not
+			                                                    // const *)
 			auto iter = map.find(key);
 			if (iter != map.end()) {
 				// set the bitvector value at tree_index
@@ -37,7 +38,8 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 			} else {
 				// allcoate bitvetcor and store a single value at tree_index
 				boost::dynamic_bitset<> bits(num_bitvec_entries, 0);
-				bits.set(list_el.getTreeId()); // TODO: push_back not needed -> faster type anywhere?
+				bits.set(list_el.getTreeId()); // TODO: push_back not needed -> faster type
+				                               // anywhere?
 				map.insert(std::make_pair(key, std::move(bits)));
 			}
 		}
@@ -50,29 +52,42 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	// max_pairwise_dst eq to 2 * (num taxa -3)
 	size_t max_pairwise_dst = 2 * splits_list[0].size();
 	size_t summed_dst = 0;
+
+	// initializing matrix
 	for (size_t i = 0; i < trees.size(); ++i) {
-		BOOST_LOG_SEV(logger, lg::normal) << "Row " << i << " of " << trees.size();
-		// init distance to maximum
 		for (size_t j = 0; j < i; ++j) {
 			pairwise_dst.set_at(i, j, max_pairwise_dst);
 		}
-		for (size_t j = 0; j < i; ++j) {
-			for (const auto &el : map) {
-				if (el.second.test(j) && el.second.test(i)) {
-                    size_t old_val = pairwise_dst.at(i, j);
-                    pairwise_dst.set_at(i, j, old_val - 2);
+	}
+	// for each split, subtract found pairing
+	for (const auto &el : map) {
+		for (size_t i = 0; i < trees.size(); ++i) {
+			BOOST_LOG_SEV(logger, lg::normal) << "Row " << i << " of " << trees.size();
+			if (!el.second.test(i)) {
+				continue;
+			}
+			for (size_t j = 0; j < i; ++j) {
+				if (el.second.test(j)) {
+					size_t old_val = pairwise_dst.at(i, j);
+					pairwise_dst.set_at(i, j, old_val - 2);
 				}
 			}
-			summed_dst += pairwise_dst.at(i, j);
+		}
+		for (size_t i = 0; i < trees.size(); ++i) {
+			for (size_t j = 0; j < i; ++j) {
+				summed_dst += pairwise_dst.at(i, j);
+			}
 		}
 	}
-	double mean_dst = static_cast<double>(summed_dst) / static_cast<double>(trees.size() * (trees.size()-1));
-    BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
-    RfMetricInterface::Results res(trees.size());
+
+	double mean_dst =
+	    static_cast<double>(summed_dst) / static_cast<double>(trees.size() * (trees.size() - 1));
+	BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
+	RfMetricInterface::Results res(trees.size());
 	res.pairwise_distances = pairwise_dst;
 	res.mean_distance = mean_dst;
 
-    return res;
+	return res;
 }
 StandardRfAlgo::StandardRfAlgo() {
 	// optionally provide a tag
