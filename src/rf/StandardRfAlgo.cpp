@@ -45,27 +45,35 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	}
 
 	BOOST_LOG_SEV(logger, lg::normal) << "PREPARE FOR TEXT-WALL!";
-	for (const auto &el : map) {
-		BOOST_LOG_SEV(logger, lg::normal) << "num ones in bitvect: " << el.second.count();
-	}
+
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
-	SymmetricMatrix<size_t> num_matches(trees.size());
-	for (const auto &el : map) {
-		for (size_t i = 0; i < num_bitvec_entries-1; ++i){
-			if (el.second.test(i)){
-				continue;
-			}
-            for (size_t j = i+1; j < num_bitvec_entries-1; ++j){
-				if(el.second.test(j)){
+	SymmetricMatrix<size_t> pairwise_dst(trees.size());
+	size_t max_pairwise_dst = 2 * splits_list[0].size();
+	size_t summed_dst = 0;
+	for (size_t i = 0; i < trees.size(); ++i) {
+		BOOST_LOG_SEV(logger, lg::normal) << "Row " << i << " of " << trees.size();
+		// init distance to maximum
+		for (size_t j = 0; j < i; ++j) {
+			pairwise_dst.set_at(i, j, max_pairwise_dst);
+		}
+		for (size_t j = 0; j < i; ++j) {
+			for (const auto &el : map) {
+				if (!el.second.test(j) || !el.second.test(i)) {
 					continue;
 				}
-				size_t old_val= num_matches.at(j,i);
-				num_matches.set_at(j,i,old_val+2);
+				size_t old_val = pairwise_dst.at(i, j);
+				pairwise_dst.set_at(i, j, old_val - 2);
 			}
+			summed_dst += pairwise_dst.at(i, j);
 		}
 	}
+	double mean_dst = static_cast<double>(summed_dst) / static_cast<double>(trees.size() * (trees.size()-1));
+    BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
+    RfMetricInterface::Results res(trees.size());
+	res.pairwise_distances = pairwise_dst;
+	res.mean_distance = mean_dst;
 
-	return RfMetricInterface::Results(trees.size());
+    return res;
 }
 StandardRfAlgo::StandardRfAlgo() {
 	// optionally provide a tag
