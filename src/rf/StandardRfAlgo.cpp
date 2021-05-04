@@ -26,6 +26,7 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 
 	std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> map;
 	const size_t num_inner_splits = splits_list[0].size();
+	const size_t num_bitvec_entries = trees.size() + 1;
 	for (const auto &list_el : splits_list) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
 			HashmapKey key(list_el.getPtrToNthElem(split_num));
@@ -37,7 +38,7 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 				// sets a singular bit to initialize the bitset
 				size_t init_val = 1 << list_el.size();
 				// allcoate bitvetcor and store a single value at tree_index
-				boost::dynamic_bitset<> bits(trees.size() + 1, init_val);
+				boost::dynamic_bitset<> bits(num_bitvec_entries, init_val);
 				map.insert(std::make_pair(key, std::move(bits)));
 			}
 		}
@@ -50,7 +51,18 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
 	SymmetricMatrix<size_t> num_matches(trees.size());
 	for (const auto &el : map) {
-		// TODO
+		for (size_t i = 0; i < num_bitvec_entries-1; ++i){
+			if (el.second.test(i)){
+				continue;
+			}
+            for (size_t j = i+1; j < num_bitvec_entries-1; ++j){
+				if(el.second.test(j)){
+					continue;
+				}
+				size_t old_val= num_matches.at(j,i);
+				num_matches.set_at(j,i,old_val+2);
+			}
+		}
 	}
 
 	return RfMetricInterface::Results(trees.size());
