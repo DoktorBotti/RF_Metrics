@@ -1,13 +1,12 @@
 
 #include "include/StandardRfAlgo.h"
 #include <boost/dynamic_bitset.hpp>
-#include <unordered_map>
 
 #include <boost/log/sources/record_ostream.hpp>
 
 // needed to add a tag
 #include <boost/log/attributes/constant.hpp>
-#include <iostream>
+
 RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees) {
 	// extract splits
 	std::vector<PllSplitList> splits_list;
@@ -27,6 +26,9 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> map;
 	const size_t num_inner_splits = splits_list[0].size();
 	const size_t num_bitvec_entries = trees.size() + 1;
+
+	// Adds all splits into a hashmap. The value is a bitvector whose 1's represent all trees which
+	// contain this split.
 	for (const auto &list_el : splits_list) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
 			HashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not
@@ -53,30 +55,33 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	size_t max_pairwise_dst = 2 * splits_list[0].size();
 	size_t summed_dst = 0;
 
-	// initializing matrix
-	for (size_t i = 0; i < trees.size(); ++i) {
-		for (size_t j = 0; j < i; ++j) {
-			pairwise_dst.set_at(i, j, max_pairwise_dst);
-		}
-	}
-	// for each split, subtract found pairing
+	// Increments each matrix entry for each split which is in both trees.
 	for (const auto &el : map) {
 		for (size_t i = 0; i < trees.size(); ++i) {
-			BOOST_LOG_SEV(logger, lg::normal) << "Row " << i << " of " << trees.size();
 			if (!el.second.test(i)) {
 				continue;
 			}
+			BOOST_LOG_SEV(logger, lg::normal) << "Row " << i << " of " << trees.size();
+
 			for (size_t j = 0; j < i; ++j) {
 				if (el.second.test(j)) {
 					size_t old_val = pairwise_dst.at(i, j);
-					pairwise_dst.set_at(i, j, old_val - 2);
+					pairwise_dst.set_at(i, j, old_val + 1);
 				}
 			}
 		}
-		for (size_t i = 0; i < trees.size(); ++i) {
-			for (size_t j = 0; j < i; ++j) {
-				summed_dst += pairwise_dst.at(i, j);
-			}
+	}
+
+	// Calculates the RF metric by subtracting two times the intersection size from the sum of both
+	// sizes.
+	for (size_t i = 0; i < trees.size(); ++i) {
+		// init distance to maximum
+		for (size_t j = 0; j < i; ++j) {
+			size_t tmp = max_pairwise_dst - (pairwise_dst.at(i, j) << 1); // * 2
+			assert(tmp < max_pairwise_dst);
+			pairwise_dst.set_at(i, j, tmp);
+
+			summed_dst += tmp;
 		}
 	}
 
