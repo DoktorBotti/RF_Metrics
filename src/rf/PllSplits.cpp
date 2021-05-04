@@ -71,7 +71,7 @@ PllSplitList::PllSplitList(const PllTree &tree) {
 PllSplitList::PllSplitList(const PllSplitList &other) {
 	auto tmp_splits =
 	    static_cast<pll_split_t>(calloc(other.computeSplitArraySize(), sizeof(pll_split_base_t)));
-
+    _tree_id = other._tree_id;
 	memcpy(
 	    tmp_splits, other._splits[0](), other.computeSplitArraySize() * sizeof(pll_split_base_t));
 

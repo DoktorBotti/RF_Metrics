@@ -45,8 +45,8 @@ class PllSplit {
 
 	[[nodiscard]] bool equals(const PllSplit &other, size_t len) const;
 
-    /* Trivial and operation. Not optimized as of now. */
-    void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+	/* Trivial and operation. Not optimized as of now. */
+	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
 
 	/* Trivial or operation. Not optimized as of now. */
 	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
@@ -79,7 +79,7 @@ class PllSplitList {
 
 	PllSplitList(const PllSplitList &other);
 
-	PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})) {
+	PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
 	}
 
 	PllSplitList &operator=(const PllSplitList &other) {
@@ -113,6 +113,16 @@ class PllSplitList {
 
 		return split_len;
 	}
+	PllSplit const *getPtrToNthElem(size_t i) const {
+		return &_splits.at(i);
+	};
+
+	[[nodiscard]] size_t inline getTreeId() const {
+		return _tree_id;
+	}
+	void inline setTreeId(size_t id) {
+		_tree_id = id;
+	}
 
   private:
 	/* Computes the number of bits per split base */
@@ -125,4 +135,5 @@ class PllSplitList {
 	}
 
 	std::vector<PllSplit> _splits;
+	size_t _tree_id = 0;
 };

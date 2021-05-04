@@ -8,9 +8,9 @@
 
 struct HashingFunctor {
 	std::size_t operator()(const HashmapKey &key) const {
-		size_t hash = key.split.operator()()[0];
+		size_t hash = key.split->operator()()[0];
 		for (size_t i = 1; i < PllSplit::split_len; ++i) {
-			hash ^= key.split.operator()()[i];
+			hash ^= key.split->operator()()[i];
 		}
 		return hash;
 	}
