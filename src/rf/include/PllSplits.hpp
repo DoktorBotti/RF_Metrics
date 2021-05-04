@@ -113,7 +113,7 @@ class PllSplitList {
 
 		return split_len;
 	}
-	PllSplit const *getPtrToNthElem(size_t i) const {
+	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const {
 		return &_splits.at(i);
 	};
 

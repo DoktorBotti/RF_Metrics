@@ -20,7 +20,7 @@ class SymmetricMatrix {
 	/* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
 	T checked_at(size_t row, size_t column) const;
 	size_t size();
-
+    std::vector<std::vector<T>> to_vector() const;
   private:
 	std::vector<std::vector<T>> matrix;
 	size_t dim;
@@ -63,6 +63,10 @@ void SymmetricMatrix<T>::checked_set_at(size_t row, size_t column, T val) {
 template <typename T>
 T SymmetricMatrix<T>::checked_at(size_t row, size_t column) const {
 	return row >= column ? matrix[row][column] : matrix[column][row];
+}
+template <typename T>
+std::vector<std::vector<T>> SymmetricMatrix<T>::to_vector() const {
+	return matrix;
 }
 
 #endif // INFORF_SYMMETRICMATRIX_H

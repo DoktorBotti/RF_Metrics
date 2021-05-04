@@ -101,7 +101,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		// auto res = RfMetricInterface::do_magical_high_performance_stuff(params);
+		 auto res = RfMetricInterface(params);
+		 res.do_magical_high_performance_stuff();
+		 bool success = res.write_result_to_file();
+		 assert(success);
 
 	} catch (const std::exception &err) {
 		std::cerr << "Exception : " << err.what() << std::endl;
