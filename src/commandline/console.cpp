@@ -30,7 +30,7 @@ struct Flag {
 	}
 };
 
-std::vector<Flag> flags = {
+const static std::vector<Flag> flags = {
     {"--metric",
      1,
      "[ RF | MCI | MSI | SPI ] The metric to be calculated.",
@@ -72,17 +72,13 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}
 
-		sort(std::begin(flags), std::end(flags), [](const Flag &l, const Flag &r) {
-			return l.name < r.name;
-		});
-
 		bool flag_found = false;
 		int arg_pos = 1;
 		RfMetricInterface::Params params;
-		while (arg_pos != argc) {
+		while (arg_pos < argc) {
 			flag_found = false;
 			for (auto &c : flags) {
-				if (c.name == argv[arg_pos]) {
+				if (!flag_found && c.name == argv[arg_pos]) {
 					if (arg_pos + 1 + c.parameter_count > argc)
 						throw std::runtime_error("Not enough parameters to command " + c.name);
 
