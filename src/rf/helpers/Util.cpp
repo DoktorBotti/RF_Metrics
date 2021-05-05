@@ -13,13 +13,13 @@ std::string Util::get_output_of_bash_command(const std::string & cmd) {
 	std::string data;
 	FILE * stream;
 	const int max_buffer = 256;
-	char buffer[max_buffer];
 	auto manipCommand = cmd;
 	manipCommand.append(" 2>&1");
 
 	stream = popen(manipCommand.c_str(), "r");
 
 	if (stream) {
+        char buffer[max_buffer];
 		while (!feof(stream))
 			if (fgets(buffer, max_buffer, stream) != nullptr)
 				data.append(buffer);
@@ -56,11 +56,7 @@ std::vector<PllTree> Util::create_trees(int n, const std::string & file_name) {
 	return get_tree_from_string_list(tree_str);
 }
 std::vector<PllTree> Util::get_tree_from_string_list(std::vector<std::string> &tree_str) {
-	std::vector<PllTree> trees;
-	trees.reserve(tree_str.size());
-	for (auto s : tree_str) {
-		trees.emplace_back(s);
-	}
+	std::vector<PllTree> trees(tree_str.begin(), tree_str.end());
 	return trees;
 }
 std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {

@@ -108,6 +108,6 @@ int main(int argc, char *argv[]) {
 
 	} catch (const std::exception &err) {
 		std::cerr << "Exception : " << err.what() << std::endl;
-		throw err;
+		throw;
 	}
 }

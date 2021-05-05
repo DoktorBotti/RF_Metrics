@@ -19,7 +19,7 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 		tree_list = Util::create_all_trees(parameters.input_file_path);
 	} catch (const std::invalid_argument &ex) {
 		BOOST_LOG_SEV(logger, lg::error) << ex.what();
-		throw ex;
+		throw;
 	}
 	result_ptr = std::make_unique<Results>(tree_list.size());
 	switch (parameters.metric) {
