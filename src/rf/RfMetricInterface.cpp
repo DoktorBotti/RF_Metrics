@@ -67,7 +67,7 @@ io::IOData RfMetricInterface::get_result_as_IOData() const {
     assert(has_calculated);
     io::IOData output;
 	output.pairwise_distance_mtx = result_ptr->pairwise_distances_relative.to_vector();
-	output.mean_modified_rf_dst = result_ptr->mean_distance;
+	output.mean_rf_dst = result_ptr->mean_distance;
 	output.number_of_unique_trees = result_ptr->num_unique_trees;
 	return output;
 }
