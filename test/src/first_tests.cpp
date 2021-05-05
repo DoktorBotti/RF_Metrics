@@ -9,24 +9,6 @@
 #include <sstream>
 #include <string>
 
-TEST_CASE("sample code", "[useless]") {
-	std::vector<std::string> tree_strings{
-	    "(a, b, (c, d));",
-	    "(a, d, (c, b));",
-	};
-	std::vector<PllTree> tree_list;
-	for (auto t : tree_strings) {
-		tree_list.emplace_back(t);
-	}
-
-	std::vector<PllSplitList> splits_list;
-
-	for (auto &t : tree_list) {
-		t.alignNodeIndices(*tree_list.begin());
-		splits_list.emplace_back(t);
-	}
-}
-
 TEST_CASE("read first test tree", "[data]") {
 	std::string temporaryPath = "/home/user/tmpoutput.txt";
 	std::string command = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
@@ -56,4 +38,12 @@ TEST_CASE("Check CPU output", "[useless]") {
 	const std::string command = "lscpu";
 	INFO(Util::get_output_of_bash_command(command));
 	REQUIRE(false);
+}
+
+TEST_CASE("Checked methods SymmetricMatrix", "[SymMtx]") {
+	SymmetricMatrix<size_t> mat(2);
+	const size_t val = 1337;
+	mat.checked_set_at(0,1,val);
+	REQUIRE(mat.checked_at(0,1) == val);
+	REQUIRE(mat.at(1,0) == val);
 }

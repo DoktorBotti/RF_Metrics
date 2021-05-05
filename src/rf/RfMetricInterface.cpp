@@ -14,6 +14,9 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 	BOOST_LOG_SEV(logger, lg::critical) << "Everything crumbles, shoot me now!";
 	BOOST_LOG_SEV(logger, lg::normal) << "Program is based on commit " << GIT_REVISION;
 	std::vector<PllTree> tree_list;
+	if(parameters.threads > 1){
+        BOOST_LOG_SEV(logger, lg::warning) << "No support for multi-core processing yet. Continuing with singular core.";
+    }
 	try {
 		tree_list = Util::create_all_trees(parameters.input_file_path);
 	} catch (const std::invalid_argument &ex) {
@@ -26,7 +29,9 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			result_ptr = std::make_unique<Results>(standardAlgo.calculate(tree_list));
 			break;
 		}
-		default:
+		case Metric::MCI:
+		case Metric::MSI:
+		case Metric::SPI:
 			BOOST_LOG_SEV(logger, lg::critical) << "Other metrics not yet implemented!";
 			throw std::invalid_argument("This metric has not been implemented");
 	}
