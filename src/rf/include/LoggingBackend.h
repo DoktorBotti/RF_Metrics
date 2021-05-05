@@ -13,7 +13,7 @@ enum SeverityLevel { normal, notification, warning, error, critical };
 class LoggingBackend {
   public:
     LoggingBackend();
-    void disable_logging();
+    static void disable_logging();
   private:
     const std::string full_logging_path = "/tmp/rfdst_full.log";
     const std::string important_logging_path = "/tmp/rfdst_important.log";
