@@ -6,7 +6,7 @@
 #include <vector>
 class RfAlgorithmInterface {
   public:
-	virtual RfMetricInterface::Results calculate(std::vector<PllTree> & trees) = 0;
+	virtual RfMetricInterface::Results calculate(std::vector<PllTree> &trees) = 0;
 	virtual ~RfAlgorithmInterface() = default;
 };
 

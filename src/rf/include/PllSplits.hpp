@@ -115,7 +115,7 @@ class PllSplitList {
 	}
 	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const {
 		return &_splits.at(i);
-	};
+	}
 
 	[[nodiscard]] size_t inline getTreeId() const {
 		return _tree_id;

@@ -34,7 +34,7 @@ class RfMetricInterface {
 		SymmetricMatrix<size_t> pairwise_distances_absolute;
 		SymmetricMatrix<double> pairwise_distances_relative;
 		size_t num_unique_trees = 0;
-		double mean_distance = NAN;
+		double mean_distance = static_cast<double>(NAN);
 	};
 	// This should be our class which we expose to others. Like our commandline
 	// module

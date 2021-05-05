@@ -1,1 +1,1 @@
-../bin/commandline_rf
+../bin/commandline_rf --metric RF -i ../test/samples/data/heads/BS/141 -o /tmp/softwipe_exe.txt
