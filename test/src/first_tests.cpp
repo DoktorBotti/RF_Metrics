@@ -80,6 +80,8 @@ TEST_CASE("Calc standard RF distance", "[RF]") {
 	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo(libParams);
 	algo.do_magical_high_performance_stuff();
+	INFO(algo.get_result().num_unique_trees);
 	INFO(algo.get_result().mean_distance);
+	INFO(algo.get_result().pairwise_distances.checked_at(5, 20));
 	REQUIRE(false);
 }
