@@ -3,6 +3,7 @@
 #include <boost/dynamic_bitset.hpp>
 
 #include <boost/log/sources/record_ostream.hpp>
+#include <boost/pending/disjoint_sets.hpp>
 
 // needed to add a tag
 #include <boost/log/attributes/constant.hpp>
@@ -72,6 +73,13 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 		}
 	}
 
+	std::vector<size_t> rank(trees.size());
+	std::vector<size_t> parent(trees.size());
+	boost::disjoint_sets<size_t *, size_t *> d_set(&rank[0], &parent[0]);
+	for (size_t i = 0; i < trees.size(); ++i) {
+		d_set.make_set(i);
+	}
+
 	// Calculates the RF metric by subtracting two times the intersection size from the sum of both
 	// sizes.
 	for (size_t i = 0; i < trees.size(); ++i) {
@@ -79,18 +87,29 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 		for (size_t j = 0; j < i; ++j) {
 			size_t tmp = max_pairwise_dst - (pairwise_dst.at(i, j) << 1); // * 2
 			assert(tmp < max_pairwise_dst);
-			pairwise_dst.set_at(i, j, tmp);
+			pairwise_dst.set_at(i, j, tmp); // TODO: Count 0's or 1's timing
 
 			summed_dst += tmp;
+
+			if (tmp == 0) {
+				d_set.union_set(i, j);
+			}
 		}
 	}
 
+	// TODO: WTF is there no simpler way?
+	std::vector<size_t> tree_reps(trees.size());
+	std::iota(tree_reps.begin(), tree_reps.end(), 0);
+	size_t unique_trees = d_set.count_sets(tree_reps.begin(), tree_reps.end());
+
 	double mean_dst =
-	    static_cast<double>(summed_dst) / static_cast<double>(trees.size() * (trees.size() - 1));
+	    static_cast<double>(summed_dst) /
+	    static_cast<double>((trees.size() * (trees.size() - 1) * max_pairwise_dst) >> 1);
 	BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
 	RfMetricInterface::Results res(trees.size());
 	res.pairwise_distances = pairwise_dst;
 	res.mean_distance = mean_dst;
+	res.num_unique_trees = unique_trees;
 
 	return res;
 }
