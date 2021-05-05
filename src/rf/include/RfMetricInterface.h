@@ -28,7 +28,8 @@ class RfMetricInterface {
 	struct Results {
 		explicit Results(size_t num_trees);
 
-		SymmetricMatrix<size_t> pairwise_distances;
+		SymmetricMatrix<size_t> pairwise_distances_absolute;
+		SymmetricMatrix<double> pairwise_distances_relative;
 		size_t num_unique_trees = 0;
 		double mean_distance = NAN;
 	};
@@ -46,9 +47,6 @@ class RfMetricInterface {
 	bool has_calculated = false;
 	std::unique_ptr<Results> result_ptr;
 	lg::LoggingBackend logging_backend;
-
-	static std::vector<std::vector<double>>
-	to_relative_dst(const std::vector<std::vector<size_t>> &lower_abs_mtx, size_t num_unique_trees);
 };
 
 #endif // INFORF_RFMETRICINTERFACE_H

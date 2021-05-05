@@ -48,8 +48,6 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 		}
 	}
 
-	BOOST_LOG_SEV(logger, lg::normal) << "PREPARE FOR TEXT-WALL!";
-
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
 	SymmetricMatrix<size_t> pairwise_dst(trees.size());
 	// max_pairwise_dst eq to 2 * (num taxa -3)
@@ -107,7 +105,16 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	    static_cast<double>((trees.size() * (trees.size() - 1) * max_pairwise_dst) >> 1);
 	BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
 	RfMetricInterface::Results res(trees.size());
-	res.pairwise_distances = pairwise_dst;
+	res.pairwise_distances_absolute = pairwise_dst;
+	for (size_t i = 0; i < res.pairwise_distances_absolute.size(); ++i) {
+		for (size_t j = 0; j < i; ++j) {
+			res.pairwise_distances_relative.set_at(
+			    i,
+			    j,
+			    static_cast<double>(res.pairwise_distances_absolute.at(i, j)) /
+			        static_cast<double>(max_pairwise_dst));
+		}
+	}
 	res.mean_distance = mean_dst;
 	res.num_unique_trees = unique_trees;
 

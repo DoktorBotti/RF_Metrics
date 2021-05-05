@@ -9,21 +9,6 @@
 #include <sstream>
 #include <string>
 
-// I LIED, its only the first tree!
-static std::string get_first_n_trees(size_t N = 1) {
-	assert(N == 1);
-	std::string temporaryPath = "/tmp/tmpoutput.txt";
-	std::string command = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
-	// command = "ls /";
-	system(command.c_str());
-	std::stringstream ss;
-	auto stream = std::ifstream(temporaryPath);
-	ss << stream.rdbuf();
-	CHECK(stream.is_open());
-	std::string out = ss.str();
-	return out;
-}
-
 TEST_CASE("sample code", "[useless]") {
 	std::vector<std::string> tree_strings{
 	    "(a, b, (c, d));",
@@ -36,7 +21,7 @@ TEST_CASE("sample code", "[useless]") {
 
 	std::vector<PllSplitList> splits_list;
 
-	for (auto & t : tree_list) {
+	for (auto &t : tree_list) {
 		t.alignNodeIndices(*tree_list.begin());
 		splits_list.emplace_back(t);
 	}
@@ -60,7 +45,7 @@ TEST_CASE("Print first Split", "[useless]") {
 
 	std::vector<PllSplitList> splits_list;
 
-	for (auto & t : tree_list) {
+	for (auto &t : tree_list) {
 		t.alignNodeIndices(*tree_list.begin());
 		splits_list.emplace_back(t);
 	}

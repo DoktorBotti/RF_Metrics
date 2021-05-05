@@ -13,7 +13,7 @@ RfMetricInterface::Results TrivialSequentialRFAlgo::calculate(std::vector<PllTre
 
 	for (size_t row = 0; row < trees.size(); ++row) {
 		for (size_t col = 0; col < row; ++col) {
-			result.pairwise_distances.set_at(row, col, rf_dist(trees[row], trees[col]));
+			result.pairwise_distances_absolute.set_at(row, col, rf_dist(trees[row], trees[col]));
 		}
 	}
 

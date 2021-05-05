@@ -66,24 +66,12 @@ bool RfMetricInterface::write_result_to_file() {
 io::IOData RfMetricInterface::get_result_as_IOData() const {
     assert(has_calculated);
     io::IOData output;
-	output.pairwise_distance_mtx = to_relative_dst(result_ptr->pairwise_distances.to_vector(), result_ptr->num_unique_trees);
+	output.pairwise_distance_mtx = result_ptr->pairwise_distances_relative.to_vector();
 	output.mean_modified_rf_dst = result_ptr->mean_distance;
 	output.number_of_unique_trees = result_ptr->num_unique_trees;
 	return output;
 }
-std::vector<std::vector<double>>
-RfMetricInterface::to_relative_dst(const std::vector<std::vector<size_t>> &lower_abs_mtx,
-                                   size_t num_unique_trees) {
-	std::vector<std::vector<double>> res(lower_abs_mtx.size());
-	for (const auto &input_row : lower_abs_mtx) {
-		std::vector<double> &newRow = res.emplace_back(input_row.size());
-		std::transform(
-		    input_row.begin(), input_row.end(), newRow.begin(), [num_unique_trees](size_t in) {
-			    return static_cast<double>(in) / static_cast<double>(num_unique_trees);
-		    });
-	}
-	return res;
-}
 
-RfMetricInterface::Results::Results(size_t num_trees) : pairwise_distances(num_trees) {
+
+RfMetricInterface::Results::Results(size_t num_trees) : pairwise_distances_absolute(num_trees) , pairwise_distances_relative(num_trees){
 }

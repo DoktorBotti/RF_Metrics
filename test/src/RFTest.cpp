@@ -9,14 +9,14 @@
 #include <utility>
 #include <rf/helpers/Util.h>
 
-TEST_CASE("trivial sequential RF algorithm", "[rf-algo]") {
+TEST_CASE("trivial sequential RF algorithm", "[rf-algo][long]") {
 	auto trees = Util::create_trees(9, "/rf_data/BS/125");
 	TrivialSequentialRFAlgo alg;
 	auto res = alg.calculate(trees);
 	// TODO something to actually compare against
 }
 
-TEST_CASE("Calc standard RF distance", "[RF]") {
+TEST_CASE("Calc standard RF distance", "[RF][long]") {
 	RfMetricInterface::Params libParams = {
 	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo(libParams);

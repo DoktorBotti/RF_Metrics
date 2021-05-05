@@ -62,7 +62,7 @@ std::vector<PllTree> Util::get_tree_from_string_list(std::vector<std::string> &t
 std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {
     std::ifstream overview(file_name);
     if (!overview.is_open()) {
-//TODO
+        throw std::invalid_argument("Could not open input file");
     }
     // read entire file to string
     std::string file_content((std::istreambuf_iterator<char>(overview)),
