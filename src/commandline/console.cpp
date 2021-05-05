@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 			return l.name < r.name;
 		});
 
-		bool flag_found;
+		bool flag_found = false;
 		int arg_pos = 1;
 		RfMetricInterface::Params params;
 		while (arg_pos != argc) {
