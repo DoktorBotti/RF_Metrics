@@ -64,6 +64,8 @@ io::IOData RfMetricInterface::get_result_as_IOData() const {
     assert(has_calculated);
     io::IOData output;
 	output.pairwise_distance_mtx = to_relative_dst(result_ptr->pairwise_distances.to_vector(), result_ptr->num_unique_trees);
+	output.mean_modified_rf_dst = result_ptr->mean_distance;
+	output.number_of_unique_trees = result_ptr->num_unique_trees;
 	return output;
 }
 std::vector<std::vector<double>>
@@ -78,10 +80,6 @@ RfMetricInterface::to_relative_dst(const std::vector<std::vector<size_t>> &lower
 		    });
 	}
 	return res;
-}
-io::IOData RfMetricInterface::get_result_as_IO() const {
-	assert(has_calculated);
-	return get_result_as_IO();
 }
 
 RfMetricInterface::Results::Results(size_t num_trees) : pairwise_distances(num_trees) {
