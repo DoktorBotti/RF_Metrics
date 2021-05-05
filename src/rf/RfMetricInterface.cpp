@@ -57,8 +57,10 @@ bool RfMetricInterface::write_result_to_file() {
 
 		out_stream << j;
 		out_stream.close();
+		return true;
 	} else {
 		BOOST_LOG_SEV(logger, lg::critical) << "Could not write to outputfile";
+		return false;
 	}
 }
 io::IOData RfMetricInterface::get_result_as_IOData() const {

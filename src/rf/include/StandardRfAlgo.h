@@ -16,7 +16,7 @@ class StandardRfAlgo : public RfAlgorithmInterface {
 	StandardRfAlgo();
 	StandardRfAlgo(const StandardRfAlgo &) = default;
 	StandardRfAlgo(StandardRfAlgo &&) = default;
-	~StandardRfAlgo() = default;
+	~StandardRfAlgo() override = default;
 	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
 
   private:
