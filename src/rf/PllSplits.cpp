@@ -6,13 +6,13 @@ size_t PllSplit::popcount(size_t len) const {
 	size_t popcount = 0;
 	for (size_t i = 0; i < len; ++i) {
 		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
-//		if constexpr (sizeof(pll_split_base_t) == 4) {
-			popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
-//		} else if constexpr (sizeof(pll_split_base_t) == 8) {
-//			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
-//		} else {
-//			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
-//		}
+		//		if constexpr (sizeof(pll_split_base_t) == 4) {
+		popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
+		//		} else if constexpr (sizeof(pll_split_base_t) == 8) {
+		//			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
+		//		} else {
+		//			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
+		//		}
 	}
 	return popcount;
 }
@@ -78,7 +78,7 @@ PllSplitList::PllSplitList(const PllSplitList &other) {
 
 PllSplitList::~PllSplitList() {
 	if (!_splits.empty()) {
-		free(_splits[0]()); // Probably fine. Always allocate all Splits in a single chunk of
+		free(_splits[0]()); // Probably fine. Always allocate all splits in a single chunk of
 		                    // memory!!
 	}
 }
