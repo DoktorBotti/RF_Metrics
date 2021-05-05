@@ -15,8 +15,6 @@ add_library(rf_lib STATIC
         helpers/Util.cpp
         include/HashmapKey.hpp
         include/HashingFunctor.hpp
-        TrivialSequentialRFAlgo.cpp
-        include/TrivialSequentialRFAlgo.h
         )
 
 set_target_properties(rf_lib PROPERTIES

@@ -2,19 +2,12 @@
 // Created by Robert Schmoltzi on 03.05.21.
 //
 
-#include <TrivialSequentialRFAlgo.h>
+#include <RfMetricInterface.h>
 #include <catch2/catch.hpp>
 #include <filesystem>
 #include <iostream>
-#include <utility>
 #include <rf/helpers/Util.h>
-
-TEST_CASE("trivial sequential RF algorithm", "[rf-algo][long]") {
-	auto trees = Util::create_trees(9, "/rf_data/BS/125");
-	TrivialSequentialRFAlgo alg;
-	auto res = alg.calculate(trees);
-	// TODO something to actually compare against
-}
+#include <utility>
 
 TEST_CASE("Calc standard RF distance", "[RF][long]") {
 	RfMetricInterface::Params libParams = {
