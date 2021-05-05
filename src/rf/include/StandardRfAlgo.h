@@ -9,6 +9,7 @@
 #include "RfAlgorithmInterface.h"
 #include <boost/log/sources/severity_logger.hpp>
 
+#include <boost/dynamic_bitset.hpp>
 #include <vector>
 
 class StandardRfAlgo : public RfAlgorithmInterface {
@@ -21,6 +22,17 @@ class StandardRfAlgo : public RfAlgorithmInterface {
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+	static std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor>
+	insert_all_splits(const std::vector<PllSplitList> &split_lists,
+	                  size_t num_inner_splits,
+	                  size_t num_bitvec_entries);
+	SymmetricMatrix<size_t> pairwise_occurences(
+	    const std::vector<PllTree> &trees,
+	    const std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> &map);
+	static size_t calc_rf_and_unique_trees(size_t tree_size,
+	                                       SymmetricMatrix<size_t> &pairwise_dst,
+	                                       size_t max_pairwise_dst,
+	                                       size_t &summed_dst);
 };
 
 #endif // INFORF_STANDARDRFALGO_H
