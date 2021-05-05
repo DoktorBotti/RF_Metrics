@@ -10,7 +10,7 @@ if(NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*")
         ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND
         #${CMAKE_COMMAND} -E touch ./genFile
-        /bin/bash -c "softwipe -CM ${CMAKE_CURRENT_SOURCE_DIR}/../ -e executeFile -x ${CMAKE_CURRENT_SOURCE_DIR}/../libs,${CMAKE_CURRENT_SOURCE_DIR}/../utils,${CMAKE_CURRENT_SOURCE_DIR},${CMAKE_CURRENT_SOURCE_DIR}/../src/commandline/IO/json -a ASSERT,CHECK,REQUIRE"
+        /bin/bash -c "softwipe -CM ${CMAKE_SOURCE_DIR} -e executeFile -x ${CMAKE_SOURCE_DIR}/libs,${CMAKE_SOURCE_DIR}/utils,${CMAKE_CURRENT_SOURCE_DIR},${CMAKE_SOURCE_DIR}/src/commandline/IO/json,${PROJECT_BINARY_DIR} -a ASSERT,CHECK,REQUIRE"
 )
 
 endif()
