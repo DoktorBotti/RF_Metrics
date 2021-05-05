@@ -37,7 +37,7 @@ class RfMetricInterface {
 	void do_magical_high_performance_stuff();
 	Results &get_result();
 	bool write_result_to_file();
-	[[nodiscard]] io::IOData get_result_as_IO() const;
+	[[nodiscard]] io::IOData get_result_as_IOData() const;
 	void disable_logging();
 
   private:
@@ -49,7 +49,6 @@ class RfMetricInterface {
 
 	static std::vector<std::vector<double>>
 	to_relative_dst(const std::vector<std::vector<size_t>> &lower_abs_mtx, size_t num_unique_trees);
-	[[nodiscard]] io::IOData get_result_as_IOData() const;
 };
 
 #endif // INFORF_RFMETRICINTERFACE_H

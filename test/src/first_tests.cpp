@@ -56,9 +56,7 @@ TEST_CASE("read first test tree", "[data]") {
 }
 
 TEST_CASE("Print first Split", "[useless]") {
-	std::string firstTree = get_first_n_trees(1);
-	std::vector<PllTree> tree_list;
-	tree_list.emplace_back(firstTree);
+	auto tree_list = Util::create_trees(1, "/rf_data/BS/24");
 
 	std::vector<PllSplitList> splits_list;
 
@@ -72,16 +70,5 @@ TEST_CASE("Print first Split", "[useless]") {
 TEST_CASE("Check CPU output", "[useless]") {
 	const std::string command = "lscpu";
 	INFO(Util::get_output_of_bash_command(command));
-	REQUIRE(false);
-}
-
-TEST_CASE("Calc standard RF distance", "[RF]") {
-	RfMetricInterface::Params libParams = {
-	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
-	RfMetricInterface algo(libParams);
-	algo.do_magical_high_performance_stuff();
-	INFO(algo.get_result().num_unique_trees);
-	INFO(algo.get_result().mean_distance);
-	INFO(algo.get_result().pairwise_distances.checked_at(5, 20));
 	REQUIRE(false);
 }
