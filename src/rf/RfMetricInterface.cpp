@@ -33,6 +33,7 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			throw std::invalid_argument("This metric has not been implemented");
 			break;
 	}
+	has_calculated = true;
 }
 void RfMetricInterface::disable_logging() {
 	logging_backend.disable_logging();
