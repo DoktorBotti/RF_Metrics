@@ -42,7 +42,7 @@ class RfMetricInterface {
 	Results &get_result();
 	bool write_result_to_file();
 	[[nodiscard]] io::IOData get_result_as_IOData() const;
-	void disable_logging();
+	static void disable_logging();
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;

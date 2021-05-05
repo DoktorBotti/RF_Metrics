@@ -1,6 +1,5 @@
 
 #include "RfMetricInterface.h"
-#include "../../commandline/IO/IOData.h"
 #include "gitVersionHeader.h"
 #include "helpers/Util.h"
 #include "include/StandardRfAlgo.h"
@@ -30,17 +29,16 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 		default:
 			BOOST_LOG_SEV(logger, lg::critical) << "Other metrics not yet implemented!";
 			throw std::invalid_argument("This metric has not been implemented");
-			break;
 	}
 	has_calculated = true;
 }
 void RfMetricInterface::disable_logging() {
-	logging_backend.disable_logging();
+	lg::LoggingBackend::disable_logging();
 }
 RfMetricInterface::RfMetricInterface(RfMetricInterface::Params params)
     : parameters(std::move(params)) {
-    // optionally provide a tag
-    logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("INTERFACE"));
+	// optionally provide a tag
+	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("INTERFACE"));
 }
 RfMetricInterface::Results &RfMetricInterface::get_result() {
 	assert(has_calculated);
@@ -57,20 +55,19 @@ bool RfMetricInterface::write_result_to_file() {
 		out_stream << j;
 		out_stream.close();
 		return true;
-	} else {
-		BOOST_LOG_SEV(logger, lg::critical) << "Could not write to outputfile";
-		return false;
 	}
+	BOOST_LOG_SEV(logger, lg::critical) << "Could not write to outputfile";
+	return false;
 }
 io::IOData RfMetricInterface::get_result_as_IOData() const {
-    assert(has_calculated);
-    io::IOData output;
+	assert(has_calculated);
+	io::IOData output;
 	output.pairwise_distance_mtx = result_ptr->pairwise_distances_relative.to_vector();
 	output.mean_rf_dst = result_ptr->mean_distance;
 	output.number_of_unique_trees = result_ptr->num_unique_trees;
 	return output;
 }
 
-
-RfMetricInterface::Results::Results(size_t num_trees) : pairwise_distances_absolute(num_trees) , pairwise_distances_relative(num_trees){
+RfMetricInterface::Results::Results(size_t num_trees)
+    : pairwise_distances_absolute(num_trees), pairwise_distances_relative(num_trees) {
 }

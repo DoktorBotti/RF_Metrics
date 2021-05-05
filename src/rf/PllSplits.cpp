@@ -1,24 +1,21 @@
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "Simplify"
 /*  Calculates the Hamming weight of the split. */
 size_t PllSplit::popcount(size_t len) const {
 	size_t popcount = 0;
 	for (size_t i = 0; i < len; ++i) {
 		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
-		if constexpr (sizeof(pll_split_base_t) == 4) {
+//		if constexpr (sizeof(pll_split_base_t) == 4) {
 			popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
-		} else if constexpr (sizeof(pll_split_base_t) == 8) {
-			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
-		} else {
-			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
-		}
+//		} else if constexpr (sizeof(pll_split_base_t) == 8) {
+//			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
+//		} else {
+//			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
+//		}
 	}
 	return popcount;
 }
-#pragma clang diagnostic pop
 
 uint32_t PllSplit::bit_extract(size_t bit_index) const {
 	pll_split_base_t split_part = _split[computeMajorIndex(bit_index)];
@@ -46,14 +43,13 @@ void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *re
 }
 
 bool PllSplit::equals(const PllSplit &other, size_t len) const {
-    for (size_t i = 0; i < len; ++i) {
-        if (_split[i] != other._split[i]) {
+	for (size_t i = 0; i < len; ++i) {
+		if (_split[i] != other._split[i]) {
 			return false;
 		}
-    }
+	}
 	return true;
 }
-
 
 // ------------- PllSplitList -------------
 
@@ -71,7 +67,7 @@ PllSplitList::PllSplitList(const PllTree &tree) {
 PllSplitList::PllSplitList(const PllSplitList &other) {
 	auto tmp_splits =
 	    static_cast<pll_split_t>(calloc(other.computeSplitArraySize(), sizeof(pll_split_base_t)));
-    _tree_id = other._tree_id;
+	_tree_id = other._tree_id;
 	memcpy(
 	    tmp_splits, other._splits[0](), other.computeSplitArraySize() * sizeof(pll_split_base_t));
 
@@ -82,6 +78,7 @@ PllSplitList::PllSplitList(const PllSplitList &other) {
 
 PllSplitList::~PllSplitList() {
 	if (!_splits.empty()) {
-		free(_splits[0]());
+		free(_splits[0]()); // Probably fine. Always allocate all Splits in a single chunk of
+		                    // memory!!
 	}
 }
