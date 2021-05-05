@@ -23,9 +23,7 @@ class StandardRfAlgo : public RfAlgorithmInterface {
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	static std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor>
-	insert_all_splits(const std::vector<PllSplitList> &split_lists,
-	                  size_t num_inner_splits,
-	                  size_t num_bitvec_entries);
+	insert_all_splits(const std::vector<PllSplitList> &split_lists);
 	SymmetricMatrix<size_t> pairwise_occurences(
 	    const std::vector<PllTree> &trees,
 	    const std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> &map);

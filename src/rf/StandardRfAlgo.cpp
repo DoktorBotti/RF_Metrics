@@ -8,34 +8,35 @@
 #include <boost/log/attributes/constant.hpp>
 
 RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees) {
+
 	// extract splits
-	std::vector<PllSplitList> splits_list;
+	std::vector<PllSplitList> split_lists;
 	size_t curr_tree = 0;
 	assert(!trees.empty());
 	for (auto &t : trees) {
 		t.alignNodeIndices(*trees.begin());
-		splits_list.emplace_back(t);
-		splits_list.back().setTreeId(curr_tree++);
+		split_lists.emplace_back(t);
+		split_lists.back().setTreeId(curr_tree++);
 	}
+	assert(split_lists.size() == trees.size());
+
 	// define hashmap for counting similar splits
 	BOOST_LOG_SEV(logger, lg::normal) << "Starting with HashMap insertion";
 	// this occurs once and determines how long the splits are and consequently,
 	// how much elements are part of hashing in splits
-	PllSplit::split_len = splits_list[0].computeSplitLen();
+	PllSplit::split_len = split_lists[0].computeSplitLen();
 
-	const size_t num_inner_splits = splits_list[0].size();
-	const size_t num_bitvec_entries = trees.size() + 1;
-
-	auto map = insert_all_splits(splits_list, num_inner_splits, num_bitvec_entries);
+	auto map = insert_all_splits(split_lists);
 
 	BOOST_LOG_SEV(logger, lg::normal) << "Counting pairwise tree matches";
 
-	size_t max_pairwise_dst = 2 * splits_list[0].size();
+	size_t max_pairwise_dst = 2 * split_lists[0].size();
 	// max_pairwise_dst eq to 2 * (num taxa - 3);
 	size_t summed_dst = 0;
 	auto pairwise_dst = pairwise_occurences(trees, map);
 
-	auto unique_trees = calc_rf_and_unique_trees(trees.size(), pairwise_dst, max_pairwise_dst, summed_dst);
+	auto unique_trees =
+	    calc_rf_and_unique_trees(trees.size(), pairwise_dst, max_pairwise_dst, summed_dst);
 
 	double mean_dst =
 	    static_cast<double>(summed_dst) /
@@ -116,9 +117,10 @@ SymmetricMatrix<size_t> StandardRfAlgo::pairwise_occurences(
 }
 
 std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor>
-StandardRfAlgo::insert_all_splits(const std::vector<PllSplitList> &split_lists,
-                                  const size_t num_inner_splits,
-                                  const size_t num_bitvec_entries) {
+StandardRfAlgo::insert_all_splits(const std::vector<PllSplitList> &split_lists) {
+	const size_t num_inner_splits = split_lists[0].size();
+	const size_t num_bitvec_entries = split_lists.size() + 1;
+
 	// Adds all splits into a hashmap. The value is a bitvector whose 1's represent all trees which
 	// contain this split.
 	std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> map;
