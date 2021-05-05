@@ -27,6 +27,9 @@ class RfMetricInterface {
 	explicit RfMetricInterface(Params params);
 	struct Results {
 		explicit Results(size_t num_trees);
+		Results(const Results& ) = default;
+		Results(Results&& ) = default;
+		~Results() = default;
 
 		SymmetricMatrix<size_t> pairwise_distances_absolute;
 		SymmetricMatrix<double> pairwise_distances_relative;

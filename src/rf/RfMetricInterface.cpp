@@ -21,11 +21,10 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 		BOOST_LOG_SEV(logger, lg::error) << ex.what();
 		throw;
 	}
-	result_ptr = std::make_unique<Results>(tree_list.size());
 	switch (parameters.metric) {
 		case Metric::RF: {
 			StandardRfAlgo standardAlgo;
-			*result_ptr = standardAlgo.calculate(tree_list);
+			result_ptr = std::make_unique<Results>(standardAlgo.calculate(tree_list));
 			break;
 		}
 		default:

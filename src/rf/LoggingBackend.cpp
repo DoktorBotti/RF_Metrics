@@ -62,7 +62,7 @@ LoggingBackend::LoggingBackend() {
     add_common_attributes();
 }
 void LoggingBackend::disable_logging() {
-    boost::log::core::get()->remove_all_sinks();
+    boost::log::core::get()->set_logging_enabled(false);
 }
 std::ostream &operator<<(std::ostream &strm, SeverityLevel level) {
     static const char* strings[] =
