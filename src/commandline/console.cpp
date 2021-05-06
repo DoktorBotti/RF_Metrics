@@ -66,9 +66,10 @@ const static std::vector<Flag> flags = {
 int main(int argc, char *argv[]) {
 	try {
 		if (argc == 1) {
-			std::cout << "Super RF metrics is in the house. House is full. For details type:\n\n\t"
-			          << argv[0] << " help\n"
-			          << std::endl;
+			std::cout << "Please use the format: " << argv[0]
+			          << " --metric [ RF | MCI | MSI | SPI ]"
+			          << " -i [input-file-path]"
+			          << " -o [output-file-path]" << std::endl;
 			return 0;
 		}
 
@@ -97,10 +98,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		 auto res = RfMetricInterface(params);
-		 res.do_magical_high_performance_stuff();
-		 bool success = res.write_result_to_file();
-		 assert(success);
+		auto res = RfMetricInterface(params);
+		res.do_magical_high_performance_stuff();
+		bool success = res.write_result_to_file();
+		assert(success);
 
 	} catch (const std::exception &err) {
 		std::cerr << "Exception : " << err.what() << std::endl;
