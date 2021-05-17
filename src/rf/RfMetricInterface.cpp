@@ -5,6 +5,7 @@
 #include "include/StandardRfAlgo.h"
 #include <PllTree.hpp>
 #include <fstream>
+#include "MsiAlgo.h"
 
 // boost includes
 #include <boost/log/attributes/constant.hpp>
@@ -14,9 +15,10 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 	BOOST_LOG_SEV(logger, lg::critical) << "Everything crumbles, shoot me now!";
 	BOOST_LOG_SEV(logger, lg::normal) << "Program is based on commit " << GIT_REVISION;
 	std::vector<PllTree> tree_list;
-	if(parameters.threads > 1){
-        BOOST_LOG_SEV(logger, lg::warning) << "No support for multi-core processing yet. Continuing with singular core.";
-    }
+	if (parameters.threads > 1) {
+		BOOST_LOG_SEV(logger, lg::warning)
+		    << "No support for multi-core processing yet. Continuing with singular core.";
+	}
 	try {
 		tree_list = Util::create_all_trees(parameters.input_file_path);
 	} catch (const std::invalid_argument &ex) {
@@ -29,7 +31,10 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			result_ptr = std::make_unique<Results>(standardAlgo.calculate(tree_list));
 			break;
 		}
-		case Metric::MCI:
+		case Metric::MCI: {
+			MsiAlgo genAlgo;
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+		}
 		case Metric::MSI:
 		case Metric::SPI:
 			BOOST_LOG_SEV(logger, lg::critical) << "Other metrics not yet implemented!";

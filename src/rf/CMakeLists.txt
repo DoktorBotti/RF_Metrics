@@ -15,6 +15,10 @@ add_library(rf_lib STATIC
         helpers/Util.cpp
         include/HashmapKey.hpp
         include/HashingFunctor.hpp
+        GeneralizedRfAlgo.cpp
+        include/GeneralizedRfAlgo.h
+        MsiAlgo.cpp
+        include/MsiAlgo.h
         )
 
 set_target_properties(rf_lib PROPERTIES
