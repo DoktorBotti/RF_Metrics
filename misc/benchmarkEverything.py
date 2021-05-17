@@ -36,26 +36,29 @@ FNULL = open(os.devnull)
 try:
     # for each input file
     for num, path in enumerate(test_paths):
-        if num == 5 or num == 10:
+        if num == 5 or num == 10 or num != 14:
             continue
-        file_names.append(test_names[num])
         # RAxML script
         raxml_args = [raxml_exe, '-m', 'GTRCAT', '-f', 'r', '-z', path, '-n', str(num)]
         print(f"processing {test_names[num]}, {num} of {len(test_paths)}. Running RAxML:")
-        start = time.time_ns()
+        raxml_start = time.time_ns()
         proc = subprocess.run(raxml_args, shell=False, stdout=FNULL)
-        end = time.time_ns()
-        raxml_times.append(end - start)
-        print(f"Took {(end - start) * 1e-9} seconds")
+        raxml_end = time.time_ns()
+        print(f"Took {(raxml_end - raxml_start) * 1e-9} seconds")
 
         # run our script
         ours_args = [our_exe, '--metric', 'RF', '-o', '/tmp/ourRes.txt', '-i', path]
         print(f"processing {test_names[num]}, {num} of {len(test_paths)}. Running ours:")
-        start = time.time_ns()
+        our_start = time.time_ns()
         proc = subprocess.run(ours_args, shell=False, stdout=FNULL)
-        end = time.time_ns()
-        ours_times.append(end - start)
-        print(f"Took {(end - start) * 1e-9} seconds")
+        our_end = time.time_ns()
+
+        # writing to array upon successful calculation
+        ours_times.append(our_end - our_start)
+        raxml_times.append(raxml_end - raxml_start)
+        file_names.append(test_names[num])
+
+        print(f"Took {(our_end - our_start) * 1e-9} seconds")
         print(
             f"mean execution times: Ours {sum(ours_times) / len(ours_times) * 1e-9}, RAxML {sum(raxml_times) / len(raxml_times) * 1e-9}")
 except KeyboardInterrupt:
