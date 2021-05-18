@@ -10,12 +10,21 @@ enable_testing()
 
 add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib "${CMAKE_SOURCE_DIR}/cmake")
 
 
 # find and configure boost in system
 SET(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.76.0 COMPONENTS log REQUIRED)
+
+# find or-tools (google, linear programming library)
+# if the below find_package fails, you are probably not building in docker and need to manually point to your or-tools binary.
+# e.g.: cmake -DORTOOLS_ROOT:STRING="/my/path/to/the/unzipped/file" ..
+if(NOT DEFINED ORTOOLS_ROOT)
+    SET(ORTOOLS_ROOT /home/user/or-tools_Ubuntu-20.04-64bit_v9.0.9048)
+endif()
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ORTOOLS_ROOT})
+find_package(ortools REQUIRED)
 
 # define compiler warning flags which then can be set for specific targets
 set(COMPILER_WARNING_FLAGS $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:

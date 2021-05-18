@@ -6,8 +6,9 @@ add_executable(catch2_tests
         RFTest.cpp
         testIO.cpp
         MciTest.cpp
+        OrToolsTest.cpp
         ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
-        )
+        OrToolsTest.cpp)
 
 target_link_libraries(catch2_tests PUBLIC
         rf_lib
