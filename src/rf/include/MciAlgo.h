@@ -9,7 +9,6 @@
 
 class MciAlgo : public GeneralizedRfAlgo {
   protected:
-    double calc_tree_score(const PllSplitList &S1, const PllSplitList &S2) override;
 	SymmetricMatrix<double> calc_pairwise_split_scores(const PllSplitList &S1,
 	                                                   const PllSplitList &S2) override;
 

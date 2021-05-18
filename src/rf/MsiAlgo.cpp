@@ -3,28 +3,18 @@
 //
 
 #include "MsiAlgo.h"
-double MsiAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
-	assert(A.size() == B.size());
-	// store best paring
-	std::vector<size_t> best_pairing;
-	double best_score = 0;
-	// iterate through all possible split combinations
-	// TODO: that is not happening yet. This only calculates pairwise scores.
-	for (size_t i = 0;i < A.size(); ++i){
-		for (size_t j = i; j < A.size(); ++j){
-			const auto & a = A[i];
-			const auto & b = B[j];
-			// calculate score if compatible
-			if(pllmod_utree_compatible_splits(a(),b(), PllSplit::split_len, A.size()- 1)==1){
-				double prob = std::max(phylogenetic_prob(a, b), phylogenetic_prob(b, a));
-				if(prob > best_score)
-                {
-					best_score = prob;
+#include <random>
+SymmetricMatrix<double> MsiAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
+                                                            const PllSplitList &S2) {
+	// TODO: make working sample. filling with random inputs for now.
+	SymmetricMatrix<double> res(S1.size());
+	std::mt19937 rand_engine(3);
+	std::uniform_real_distribution<> distr(0., 500.);
 
-				}
-			}
+	for (size_t i = 0; i < S1.size(); ++i) {
+		for (size_t j = 0; j < i; ++j) {
+			res.set_at(i, j, distr(rand_engine));
 		}
 	}
-	// check compatibility
-	// then add up a1 and a2 bzw. a1 and b2 & return maximum of that
+	return res;
 }

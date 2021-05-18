@@ -3,15 +3,6 @@
 //
 
 #include "MciAlgo.h"
-#include "SymmetricMatrix.hpp"
-// #include "PllSplits.hpp"
-
-double MciAlgo::calc_tree_score(const PllSplitList &S1, const PllSplitList &S2) {
-	auto scores = calc_pairwise_split_scores(S1, S2);
-	// TODO: find maximum bipartite matching value
-
-	return 0;
-}
 
 SymmetricMatrix<double> MciAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
                                                             const PllSplitList &S2) {

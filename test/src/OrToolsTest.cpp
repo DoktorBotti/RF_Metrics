@@ -1,6 +1,8 @@
 #include <ortools/linear_solver/linear_solver.h>
 #include <catch2/catch.hpp>
+#include <rf/helpers/Util.h>
 #include <iostream>
+#include "MsiAlgo.h"
 
 namespace operations_research {
 void BasicExample() {
@@ -37,4 +39,11 @@ void BasicExample() {
 
 TEST_CASE("execute or-tools example", "[OR_TOOLS]"){
 	operations_research::BasicExample();
+}
+TEST_CASE("matching between sample", "[OR_TOOLS]"){
+    auto split_lists = Util::create_splits(15, "/rf_data/BS/125");
+	MsiAlgo algo;
+	double res = algo.calc_tree_score(split_lists[0], split_lists[10]);
+    INFO(res);
+    REQUIRE(false);
 }
