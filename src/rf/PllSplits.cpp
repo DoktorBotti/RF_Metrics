@@ -22,7 +22,7 @@ uint32_t PllSplit::bit_extract(size_t bit_index) const {
 	return (split_part & (1u << computeMinorIndex(bit_index))) >> computeMinorIndex(bit_index);
 }
 
-void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *res) {
+void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] & other._split[i];
 	}
@@ -30,13 +30,13 @@ void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *re
 
 size_t PllSplit::split_len = 1337;
 
-void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) {
+void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] | other._split[i];
 	}
 }
 
-void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) {
+void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] ^ other._split[i];
 	}
@@ -49,6 +49,12 @@ bool PllSplit::equals(const PllSplit &other, size_t len) const {
 		}
 	}
 	return true;
+}
+
+void PllSplit::set_not(size_t len, pll_split_base_t *res) const {
+	for (size_t i = 0; i < len; i++) {
+		res[i] = ~_split[i];
+	}
 }
 
 // ------------- PllSplitList -------------

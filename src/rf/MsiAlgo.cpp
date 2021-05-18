@@ -3,7 +3,7 @@
 //
 
 #include "MsiAlgo.h"
-double MsiAlgo::calcScore(const PllSplitList &A, const PllSplitList &B) {
+double MsiAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
 	assert(A.size() == B.size());
 	// store best paring
 	std::vector<size_t> best_pairing;
@@ -16,7 +16,7 @@ double MsiAlgo::calcScore(const PllSplitList &A, const PllSplitList &B) {
 			const auto & b = B[j];
 			// calculate score if compatible
 			if(pllmod_utree_compatible_splits(a(),b(), PllSplit::split_len, A.size()- 1)==1){
-				double prob = std::max(phylogeneticProbability(a,b), phylogeneticProbability(b,a));
+				double prob = std::max(phylogenetic_prob(a, b), phylogenetic_prob(b, a));
 				if(prob > best_score)
                 {
 					best_score = prob;

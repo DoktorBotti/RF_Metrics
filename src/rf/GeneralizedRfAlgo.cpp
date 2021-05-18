@@ -25,7 +25,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		size_t idx_a = a - all_splits.begin();
 		for (auto b = a; b != all_splits.end(); ++b) {
 			size_t idx_b = b - a;
-			double dst = calcScore(*a, *b);
+			double dst = calc_tree_score(*a, *b);
 			res.pairwise_distances_relative.set_at(idx_b, idx_a, dst);
 			total_dst += dst;
 		}
@@ -34,7 +34,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	res.mean_distance = total_dst / static_cast<double>(trees.size());
 	return res;
 }
-double GeneralizedRfAlgo::phylogeneticProbability(const PllSplit &split_a,
+double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split_a,
                                                   const PllSplit &split_b) {
 	using boost::math::double_factorial;
     const size_t split_len = PllSplit::split_len;
@@ -53,7 +53,7 @@ double GeneralizedRfAlgo::phylogeneticProbability(const PllSplit &split_a,
 	//TODO: watch out for numerical issues
 	return b1_fac * a1_fac * comb_fac / dividend;
 }
-double GeneralizedRfAlgo::phylogeneticProbability(const PllSplit &split) {
+double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split) {
     using boost::math::double_factorial;
     const size_t split_len = PllSplit::split_len;
     const size_t pop_1 = split.popcount(split_len);

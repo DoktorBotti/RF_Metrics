@@ -32,8 +32,8 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			break;
 		}
 		case Metric::MCI: {
-			MsiAlgo genAlgo;
-			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+			//MsiAlgo genAlgo;
+			//result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
 		}
 		case Metric::MSI:
 		case Metric::SPI:

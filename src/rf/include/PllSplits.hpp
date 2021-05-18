@@ -46,13 +46,16 @@ class PllSplit {
 	[[nodiscard]] bool equals(const PllSplit &other, size_t len) const;
 
 	/* Trivial and operation. Not optimized as of now. */
-	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
 	/* Trivial or operation. Not optimized as of now. */
-	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
 	/* Trivial xor operation. Not optimized as of now. */
-	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const;
+
+    /* Trivial not operation. Not optimized as of now. */
+    void set_not(size_t len, pll_split_base_t *res) const;
 
 	[[nodiscard]] static constexpr size_t splitBitWidth() {
 		return sizeof(pll_split_base_t) * 8;

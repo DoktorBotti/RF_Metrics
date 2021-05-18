@@ -17,6 +17,7 @@ class Util {
 	static std::string get_output_of_bash_command(const std::string &cmd);
 	/* Definitely should not be part of any standard library */
 	static std::vector<std::string> split(const std::string &str, char delim);
+	/* Create the PllSplitLists of the first n trees in the specified file. */
 	static std::vector<PllSplitList> create_splits(int n, const std::string &file_name);
 	static std::vector<PllTree> create_trees(int n, const std::string &file_name);
 	static std::vector<PllTree> create_all_trees(const std::string &file_name);
