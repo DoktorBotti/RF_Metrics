@@ -22,10 +22,19 @@ uint32_t PllSplit::bit_extract(size_t bit_index) const {
 	return (split_part & (1u << computeMinorIndex(bit_index))) >> computeMinorIndex(bit_index);
 }
 
-void PllSplit::intersect(const PllSplit &other, size_t len, pll_split_base_t *res) const {
+void PllSplit::intersect(const PllSplit &other, const size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] & other._split[i];
 	}
+}
+
+bool PllSplit::is_disjoint(const PllSplit &other, size_t len) const {
+	for (size_t i = 0; i < len; ++i) {
+		if ((_split[i] & other._split[i]) != 0) {
+			return false;
+		}
+	}
+	return true;
 }
 
 size_t PllSplit::split_len = 1337;

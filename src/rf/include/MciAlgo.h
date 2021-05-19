@@ -14,6 +14,7 @@ class MciAlgo : public GeneralizedRfAlgo {
 	                                                   const PllSplitList &S2) override;
 
   public:
+	// TODO: make private and still testable?
     static double info_cl(PllSplit split1, PllSplit split2, size_t taxa, size_t split_len);
 };
 

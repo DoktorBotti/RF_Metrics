@@ -21,6 +21,8 @@ add_library(rf_lib STATIC
         include/MsiAlgo.h
         MciAlgo.cpp
         include/MciAlgo.h
+        SpiAlgo.cpp
+        include/SpiAlgo.h
         )
 
 set_target_properties(rf_lib PROPERTIES

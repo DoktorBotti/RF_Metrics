@@ -6,7 +6,7 @@
 #define INFORF_MSIALGO_H
 #include "GeneralizedRfAlgo.h"
 #include "PllSplits.hpp"
-class MsiAlgo : public GeneralizedRfAlgo{
+class MsiAlgo : public GeneralizedRfAlgo {
   protected:
 	double calc_tree_score(const PllSplitList &A, const PllSplitList &B) override;
 };
