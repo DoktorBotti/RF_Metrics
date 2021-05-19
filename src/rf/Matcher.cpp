@@ -48,7 +48,6 @@ double Matcher::solve(const SymmetricMatrix<double> &scores,
 	// get solution
 	std::set<size_t> connected;
 	double total_score = 0;
-	if (best_matching_out) {
 		for (size_t i = 0; i < scores.size(); ++i) {
 			for (size_t j = 0; j < scores.size(); ++j) {
 				const auto &var = variables[i * scores.size() + j];
@@ -72,7 +71,7 @@ double Matcher::solve(const SymmetricMatrix<double> &scores,
 				}
 			}
 		}
-	}
+
 	return total_score;
 }
 void Matcher::init_constraints(size_t elems) {

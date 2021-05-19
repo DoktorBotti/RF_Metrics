@@ -43,7 +43,7 @@ TEST_CASE("execute or-tools example", "[OR_TOOLS]"){
 }
 
 TEST_CASE("matching between sample", "[OR_TOOLS]"){
-	const size_t dim_size = 200;
+	const size_t dim_size = 10;
 	SymmetricMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	Matcher matcher;
 	std::vector<size_t> res_matching(dim_size, 0);
