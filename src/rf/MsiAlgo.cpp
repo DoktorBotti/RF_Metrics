@@ -12,7 +12,7 @@ SymmetricMatrix<double> MsiAlgo::calc_pairwise_split_scores(const PllSplitList &
 	std::uniform_real_distribution<> distr(0., 500.);
 
 	for (size_t i = 0; i < S1.size(); ++i) {
-		for (size_t j = 0; j < i; ++j) {
+		for (size_t j = 0; j <= i; ++j) {
 			res.set_at(i, j, distr(rand_engine));
 		}
 	}

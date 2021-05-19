@@ -74,63 +74,80 @@ double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split) {
 double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
 	using namespace operations_research;
 	auto scores = calc_pairwise_split_scores(A, B);
-	std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("GLOP"));
+	std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("SCIP"));
 	if (!solver) {
 		BOOST_LOG_SEV(logger, lg::critical) << "Could not create linear solver";
 	}
 	// TODO: extract everything to class scope except objective function. -Can easily be reused.
 	const int num_vars = static_cast<int>(scores.size() * scores.size());
 	std::vector<MPVariable *> variables;
-	// insert all variables representing
-	solver->MakeBoolVarArray(num_vars, "split", &variables);
+	variables.reserve(num_vars);
+	solver->MakeIntVarArray(num_vars, 0, 1, "split", &variables);
+
 	for (size_t i = 0; i < scores.size(); ++i) {
 		MPConstraint *const to_constraint = solver->MakeRowConstraint(1., 1.);
 		MPConstraint *const from_constraint = solver->MakeRowConstraint(1., 1.);
 		for (size_t j = 0; j < scores.size(); ++j) {
 			// create restriction that each source is only used once
-			from_constraint->SetCoefficient(variables[i * scores.size() + j], 1.);
+			from_constraint->SetCoefficient(variables[j * scores.size() + i], 1.);
 			// create restriction that each target is only used once
-			to_constraint->SetCoefficient(variables[j * scores.size() + i], 1.);
+			to_constraint->SetCoefficient(variables[i * scores.size() + j], 1.);
 		}
 	}
+
+	BOOST_LOG_SEV(logger, lg::notification) << "Number of variables: " << solver->NumVariables();
+	BOOST_LOG_SEV(logger, lg::notification)
+	    << "Number of constraints: " << solver->NumConstraints();
 
 	MPObjective *const objective = solver->MutableObjective();
 	// set weights for target function
 	for (size_t i = 0; i < scores.size(); ++i) {
-		for (size_t j = 0; j < scores.size(); ++j) {
-			const auto &weight = scores.checked_at(i, j);
+		// set diagonal once
+		objective->SetCoefficient(variables[i*scores.size()+i], scores.at(i,i));
+		// set upper and lower triangle
+		for (size_t j = 0; j < i; ++j) {
+			const auto &weight = scores.at(i, j);
 			// i->j and j->i have same score
 			objective->SetCoefficient(variables[i * scores.size() + j], weight);
-			// objective->SetCoefficient(variables[j * scores.size() + i], weight);
+			objective->SetCoefficient(variables[j * scores.size() + i], weight);
 		}
 	}
 	objective->SetMaximization();
 
 	const MPSolver::ResultStatus result_status = solver->Solve();
 	if (result_status != MPSolver::OPTIMAL) {
-		BOOST_LOG_SEV(logger, lg::warning) << "Could not produce optimal matching!";
+		BOOST_LOG_SEV(logger, lg::critical) << "Could not produce optimal matching!";
 		return 0.;
 	}
 	std::stringstream out;
 	std::vector<size_t> mapping(scores.size(), 0);
+	std::set<size_t> connected;
 	double total_score = 0;
 	// get solution
 	for (size_t i = 0; i < scores.size(); ++i) {
 		for (size_t j = 0; j < scores.size(); ++j) {
 			const auto &var = variables[i * scores.size() + j];
-			if (var->solution_value() != 0 && i > j) {
-				assert(mapping[i] == 0 || mapping[i] == j);
+			if (var->solution_value() == 0) {
+				continue;
+			}
+			assert(var->solution_value() == 1.);
+			if (connected.find(i) == connected.end()) {
+				// assert(mapping[i] == 0 || mapping[i] == j);
 				mapping[i] = j;
-				total_score += scores.at(i, j);
-			} else if (var->solution_value() != 0) {
-				assert(mapping[j] == 0 || mapping[j] == i);
+				connected.insert(i);
+				total_score += scores.checked_at(i, j);
+			} else if (connected.find(j) == connected.end()) {
 				mapping[j] = i;
-				total_score += scores.at(j, i);
+				connected.insert(j);
+				total_score += scores.checked_at(j, i);
+			} else if (mapping[j] != i && mapping[i] != j) {
+				BOOST_LOG_SEV(logger, lg::warning)
+				    << "Variable mapping makes no sense for (" << i << "," << j << ")";
 			}
 		}
 	}
 	for (size_t i = 0; i < mapping.size(); ++i) {
-		out << " " << i << "->" << mapping[i] << " ";
+		out << " " << i << "<>" << mapping[i] << " ";
 	}
 	BOOST_LOG_SEV(logger, lg::notification) << "Mapping solution: " << out.str();
 	return total_score;
