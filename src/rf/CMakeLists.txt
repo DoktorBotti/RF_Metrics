@@ -1,26 +1,28 @@
 add_library(rf_lib STATIC
+        GeneralizedRfAlgo.cpp
+        LoggingBackend.cpp
+        Matcher.cpp
+        MciAlgo.cpp
+        MsiAlgo.cpp
+        PllSplits.cpp
+        PllTree.cpp
+        RfMetricInterface.cpp
+        StandardRfAlgo.cpp
+        helpers/Util.cpp
+        helpers/Util.h
+        include/GeneralizedRfAlgo.h
+        include/HashingFunctor.hpp
+        include/HashmapKey.hpp
+        include/LoggingBackend.h
+        include/Matcher.h
+        include/MciAlgo.h
+        include/MsiAlgo.h
         include/PllSplits.hpp
         include/PllTree.hpp
-        include/RfMetricInterface.h
-        PllTree.cpp
-        PllSplits.cpp
-        RfMetricInterface.cpp
-        LoggingBackend.cpp
-        include/LoggingBackend.h
         include/RfAlgorithmInterface.h
-        StandardRfAlgo.cpp
+        include/RfMetricInterface.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
-        helpers/Util.h
-        helpers/Util.cpp
-        include/HashmapKey.hpp
-        include/HashingFunctor.hpp
-        GeneralizedRfAlgo.cpp
-        include/GeneralizedRfAlgo.h
-        MsiAlgo.cpp
-        include/MsiAlgo.h
-        MciAlgo.cpp
-        include/MciAlgo.h
         SpiAlgo.cpp
         include/SpiAlgo.h
         )

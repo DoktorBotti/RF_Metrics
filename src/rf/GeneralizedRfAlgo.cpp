@@ -4,6 +4,10 @@
 
 #include "include/GeneralizedRfAlgo.h"
 #include <boost/math/special_functions/factorials.hpp>
+// boost logging
+#include <boost/log/attributes/constant.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+
 
 GeneralizedRfAlgo::GeneralizedRfAlgo() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
@@ -34,36 +38,46 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	res.mean_distance = total_dst / static_cast<double>(trees.size());
 	return res;
 }
-double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split_a,
-                                                  const PllSplit &split_b) {
+double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split_a, const PllSplit &split_b) {
 	using boost::math::double_factorial;
-    const size_t split_len = PllSplit::split_len;
+	const size_t split_len = PllSplit::split_len;
 	const size_t pop_1 = split_a.popcount(split_len);
-    const size_t pop_2 = split_b.popcount(split_len);
-    // no trivial splits here
-    assert(pop_1 > 2);
+	const size_t pop_2 = split_b.popcount(split_len);
+	// no trivial splits here
+	assert(pop_1 > 2);
 	assert(pop_1 < split_len - 1);
 	assert(pop_2 > 2);
 	assert(pop_2 < split_len - 1);
 	// calc count
-	const auto b1_fac = double_factorial<double>(2* (split_len- pop_1) - 3);
-	const auto a1_fac = double_factorial<double>(2* pop_1 - 3);
-	const auto comb_fac = double_factorial<double>(2* pop_1 - 2*pop_2 - 1);
-	const auto dividend = double_factorial<double>(2* split_len - 5);
-	//TODO: watch out for numerical issues
+	const auto b1_fac = double_factorial<double>(2 * (split_len - pop_1) - 3);
+	const auto a1_fac = double_factorial<double>(2 * pop_1 - 3);
+	const auto comb_fac = double_factorial<double>(2 * pop_1 - 2 * pop_2 - 1);
+	const auto dividend = double_factorial<double>(2 * split_len - 5);
+	// TODO: watch out for numerical issues
 	return b1_fac * a1_fac * comb_fac / dividend;
 }
 double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split) {
-    using boost::math::double_factorial;
-    const size_t split_len = PllSplit::split_len;
-    const size_t pop_1 = split.popcount(split_len);
-    // no trivial splits here
-    assert(pop_1 > 2);
-    assert(pop_1 < split_len - 1);
+	using boost::math::double_factorial;
+	const size_t split_len = PllSplit::split_len;
+	const size_t pop_1 = split.popcount(split_len);
+	// no trivial splits here
+	assert(pop_1 > 2);
+	assert(pop_1 < split_len - 1);
 
-    const auto b1_fac = double_factorial<double>(2* (split_len- pop_1) - 3);
-    const auto a1_fac = double_factorial<double>(2* pop_1 - 3);
-	const auto dividend = double_factorial<double>(2* split_len - 5);
-    return b1_fac * a1_fac  / dividend;
+	const auto b1_fac = double_factorial<double>(2 * (split_len - pop_1) - 3);
+	const auto a1_fac = double_factorial<double>(2 * pop_1 - 3);
+	const auto dividend = double_factorial<double>(2 * split_len - 5);
+	return b1_fac * a1_fac / dividend;
+}
+double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
+	auto scores = calc_pairwise_split_scores(A, B);
+    std::vector<size_t> mapping(scores.size(), 0);
+    double total_score = match_solver.solve(scores, &mapping);
+	std::stringstream out;
 
+	for (size_t i = 0; i < mapping.size(); ++i) {
+		out << " " << i << "<>" << mapping[i] << " ";
+	}
+	BOOST_LOG_SEV(logger, lg::notification) << "Mapping solution: " << out.str();
+	return total_score;
 }
