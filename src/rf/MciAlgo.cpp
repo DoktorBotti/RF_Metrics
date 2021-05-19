@@ -4,21 +4,7 @@
 
 #include "MciAlgo.h"
 
-SymmetricMatrix<double> MciAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
-                                                            const PllSplitList &S2) {
-	SymmetricMatrix<double> scores(S1.size());
-	const auto taxa = S1.size() + 3;
-	const auto split_len = S1.computeSplitLen();
-	for (size_t row = 0; row < S1.size(); ++row) {
-		for (size_t col = 0; col <= row; ++col) {
-			scores.set_at(row, col, info_cl(S1[row], S2[col], taxa, split_len));
-		}
-	}
-
-	return scores;
-}
-
-double MciAlgo::info_cl(const PllSplit split1, const PllSplit split2, size_t taxa, size_t split_len) {
+double MciAlgo::calc_split_score(const PllSplit &split1, const PllSplit &split2, size_t taxa, size_t split_len) {
 	double inv_pcl_a1 = (double) taxa / (double) split1.popcount(split_len);
 	double inv_pcl_a2 = (double) taxa / (double) split2.popcount(split_len);
 	double inv_pcl_b1 = (double) taxa / (double) (taxa - split1.popcount(split_len));

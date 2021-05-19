@@ -8,10 +8,53 @@
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-
 GeneralizedRfAlgo::GeneralizedRfAlgo() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 }
+
+double GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
+	return (-1) * std::log(p_phy(S, taxa, split_len));
+}
+
+double GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
+                                         const PllSplit &S2,
+                                         size_t taxa,
+                                         size_t split_len) {
+	return (-1) * std::log(p_phy(S1, S2, taxa, split_len));
+}
+
+double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
+	const auto a = S.popcount(split_len);
+	const auto b = taxa - a;
+
+	assert(a >= 2);
+	assert(b >= 2);
+
+	return boost::math::double_factorial<double>(2 * a - 3) *
+	       boost::math::double_factorial<double>(2 * b - 3) /
+	       boost::math::double_factorial<double>(2 * (a + b) - 5);
+}
+
+double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
+                                       const PllSplit &S2,
+                                       size_t taxa,
+                                       size_t split_len) {
+	const auto a1 = S1.popcount(split_len);
+	const auto b1 = taxa - a1;
+	const auto a2 = S2.popcount(split_len);
+
+	assert(a1 >= 2);
+	assert(b1 >= 2);
+	assert(a2 >= 2);
+
+	// TODO: Watch for numerical problems
+	// TODO: implement explicit a!!/b!! method
+	return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
+	       boost::math::double_factorial<double>(2 * (a2 + 1) - 5) *
+	       boost::math::double_factorial<double>(2 * (a1 - a2 + 2) - 5) /
+	       boost::math::double_factorial<double>(2 * (taxa) - 5);
+}
+
 RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
 	assert(trees.size() >= 2);
 	// extract splits. Each tree now identifies by its index in all_splits
@@ -38,41 +81,11 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	res.mean_distance = total_dst / static_cast<double>(trees.size());
 	return res;
 }
-double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split_a, const PllSplit &split_b) {
-	using boost::math::double_factorial;
-	const size_t split_len = PllSplit::split_len;
-	const size_t pop_1 = split_a.popcount(split_len);
-	const size_t pop_2 = split_b.popcount(split_len);
-	// no trivial splits here
-	assert(pop_1 > 2);
-	assert(pop_1 < split_len - 1);
-	assert(pop_2 > 2);
-	assert(pop_2 < split_len - 1);
-	// calc count
-	const auto b1_fac = double_factorial<double>(2 * (split_len - pop_1) - 3);
-	const auto a1_fac = double_factorial<double>(2 * pop_1 - 3);
-	const auto comb_fac = double_factorial<double>(2 * pop_1 - 2 * pop_2 - 1);
-	const auto dividend = double_factorial<double>(2 * split_len - 5);
-	// TODO: watch out for numerical issues
-	return b1_fac * a1_fac * comb_fac / dividend;
-}
-double GeneralizedRfAlgo::phylogenetic_prob(const PllSplit &split) {
-	using boost::math::double_factorial;
-	const size_t split_len = PllSplit::split_len;
-	const size_t pop_1 = split.popcount(split_len);
-	// no trivial splits here
-	assert(pop_1 > 2);
-	assert(pop_1 < split_len - 1);
 
-	const auto b1_fac = double_factorial<double>(2 * (split_len - pop_1) - 3);
-	const auto a1_fac = double_factorial<double>(2 * pop_1 - 3);
-	const auto dividend = double_factorial<double>(2 * split_len - 5);
-	return b1_fac * a1_fac / dividend;
-}
 double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
-    std::vector<size_t> mapping(scores.size(), 0);
-    double total_score = match_solver.solve(scores, &mapping);
+	std::vector<size_t> mapping(scores.size(), 0);
+	double total_score = match_solver.solve(scores, &mapping);
 	std::stringstream out;
 
 	for (size_t i = 0; i < mapping.size(); ++i) {
@@ -80,4 +93,18 @@ double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitL
 	}
 	BOOST_LOG_SEV(logger, lg::notification) << "Mapping solution: " << out.str();
 	return total_score;
+}
+
+SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
+                                                                      const PllSplitList &S2) {
+	SymmetricMatrix<double> scores(S1.size());
+	const auto taxa = S1.size() + 3;
+	const auto split_len = S1.computeSplitLen();
+	for (size_t row = 0; row < S1.size(); ++row) {
+		for (size_t col = 0; col <= row; ++col) {
+			scores.set_at(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
+		}
+	}
+
+	return scores;
 }

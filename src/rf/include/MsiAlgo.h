@@ -8,8 +8,8 @@
 #include "PllSplits.hpp"
 class MsiAlgo : public GeneralizedRfAlgo {
   protected:
-	SymmetricMatrix<double> calc_pairwise_split_scores(const PllSplitList &S1,
-	                                                   const PllSplitList &S2) override;
+	// TODO:
+    double calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) override;
 };
 
 #endif // INFORF_MSIALGO_H

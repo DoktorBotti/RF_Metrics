@@ -18,9 +18,12 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
     RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
   protected:
     virtual double calc_tree_score(const PllSplitList& A, const PllSplitList& B );
-    double phylogenetic_prob(const PllSplit& split_a, const PllSplit& split_b);
-	double phylogenetic_prob(const PllSplit& split);
-	virtual SymmetricMatrix<double> calc_pairwise_split_scores(const PllSplitList& S1, const PllSplitList& S2) = 0;
+    static double p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
+    static double p_phy(const PllSplit &S, size_t taxa, size_t split_len);
+    static double h_info_content(const PllSplit &S, size_t taxa, size_t split_len);
+    static double h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
+	SymmetricMatrix<double> calc_pairwise_split_scores(const PllSplitList& S1, const PllSplitList& S2);
+    virtual double calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
   private:
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	Matcher match_solver;

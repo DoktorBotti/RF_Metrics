@@ -3,7 +3,9 @@
 //
 
 #include "MsiAlgo.h"
-SymmetricMatrix<double> MsiAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
-                                                            const PllSplitList &S2) {
-	return SymmetricMatrix<double>(S1.size());
+
+double
+MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
+	// TODO:
+	return 0;
 }
