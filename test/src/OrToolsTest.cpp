@@ -2,7 +2,8 @@
 #include <catch2/catch.hpp>
 #include <rf/helpers/Util.h>
 #include <iostream>
-#include "MsiAlgo.h"
+#include <random>
+#include "Matcher.h"
 
 namespace operations_research {
 void BasicExample() {
@@ -40,10 +41,27 @@ void BasicExample() {
 TEST_CASE("execute or-tools example", "[OR_TOOLS]"){
 	operations_research::BasicExample();
 }
+
 TEST_CASE("matching between sample", "[OR_TOOLS]"){
-    auto split_lists = Util::create_splits(15, "/rf_data/BS/125");
-	MsiAlgo algo;
-	double res = algo.calc_tree_score(split_lists[0], split_lists[10]);
+	const size_t dim_size = 200;
+	SymmetricMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
+	Matcher matcher;
+	std::vector<size_t> res_matching(dim_size, 0);
+	double res = matcher.solve(dst_mtx, &res_matching);
     INFO(res);
-    REQUIRE(false);
+	// create 100 random mappings
+	int dummy = GENERATE(take(100,random(-100,100)));
+	std::vector<size_t> bad_mapping;
+	std::random_device rnd;
+	std::mt19937 mt(rnd());
+	for(size_t i = 0; i < dim_size; ++i){
+		bad_mapping.push_back(i);
+	}
+	std::shuffle(bad_mapping.begin(), bad_mapping.end(), mt);
+	// verify that res is (probably) best mapping
+	double oth_score = 0;
+	for(size_t i = 0; i < dim_size; ++i){
+		oth_score += dst_mtx.checked_at(i,bad_mapping[i]);
+	}
+	REQUIRE(oth_score <= res);
 }

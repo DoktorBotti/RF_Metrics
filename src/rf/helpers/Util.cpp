@@ -6,6 +6,7 @@
 #include <PllTree.hpp>
 #include <algorithm>
 #include <fstream>
+#include <random>
 #include <sstream>
 #include <string>
 
@@ -70,4 +71,17 @@ std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {
     overview.close();
     auto tree_str = Util::split(file_content, '\n');
 	return get_tree_from_string_list(tree_str);
+}
+SymmetricMatrix<double> Util::create_random_mtx(const size_t dim) {
+    SymmetricMatrix<double> res(dim);
+	std::random_device dev;
+    std::mt19937 rand_engine(dev());
+    std::uniform_real_distribution<> distr(0., 500.);
+
+    for (size_t i = 0; i < dim; ++i) {
+        for (size_t j = 0; j <= i; ++j) {
+            res.set_at(i, j, distr(rand_engine));
+        }
+    }
+    return res;
 }

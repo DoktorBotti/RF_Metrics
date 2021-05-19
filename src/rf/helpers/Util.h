@@ -9,6 +9,7 @@
 #include <PllSplits.hpp>
 #include <string>
 #include <vector>
+#include "SymmetricMatrix.hpp"
 
 class Util {
   public:
@@ -21,6 +22,7 @@ class Util {
 	static std::vector<PllSplitList> create_splits(int n, const std::string &file_name);
 	static std::vector<PllTree> create_trees(int n, const std::string &file_name);
 	static std::vector<PllTree> create_all_trees(const std::string &file_name);
+	static SymmetricMatrix<double> create_random_mtx(const size_t dim);
 
   private:
 	static std::vector<PllTree> get_tree_from_string_list(std::vector<std::string> &tree_str);

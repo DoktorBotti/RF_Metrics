@@ -7,6 +7,8 @@
 
 #include <cstdio>
 #include <vector>
+#include <cassert>
+
 template <typename T>
 class SymmetricMatrix {
   public:
@@ -15,11 +17,13 @@ class SymmetricMatrix {
 	void set_at(size_t row, size_t column, T val);
 	/* Sets the value at row, column. Checked, behaves like a symmetric matrix. */
 	void checked_set_at(size_t row, size_t column, T val);
+	/* Sets the entire i-th row to the vectors values */
+	void set_row_at(size_t row, std::vector<T>&& vals);
 	/* Retrieves the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	T at(size_t row, size_t column) const;
 	/* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
 	T checked_at(size_t row, size_t column) const;
-	size_t size();
+	[[nodiscard]] size_t size() const;
     std::vector<std::vector<T>> to_vector() const;
   private:
 	std::vector<std::vector<T>> matrix;
@@ -49,7 +53,7 @@ T SymmetricMatrix<T>::at(size_t row, size_t column) const {
 }
 
 template <typename T>
-size_t SymmetricMatrix<T>::size() {
+size_t SymmetricMatrix<T>::size() const {
 	return dim;
 }
 template <typename T>
@@ -67,6 +71,12 @@ T SymmetricMatrix<T>::checked_at(size_t row, size_t column) const {
 template <typename T>
 std::vector<std::vector<T>> SymmetricMatrix<T>::to_vector() const {
 	return matrix;
+}
+template <typename T>
+void SymmetricMatrix<T>::set_row_at(size_t row, std::vector<T> &&vals) {
+	assert(vals.size() -1 == row);
+	assert(matrix[row].size() == vals.size());
+	matrix[row] = std::move(vals);
 }
 
 #endif // INFORF_SYMMETRICMATRIX_H
