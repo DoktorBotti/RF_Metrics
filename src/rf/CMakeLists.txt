@@ -4,6 +4,7 @@ add_library(rf_lib STATIC
         Matcher.cpp
         MciAlgo.cpp
         MsiAlgo.cpp
+        SpiAlgo.cpp
         PllSplits.cpp
         PllTree.cpp
         RfMetricInterface.cpp
@@ -17,14 +18,13 @@ add_library(rf_lib STATIC
         include/Matcher.h
         include/MciAlgo.h
         include/MsiAlgo.h
+        include/SpiAlgo.h
         include/PllSplits.hpp
         include/PllTree.hpp
         include/RfAlgorithmInterface.h
         include/RfMetricInterface.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
-        SpiAlgo.cpp
-        include/SpiAlgo.h
         )
 
 set_target_properties(rf_lib PROPERTIES
