@@ -23,10 +23,19 @@ double GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
 	return (-1) * std::log(p_phy(S1, S2, taxa, split_len));
 }
 
+double GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
+	return (-1) * std::log(p_phy(a, b));
+}
+
+
 double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
 	const auto a = S.popcount(split_len);
 	const auto b = taxa - a;
 
+	return p_phy(a, b);
+}
+
+double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	assert(a >= 2);
 	assert(b >= 2);
 
@@ -52,7 +61,12 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a2 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a1 - a2 + 2) - 5) /
-	       boost::math::double_factorial<double>(2 * (taxa) - 5);
+	       boost::math::double_factorial<double>(2 * (taxa) -5);
+}
+
+size_t inline GeneralizedRfAlgo::bits_too_many(size_t taxa) {
+    constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
+    return taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
 }
 
 RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
