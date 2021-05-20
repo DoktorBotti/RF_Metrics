@@ -37,6 +37,7 @@ RUN apt-get update \
 	  r-base \
 	  dirmngr \
       gnupg \
+      lzip \
       zlib1g-dev \
       apt-transport-https \
       ca-certificates software-properties-common \
@@ -96,6 +97,19 @@ RUN cd /home/user \
  && wget https://github.com/google/or-tools/releases/download/v9.0/or-tools_ubuntu-20.04_v9.0.9048.tar.gz \
  && tar -xf or-tools_ubuntu-20.04_v9.0.9048.tar.gz \
  && rm or-tools_ubuntu-20.04_v9.0.9048.tar.gz
+
+
+# install gmp precision library
+USER user
+RUN cd /home/user \
+ && wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
+ && tar --lzip -xvf gmp-6.2.1.tar.lz \
+ && rm gmp-6.2.1.tar.lz && cd gmp-6.2.1 \
+ && ./configure --enable-cxx CXX=/usr/bin/clang++ --disable-shared\
+ && make -j4
+USER root
+RUN cd /home/user/gmp-6.2.1 \
+ && make install
 
 USER root
 # Start SSH-server for remote toolchain config (useful for i.e. CLion)

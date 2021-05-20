@@ -7,6 +7,12 @@ distance function on trees using splits. To get started, first clone the reposit
 git clone --recursive git@github.com:DoktorBotti/RF_Metrics.git
 ```
 
+# Prequesites / External dependencies
+The following libraries should be findable by CMake or the installation should be pointed to with a TARGET_ROOT variable. (This variable is then added to the CMAKE_PREFIX_PATH.)
+ - gmp (v6.2.1) with --enable-cxx
+ - or-tools (v9.0.9048)
+ - graph-lib ?
+
 After that, to build the code run `make && cd build && make`, which will generate the build directory, and then start
 building the code. The static library that is built is called `libinforf`, and is placed in `bin` after building.
 

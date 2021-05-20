@@ -12,6 +12,8 @@ add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib "${CMAKE_SOURCE_DIR}/cmake")
 
+# search for gmp library
+find_package(GMP REQUIRED)
 
 # find and configure boost in system
 SET(Boost_USE_STATIC_LIBS ON)
