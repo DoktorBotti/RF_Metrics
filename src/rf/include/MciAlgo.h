@@ -12,7 +12,7 @@ class MciAlgo : public GeneralizedRfAlgo {
 
   public:
 	// TODO: make private and still testable?
-    double calc_split_score(const PllSplit &split1, const PllSplit &split2, size_t taxa, size_t split_len) override;
+    double calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) override;
 };
 
 #endif // CONCURRENT_GROWTABLE_MCIALGO_H

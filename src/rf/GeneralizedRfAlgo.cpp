@@ -27,7 +27,6 @@ double GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
 	return (-1) * std::log(p_phy(a, b));
 }
 
-
 double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
 	const auto a = S.popcount(split_len);
 	const auto b = taxa - a;
@@ -65,8 +64,8 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 }
 
 size_t inline GeneralizedRfAlgo::bits_too_many(size_t taxa) {
-    constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
-    return taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
+	constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
+	return taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
 }
 
 RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
@@ -121,4 +120,26 @@ SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllS
 	}
 
 	return scores;
+}
+
+std::vector<pll_split_base_t> inline GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
+                                                                                 const PllSplit &S2,
+                                                                                 size_t split_len) {
+	// TODO: is there something more lightweight (like an array?)
+	std::vector<pll_split_base_t> split_buffer(split_len * 6);
+	// B1 -> &split_buffer[0]
+	S1.set_not(split_len, &split_buffer[0]);
+	// B2 -> &split_buffer[split_len]
+	S2.set_not(split_len, &split_buffer[split_len]);
+	// A1 and A2 -> &split_buffer[2 * split_len]
+	S1.intersect(S2, split_len, &split_buffer[2 * split_len]);
+	// B1 and B2 -> &split_buffer[3 * split_len]
+	PllSplit(&split_buffer[0])
+	    .intersect(PllSplit(&split_buffer[split_len]), split_len, &split_buffer[3 * split_len]);
+	// A1 and B2 -> &split_buffer[4 * split_len]
+	S1.intersect(PllSplit(&split_buffer[split_len]), split_len, &split_buffer[4 * split_len]);
+	// A2 and B1 -> &split_buffer[5 * split_len]
+	S2.intersect(PllSplit(&split_buffer[0]), split_len, &split_buffer[5 * split_len]);
+
+	return split_buffer;
 }
