@@ -1,12 +1,13 @@
 
 #include "RfMetricInterface.h"
+#include "MciAlgo.h"
+#include "MsiAlgo.h"
+#include "SpiAlgo.h"
 #include "gitVersionHeader.h"
 #include "helpers/Util.h"
 #include "include/StandardRfAlgo.h"
 #include <PllTree.hpp>
 #include <fstream>
-#include "MsiAlgo.h"
-
 // boost includes
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
@@ -32,13 +33,17 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			break;
 		}
 		case Metric::MCI: {
-			//MsiAlgo genAlgo;
-			//result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+			MciAlgo genAlgo;
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
 		}
-		case Metric::MSI:
-		case Metric::SPI:
-			BOOST_LOG_SEV(logger, lg::critical) << "Other metrics not yet implemented!";
-			throw std::invalid_argument("This metric has not been implemented");
+		case Metric::MSI: {
+			MsiAlgo genAlgo;
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+		}
+		case Metric::SPI: {
+			SpiAlgo genAlgo;
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+		}
 	}
 	has_calculated = true;
 }

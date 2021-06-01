@@ -4,7 +4,7 @@
 
 #ifndef INFORF_GENERALIZEDRFALGO_H
 #define INFORF_GENERALIZEDRFALGO_H
-#include "Matcher.h"
+#include "MinFlowMatcher.h"
 #include "RfAlgorithmInterface.h"
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
@@ -47,8 +47,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
 
   private:
-	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
-	Matcher match_solver;
+    boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+    MinFlowMatcher match_solver;
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

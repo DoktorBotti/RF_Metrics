@@ -2,13 +2,13 @@
 // Created by Tobia on 19.05.2021.
 //
 
-#include "Matcher.h"
+#include "NaiveMatcher.h"
 // boost logging
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
-Matcher::Matcher() {
+NaiveMatcher::NaiveMatcher() {
     using namespace operations_research;
-    logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("Matcher"));
+    logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("NaiveMatcher"));
     solver.reset(MPSolver::CreateSolver("SCIP"));
     if (!solver) {
         BOOST_LOG_SEV(logger, lg::critical) << "Could not create linear solver";
@@ -17,7 +17,7 @@ Matcher::Matcher() {
     objective = solver->MutableObjective();
     objective->SetMaximization();
 }
-double Matcher::solve(const SymmetricMatrix<double> &scores,
+double NaiveMatcher::solve(const SymmetricMatrix<double> &scores,
                       std::vector<size_t> *best_matching_out) {
 	using namespace operations_research;
 	// initialize solver only once
@@ -74,7 +74,7 @@ double Matcher::solve(const SymmetricMatrix<double> &scores,
 
 	return total_score;
 }
-void Matcher::init_constraints(size_t elems) {
+void NaiveMatcher::init_constraints(size_t elems) {
 	using namespace operations_research;
 	const int num_vars = static_cast<int>(elems * elems);
 	variables.reserve(num_vars);

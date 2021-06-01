@@ -1,13 +1,14 @@
 add_library(rf_lib STATIC
         GeneralizedRfAlgo.cpp
         LoggingBackend.cpp
-        Matcher.cpp
         MciAlgo.cpp
+        MinFlowMatcher.cpp
         MsiAlgo.cpp
-        SpiAlgo.cpp
+        NaiveMatcher.cpp
         PllSplits.cpp
         PllTree.cpp
         RfMetricInterface.cpp
+        SpiAlgo.cpp
         StandardRfAlgo.cpp
         helpers/Util.cpp
         helpers/Util.h
@@ -17,12 +18,14 @@ add_library(rf_lib STATIC
         include/LoggingBackend.h
         include/Matcher.h
         include/MciAlgo.h
+        include/MinFlowMatcher.h
         include/MsiAlgo.h
-        include/SpiAlgo.h
+        include/NaiveMatcher.h
         include/PllSplits.hpp
         include/PllTree.hpp
         include/RfAlgorithmInterface.h
         include/RfMetricInterface.h
+        include/SpiAlgo.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
         )
