@@ -1,7 +1,3 @@
-//
-// Created by Tobia on 16.05.2021.
-//
-
 #include "include/GeneralizedRfAlgo.h"
 #include <boost/math/special_functions/factorials.hpp>
 // boost logging
@@ -63,7 +59,7 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	       boost::math::double_factorial<double>(2 * (taxa) -5);
 }
 
-size_t inline GeneralizedRfAlgo::bits_too_many(size_t taxa) {
+size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
 	constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
 	return taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
 }
