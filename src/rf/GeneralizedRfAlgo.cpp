@@ -118,7 +118,7 @@ SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllS
 	return scores;
 }
 
-std::vector<pll_split_base_t> inline GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
+std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
                                                                                  const PllSplit &S2,
                                                                                  size_t split_len) {
 	// TODO: is there something more lightweight (like an array?)
