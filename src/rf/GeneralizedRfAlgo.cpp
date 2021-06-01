@@ -61,7 +61,9 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 
 size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
 	constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
-	return taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
+    auto bits_too_many = taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
+    assert(bits_too_many < sizeof(pll_split_base_t) * 8);
+	return bits_too_many;
 }
 
 RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
