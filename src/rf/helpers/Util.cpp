@@ -61,16 +61,20 @@ std::vector<PllTree> Util::get_tree_from_string_list(std::vector<std::string> &t
 	return trees;
 }
 std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {
-    std::ifstream overview(file_name);
-    if (!overview.is_open()) {
-        throw std::invalid_argument("Could not open input file");
-    }
-    // read entire file to string
-    std::string file_content((std::istreambuf_iterator<char>(overview)),
-                             (std::istreambuf_iterator<char>()));
-    overview.close();
-    auto tree_str = Util::split(file_content, '\n');
+	std::string file_content = read_file(file_name);
+	auto tree_str = Util::split(file_content, '\n');
 	return get_tree_from_string_list(tree_str);
+}
+std::string Util::read_file(const std::string &file_name) {
+	std::ifstream ifstr(file_name);
+	if (!ifstr.is_open()) {
+		throw std::invalid_argument("Could not open input file");
+	}
+	// read entire file to string
+	std::string file_content((std::istreambuf_iterator<char>(ifstr)),
+	                         (std::istreambuf_iterator<char>()));
+	ifstr.close();
+	return file_content;
 }
 SymmetricMatrix<double> Util::create_random_mtx(const size_t dim) {
     SymmetricMatrix<double> res(dim);
@@ -84,4 +88,31 @@ SymmetricMatrix<double> Util::create_random_mtx(const size_t dim) {
         }
     }
     return res;
+}
+SymmetricMatrix<double> Util::parse_symmetric_mtx_from_r(const std::string &file_path,
+                                                         char delim_row,
+                                                         char delim_col ) {
+	std::string file_content = read_file(file_path);
+	auto lines = Util::split(file_content, delim_row);
+	std::vector<std::vector<std::string>> mat;
+	for (const auto &el : lines) {
+        mat.push_back(Util::split(el, delim_col));
+    }
+
+    std::vector<std::vector<double>> dbl_mat;
+	for(const auto& el : mat) {
+		dbl_mat.emplace_back();
+		std::for_each(el.begin(), el.end(), [&dbl_mat](auto elem) {
+			dbl_mat.back().push_back(std::stod(elem));
+		});
+	}
+	// copy out lower matrix in form of Symmetric Matrix
+	size_t dim = dbl_mat.size();
+	SymmetricMatrix<double> res(dim);
+	for (size_t i = 0; i < dim; ++i) {
+		for (size_t j = 0; j <= i; ++j) {
+			res.set_at(i, j, dbl_mat[i][j]);
+		}
+	}
+	return res;
 }

@@ -9,19 +9,18 @@ double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
 		init(scores.size());
 		is_ready = true;
 	}
-	double maximum_score = 0;
-	double minimum_score = 0;
+	constexpr long large_num = 2 << 20;
 	// find maximal pairwise score, will be needed since the solver minimizes cost
-	std::tie(minimum_score, maximum_score) = scores.get_min_max();
-
 	using namespace operations_research;
 	// Construct the LinearSumAssignment.
 	BOOST_LOG_SEV(logger, lg::normal) << "Creating assignment";
 	int num_left_nodes = static_cast<int>(scores.size());
 	LinearSumAssignment<Graph> a(graph, num_left_nodes);
 	// tiny lambda helpers
-	auto getScore = [maximum_score, scores](auto i, auto j) -> long {
-		return static_cast<long>(-scores.at(i, j) + maximum_score);
+	auto getScore = [large_num, scores](auto i, auto j) -> long {
+		// multiply score with a high value to make rounding errors less troublesome
+		auto score = -scores.at(i, j)*large_num;
+		return static_cast<long>(score);
 	};
 	for (int from = 0; from < num_left_nodes; ++from) {
 		// assign diagonal cost once
@@ -47,8 +46,7 @@ double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
 		BOOST_LOG_SEV(logger, lg::error) << "Finished assignment with errors.";
 	}
 	// Retrieve the cost of the optimum assignment.
-	double optimum_cost =
-	    -static_cast<double>(a.GetCost()) + static_cast<double>(scores.size()) * maximum_score;
+	double optimum_cost = -a.GetCost() / static_cast<double>( large_num);
 	double summed_cost = 0;
 	// Retrieve the node-node correspondence of the optimum assignment and the
 	// cost of each node pairing.
@@ -61,8 +59,8 @@ double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
 	double expected_deviation = std::nextafter(optimum_cost, HUGE_VALF) - optimum_cost;
 	// assert(summed_cost == optimum_cost);
 	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << summed_cost;
-	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by OrTools directly: " << optimum_cost
-	                                  << " difference: " << std::abs(summed_cost - optimum_cost);
+//	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by OrTools directly: " << optimum_cost
+//	                                  << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
 	return summed_cost;
 }
@@ -96,5 +94,5 @@ void MinFlowMatcher::init(size_t num_matches) {
 	}
 	// Build the StaticGraph.
 	graph.Build(&arc_permutation);
-	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with 2 * " << num_nodes << " nodes.";
+	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with " << num_nodes << " nodes.";
 }

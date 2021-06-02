@@ -33,7 +33,7 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t sp
 double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	assert(a >= 2);
 	assert(b >= 2);
-
+     // TODO: faalsch... auch auf folien. man muss die kompatiblen segmente vergleichen
 	return boost::math::double_factorial<double>(2 * a - 3) *
 	       boost::math::double_factorial<double>(2 * b - 3) /
 	       boost::math::double_factorial<double>(2 * (a + b) - 5);
@@ -95,7 +95,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 
 double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
-	std::vector<size_t> mapping(scores.size(), 0);
+	std::vector<size_t> mapping(scores.size(), -1);
 	double total_score = match_solver.solve(scores, &mapping);
 	std::stringstream out;
 

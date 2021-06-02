@@ -14,6 +14,9 @@ lapply(files, function(f){
 	
 	first_trees_txt <- readLines(f, n=10)
 	filename <- basename(f)
+	if (filename == "2554" || filename == "2308"){
+		next
+}
 	#print(first_trees_txt)
 	trees <- ape::read.tree(text=first_trees_txt)	
 	
