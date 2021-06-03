@@ -4,9 +4,6 @@
 
 #include "SpiAlgo.h"
 #include <boost/math/special_functions/factorials.hpp>
-double SpiAlgo::calc_tree_score(const PllSplitList &S1, const PllSplitList &S2) {
-	return 0;
-}
 
 double
 SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
@@ -35,3 +32,10 @@ bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, si
 	       PllSplit(&inv_bitset_buffer[0])
 	           .is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len);
 }
+
+// AB | DEFC
+// DEF | ABC --> ABC | DEF
+
+
+// ABC | DE
+// ADE | BC

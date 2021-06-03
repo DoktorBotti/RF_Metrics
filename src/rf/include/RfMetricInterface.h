@@ -23,6 +23,7 @@ class RfMetricInterface {
 		std::string input_file_path;
 		std::string output_file_path;
 		Metric metric = Metric::RF;
+		bool normalize_output = false;
 	};
 	explicit RfMetricInterface(Params params);
 	struct Results {
@@ -33,6 +34,7 @@ class RfMetricInterface {
 
 		SymmetricMatrix<size_t> pairwise_distances_absolute;
 		SymmetricMatrix<double> pairwise_distances_relative;
+		SymmetricMatrix<double> pairwise_split_info;
 		size_t num_unique_trees = 0;
 		double mean_distance = static_cast<double>(NAN);
 	};
