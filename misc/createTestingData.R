@@ -5,7 +5,7 @@
 library(TreeDist)
 library(ape)
 
-files <- list.files("./BS/", full.names=TRUE)
+files <- list.files("./data/heads/BS/", full.names=TRUE)
 spiPath <- "./SPI_10/"
 mciPath <- "./MCI_10/"
 msiPath <- "./MSI_10/"
@@ -15,24 +15,24 @@ lapply(files, function(f){
 	first_trees_txt <- readLines(f, n=10)
 	filename <- basename(f)
 	if (filename == "2554" || filename == "2308"){
-		next
+		return()
 }
 	#print(first_trees_txt)
 	trees <- ape::read.tree(text=first_trees_txt)	
 	
 	# Amount of phylogenetic information in common
 	spi <- SharedPhylogeneticInfo(trees) 
-	write.table(spi,file = paste(spiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
+	write.table(spi,file = paste0(spiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
 	print(paste("Done ", filename, " SPI"))
 		
 	# MCI metric
 	mci <- MutualClusteringInfo(trees)
-	write.table(mci,file = paste(mciPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
+	write.table(mci, file = paste0(mciPath, filename), sep = ",", row.names=FALSE, col.names=FALSE)
 	print(paste("Done ", filename, " MCI"))
 	
 	# MSI metric
 	msi <- MatchingSplitInfo(trees)
-	write.table(msi,file = paste(msiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
+	write.table(msi,file = paste0(msiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
 	print(paste("Done ", filename, " MSI"))
 	})
 #> [1] 13.75284MatchingSplitInfoSplits(splits1, splits2)
