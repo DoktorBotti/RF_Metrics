@@ -42,9 +42,29 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
                                        const PllSplit &S2,
                                        size_t taxa,
                                        size_t split_len) {
-	const auto a1 = S1.popcount(split_len);
-	const auto b1 = taxa - a1;
-	const auto a2 = S2.popcount(split_len);
+	// TODO: ensure A2 \subseteq A1
+	std::vector<pll_split_base_t> cut(split_len);
+	S1.intersect(S2, split_len, &cut[0]);
+
+	size_t a1, b1, a2;
+
+	if (S2.equals(PllSplit(&cut[0]), split_len)) {
+        a1 = S1.popcount(split_len);
+        b1 = taxa - a1;
+        a2 = S2.popcount(split_len);
+	} else if (S1.equals(PllSplit(&cut[0]), split_len)) {
+        a1 = S2.popcount(split_len);
+        b1 = taxa - a1;
+        a2 = S1.popcount(split_len);
+	} else {
+        a1 = S1.popcount(split_len);
+        b1 = taxa - a1;
+        auto b2 = S2.popcount(split_len);
+        a2 = taxa - b2;
+	}
+
+	if (a1 == a2)
+		return p_phy(a1, b1);
 
 	assert(a1 >= 2);
 	assert(b1 >= 2);
@@ -53,8 +73,9 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	// TODO: Watch for numerical problems
 	// TODO: implement explicit a!!/b!! method
 	// TODO: vergleiche dass A1 > A2
-    // TODO: falsch... auch auf folien. man muss die kompatiblen segmente vergleichen
-    return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
+	// TODO: Catch case a1 == a2
+	// TODO: falsch... auch auf folien. man muss die kompatiblen segmente vergleichen
+	return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a2 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a1 - a2 + 2) - 5) /
 	       boost::math::double_factorial<double>(2 * (taxa) -5);
@@ -62,8 +83,9 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 
 size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
 	constexpr size_t bit_amount_split = sizeof(pll_split_base_t) * 8;
-    auto bits_too_many = taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
-    assert(bits_too_many < sizeof(pll_split_base_t) * 8);
+	auto bits_too_many =
+	    taxa % bit_amount_split == 0 ? 0 : bit_amount_split - (taxa % bit_amount_split);
+	assert(bits_too_many < sizeof(pll_split_base_t) * 8);
 	return bits_too_many;
 }
 
@@ -122,8 +144,8 @@ SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllS
 }
 
 std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
-                                                                                 const PllSplit &S2,
-                                                                                 size_t split_len) {
+                                                                          const PllSplit &S2,
+                                                                          size_t split_len) {
 	// TODO: is there something more lightweight (like an array?)
 	std::vector<pll_split_base_t> split_buffer(split_len * 6);
 	// B1 -> &split_buffer[0]
