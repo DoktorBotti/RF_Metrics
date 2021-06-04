@@ -18,7 +18,7 @@ TEST_CASE("execute or-tools example", "[OR_TOOLS]") {
 }
 TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	SymmetricMatrix<double> dst_mtx =
-	    Util::parse_symmetric_mtx_from_r("/rf_metrics/luises_pairw_dst.mtx", '\n', ' ');
+	    Util::parse_symmetric_mtx_from_r("/rf_metrics/smallmtx", '\n', ' ');
 	// maybe only correct results when elements are applied with log2(el)? -> No
 	//	for(size_t row = 0; row < dst_mtx.size(); ++row){
 	//		for(size_t col = 0; col <= row; ++col){
