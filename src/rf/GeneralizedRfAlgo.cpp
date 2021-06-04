@@ -33,7 +33,6 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t sp
 double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	assert(a >= 2);
 	assert(b >= 2);
-     // TODO: faalsch... auch auf folien. man muss die kompatiblen segmente vergleichen
 	return boost::math::double_factorial<double>(2 * a - 3) *
 	       boost::math::double_factorial<double>(2 * b - 3) /
 	       boost::math::double_factorial<double>(2 * (a + b) - 5);
@@ -53,7 +52,9 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 
 	// TODO: Watch for numerical problems
 	// TODO: implement explicit a!!/b!! method
-	return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
+	// TODO: vergleiche dass A1 > A2
+    // TODO: falsch... auch auf folien. man muss die kompatiblen segmente vergleichen
+    return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a2 + 1) - 5) *
 	       boost::math::double_factorial<double>(2 * (a1 - a2 + 2) - 5) /
 	       boost::math::double_factorial<double>(2 * (taxa) -5);

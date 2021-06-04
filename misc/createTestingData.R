@@ -9,6 +9,20 @@ files <- list.files("./data/heads/BS/", full.names=TRUE)
 spiPath <- "./SPI_10/"
 mciPath <- "./MCI_10/"
 msiPath <- "./MSI_10/"
+dir.create(spiPath, showWarnings = FALSE)
+dir.create(mciPath, showWarnings = FALSE)
+dir.create(msiPath, showWarnings = FALSE)
+
+# define function which caclulates and writes all split scores for a custom function
+writeSplitScores <- function (trees, output_path, func){
+	for(i in c(1 : length(trees))){
+		for(j in 1:i){
+			out_name <- paste0(i,"_",j)
+			res_mat <- attr(func(trees[[i]], trees[[j]], reportMatching = TRUE),"pairScores")
+			write.table(res_mat, file = paste0(output_path, out_name), row.names=FALSE, col.names=FALSE)
+		}
+	}
+}
 # loop over each file in the directory
 lapply(files, function(f){
 	
@@ -18,21 +32,31 @@ lapply(files, function(f){
 		return()
 }
 	#print(first_trees_txt)
-	trees <- ape::read.tree(text=first_trees_txt)	
+	trees <- ape::read.tree(text=first_trees_txt)
 	
 	# Amount of phylogenetic information in common
-	spi <- SharedPhylogeneticInfo(trees) 
-	write.table(spi,file = paste0(spiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
+	spi <- SharedPhylogeneticInfo(trees)
+	sampleFolder <- paste0(spiPath, filename , "/")
+	dir.create(sampleFolder, showWarnings = FALSE)
+	write.table(spi,file = paste0(sampleFolder, "pairwise_trees"), sep = ",",row.names=FALSE, col.names=FALSE)
+	writeSplitScores(trees, sampleFolder, SharedPhylogeneticInfo)
 	print(paste("Done ", filename, " SPI"))
 		
 	# MCI metric
 	mci <- MutualClusteringInfo(trees)
-	write.table(mci, file = paste0(mciPath, filename), sep = ",", row.names=FALSE, col.names=FALSE)
+	sampleFolder <- paste0(mciPath, filename , "/")
+	dir.create(sampleFolder, showWarnings = FALSE)
+	write.table(mci, file = paste0(sampleFolder, "pairwise_trees"), sep = ",", row.names=FALSE, col.names=FALSE)
+	writeSplitScores(trees, sampleFolder, MutualClusteringInfo)
 	print(paste("Done ", filename, " MCI"))
 	
 	# MSI metric
 	msi <- MatchingSplitInfo(trees)
-	write.table(msi,file = paste0(msiPath, filename), sep = ",",row.names=FALSE, col.names=FALSE)
+	sampleFolder <- paste0(msiPath, filename , "/")
+	dir.create(sampleFolder, showWarnings = FALSE)
+	write.table(msi,file = paste0(sampleFolder, "pairwise_trees"), sep = ",",row.names=FALSE, col.names=FALSE)
+	writeSplitScores(trees, sampleFolder, MatchingSplitInfo)
+
 	print(paste("Done ", filename, " MSI"))
 	})
 #> [1] 13.75284MatchingSplitInfoSplits(splits1, splits2)

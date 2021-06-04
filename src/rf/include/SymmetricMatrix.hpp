@@ -1,10 +1,11 @@
 #ifndef INFORF_SYMMETRICMATRIX_H
 #define INFORF_SYMMETRICMATRIX_H
 
-#include <cstdio>
-#include <vector>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <sstream>
+#include <vector>
 
 template <typename T>
 class SymmetricMatrix {
@@ -22,6 +23,7 @@ class SymmetricMatrix {
     std::vector<std::vector<T>> to_vector() const;
 
 	[[nodiscard]] std::pair<T,T> get_min_max() const;
+	std::string print() const;
   private:
 	std::vector<T> matrix;
 	size_t dim;
@@ -83,6 +85,16 @@ std::pair<T, T> SymmetricMatrix<T>::get_min_max() const {
 	auto min_max = std::minmax_element(matrix.begin(), matrix.end());
 	return std::make_pair(*min_max.first, *min_max.second);
 }
-
+template <typename T>
+std::string SymmetricMatrix<T>::print() const {
+	std::stringstream ss;
+	for(size_t row = 0; row < size(); ++row){
+		for(size_t col = 0; col < size(); ++col){
+			ss << checked_at(row,col) << " ";
+		}
+		ss <<"\n";
+	}
+	return ss.str();
+}
 
 #endif // INFORF_SYMMETRICMATRIX_H
