@@ -23,6 +23,7 @@ add_library(rf_lib STATIC
         include/NaiveMatcher.h
         include/PllSplits.hpp
         include/PllTree.hpp
+        include/RectMatrix.hpp
         include/RfAlgorithmInterface.h
         include/RfMetricInterface.h
         include/SpiAlgo.h

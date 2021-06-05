@@ -76,20 +76,20 @@ std::string Util::read_file(const std::string &file_name) {
 	ifstr.close();
 	return file_content;
 }
-SymmetricMatrix<double> Util::create_random_mtx(const size_t dim) {
-    SymmetricMatrix<double> res(dim);
+RectMatrix<double> Util::create_random_mtx(const size_t dim) {
+    RectMatrix<double> res(dim);
 	std::random_device dev;
     std::mt19937 rand_engine(dev());
     std::uniform_real_distribution<> distr(0., 500.);
 
     for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j <= i; ++j) {
-            res.set_at(i, j, distr(rand_engine));
+        for (size_t j = 0; j <= dim; ++j) {
+            res.set(i, j, distr(rand_engine));
         }
     }
     return res;
 }
-SymmetricMatrix<double> Util::parse_symmetric_mtx_from_r(const std::string &file_path,
+RectMatrix<double> Util::parse_mtx_from_r(const std::string &file_path,
                                                          char delim_row,
                                                          char delim_col ) {
 	std::string file_content = read_file(file_path);
@@ -106,12 +106,12 @@ SymmetricMatrix<double> Util::parse_symmetric_mtx_from_r(const std::string &file
 			dbl_mat.back().push_back(std::stod(elem));
 		});
 	}
-	// copy out lower matrix in form of Symmetric Matrix
+	// copy out matrix
 	size_t dim = dbl_mat.size();
-	SymmetricMatrix<double> res(dim);
+	RectMatrix<double> res(dim);
 	for (size_t i = 0; i < dim; ++i) {
-		for (size_t j = 0; j <= i; ++j) {
-			res.set_at(i, j, dbl_mat[i][j]);
+		for (size_t j = 0; j <= dim; ++j) {
+			res.set(i, j, dbl_mat[i][j]);
 		}
 	}
 	return res;

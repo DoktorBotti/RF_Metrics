@@ -2,7 +2,7 @@
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
+double MinFlowMatcher::solve(const RectMatrix<double> &scores,
                              std::vector<size_t> *best_matching_out) {
 	// initialize on first usage
 	if (!is_ready) {
@@ -36,7 +36,7 @@ double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
 		const size_t right_idx = a.GetMate(left_node) - scores.size();
 		assert(right_idx >= 0 && right_idx < scores.size());
 		best_matching_out->operator[](left_node) = right_idx;
-		double arc_score = scores.checked_at(left_node, right_idx);
+		double arc_score = scores.at(left_node, right_idx);
 		{
 			// DEBUG verify that chosen arc index is left_id * size + right_id - size
 			auto arc_mate_id = a.GetAssignmentArc(left_node);
@@ -58,7 +58,7 @@ double MinFlowMatcher::solve(const SymmetricMatrix<double> &scores,
 }
 operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &
 MinFlowMatcher::parameterize_assignment(
-    const SymmetricMatrix<double> &scores,
+    const RectMatrix<double> &scores,
     const long large_num,
     operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &a) { // tiny lambda helpers
 	auto getScore = [large_num, scores](auto i, auto j) -> long {
@@ -67,16 +67,12 @@ MinFlowMatcher::parameterize_assignment(
 		return static_cast<long>(score);
 	};
 	for (int from = 0; from < scores.size() ; ++from) {
-		for (int to = 0; to < from; ++to) {
+		for (int to = 0; to < scores.size(); ++to) {
 			// TODO problem that casted to long?
 			long arc_cost = getScore(from, to);
 			// from -> to
 			assign_permuted_cost(from * scores.size() + to, arc_cost, a);
-			// to -> from
-			assign_permuted_cost(to * scores.size() + from, arc_cost, a);
 		}
-		// assign diagonal cost once
-		assign_permuted_cost(from * scores.size() + from, getScore(from, from), a);
 	}
 	return a;
 }
@@ -111,7 +107,7 @@ void MinFlowMatcher::init(size_t num_matches) {
 	graph.Build(&arc_permutation);
 	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with " << num_nodes << " nodes.";
 }
-void MinFlowMatcher::debugAssignment(const SymmetricMatrix<double> &scores, operations_research::LinearSumAssignment<MinFlowMatcher::Graph>* out) {
+void MinFlowMatcher::debugAssignment(const RectMatrix<double> &scores, operations_research::LinearSumAssignment<MinFlowMatcher::Graph>* out) {
 	using namespace operations_research;
     // initialize on first usage
     if (!is_ready) {
@@ -121,7 +117,7 @@ void MinFlowMatcher::debugAssignment(const SymmetricMatrix<double> &scores, oper
     parameterize_assignment(scores, 2 << 30, *out);
 
 }
-MinFlowMatcher::Graph MinFlowMatcher::getGraphCopy(const SymmetricMatrix<double> &scores) {
+MinFlowMatcher::Graph MinFlowMatcher::getGraphCopy(const RectMatrix<double> &scores) {
     using namespace operations_research;
     // initialize on first usage
     if (!is_ready) {

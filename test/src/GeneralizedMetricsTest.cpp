@@ -80,8 +80,8 @@ static void test_metric(const std::string &base_path_splits,
 		io::IOData res = iface.get_result_as_IOData();
 
 		// load solution matrix
-		SymmetricMatrix<double> true_mtx =
-		    Util::parse_symmetric_mtx_from_r(base_path_res + res_fname+ "/pairwise_trees");
+		RectMatrix<double> true_mtx =
+		    Util::parse_mtx_from_r(base_path_res + res_fname + "/pairwise_trees");
 		io::IOData true_ioData;
 		true_ioData.pairwise_distance_mtx = true_mtx.to_vector();
 		CHECK(true_ioData.comparePairwiseDistances(res));

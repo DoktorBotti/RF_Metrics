@@ -17,7 +17,7 @@ NaiveMatcher::NaiveMatcher() {
     objective = solver->MutableObjective();
     objective->SetMaximization();
 }
-double NaiveMatcher::solve(const SymmetricMatrix<double> &scores,
+double NaiveMatcher::solve(const RectMatrix<double> &scores,
                       std::vector<size_t> *best_matching_out) {
 	using namespace operations_research;
 	// initialize solver only once
@@ -58,11 +58,11 @@ double NaiveMatcher::solve(const SymmetricMatrix<double> &scores,
 				if (connected.find(i) == connected.end()) {
 					best_matching_out->operator[](i) = j;
 					connected.insert(i);
-					total_score += scores.checked_at(i, j);
+					total_score += scores.at(i, j);
 				} else if (connected.find(j) == connected.end()) {
 					best_matching_out->operator[](j) = i;
 					connected.insert(j);
-					total_score += scores.checked_at(j, i);
+					total_score += scores.at(j, i);
 				} else if (best_matching_out->operator[](j) != i &&
 				           best_matching_out->operator[](i) != j) {
 					BOOST_LOG_SEV(logger, lg::warning)

@@ -113,6 +113,9 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 			res.pairwise_distances_relative.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 		}
+		double diag_dst = calc_tree_score(*a,*a);
+		res.pairwise_distances_relative.set_at(idx_a,idx_a, diag_dst);
+		total_dst += diag_dst;
 	}
 	// calc mean distance between trees
 	res.mean_distance = total_dst / static_cast<double>(trees.size());
@@ -132,14 +135,15 @@ double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitL
 	return total_score;
 }
 
-SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
+RectMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
                                                                       const PllSplitList &S2) {
-	SymmetricMatrix<double> scores(S1.size());
+	RectMatrix<double> scores(S1.size());
+	assert(S1.size() == S2.size());
 	const auto taxa = S1.size() + 3;
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
-		for (size_t col = 0; col <= row; ++col) {
-			scores.set_at(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
+		for (size_t col = 0; col < S1.size(); ++col) {
+			scores.set(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
 		}
 	}
 

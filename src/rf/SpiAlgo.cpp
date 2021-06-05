@@ -27,8 +27,8 @@ bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, si
 	pll_split_base_t mask = (~0) << bits_too_many;
 	inv_bitset_buffer[split_len - 1] &= mask;
 
-	return S1.is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len) ||
-	       S2.is_disjoint(PllSplit(&inv_bitset_buffer[0]), split_len) ||
+	return S1.is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len) ||  // A1 <-> B2
+	       S2.is_disjoint(PllSplit(&inv_bitset_buffer[0]), split_len) ||  // A2 <-> B1
 	       PllSplit(&inv_bitset_buffer[0])
 	           .is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len);
 }

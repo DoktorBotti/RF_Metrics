@@ -9,6 +9,7 @@
 #include <PllSplits.hpp>
 #include <string>
 #include <vector>
+#include "RectMatrix.hpp"
 #include "SymmetricMatrix.hpp"
 
 class Util {
@@ -22,11 +23,11 @@ class Util {
 	static std::vector<PllSplitList> create_splits(int n, const std::string &file_name);
 	static std::vector<PllTree> create_trees(int n, const std::string &file_name);
 	static std::vector<PllTree> create_all_trees(const std::string &file_name);
-    static SymmetricMatrix<double>
-    parse_symmetric_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
+    static RectMatrix<double>
+	parse_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
                                char delim_col = ',');
 
-	static SymmetricMatrix<double> create_random_mtx(const size_t dim);
+	static RectMatrix<double> create_random_mtx(const size_t dim);
 
 	static std::string read_file(const std::string &file_name);
   private:

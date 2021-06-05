@@ -5,6 +5,7 @@
 #ifndef INFORF_GENERALIZEDRFALGO_H
 #define INFORF_GENERALIZEDRFALGO_H
 #include "MinFlowMatcher.h"
+#include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
@@ -28,7 +29,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static double h_info_content(size_t a, size_t b);
-	SymmetricMatrix<double> calc_pairwise_split_scores(const PllSplitList &S1,
+	RectMatrix<double> calc_pairwise_split_scores(const PllSplitList &S1,
 	                                                   const PllSplitList &S2);
 	virtual double
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;

@@ -17,8 +17,7 @@ TEST_CASE("execute or-tools example", "[OR_TOOLS]") {
 	BasicExample();
 }
 TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
-	SymmetricMatrix<double> dst_mtx =
-	    Util::parse_symmetric_mtx_from_r("/rf_metrics/smallmtx", '\n', ' ');
+	RectMatrix<double> dst_mtx = Util::parse_mtx_from_r("/rf_metrics/smallmtx", '\n', ' ');
 	// maybe only correct results when elements are applied with log2(el)? -> No
 	//	for(size_t row = 0; row < dst_mtx.size(); ++row){
 	//		for(size_t col = 0; col <= row; ++col){
@@ -40,7 +39,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	const size_t dim_size = 9;
 	std::cout << "number of possible matchings: " << dim_size
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
-	SymmetricMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
+	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	MinFlowMatcher matcher;
 	std::vector<size_t> res_matching(dim_size, 0);
 	double res = matcher.solve(dst_mtx, &res_matching);
@@ -59,7 +58,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 		// verify that res is (probably) best mapping
 		double oth_score = 0;
 		for (size_t i = 0; i < dim_size; ++i) {
-			oth_score += dst_mtx.checked_at(i, bad_mapping[i]);
+			oth_score += dst_mtx.at(i, bad_mapping[i]);
 		}
 		if (oth_score > closest_guess) {
 			closest_guess = oth_score;
@@ -112,8 +111,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		double solution = get_pairwise_tree_score(score_file_iter->path());
 
 		// calculate own solution by matching from pairwise split score matrix
-		auto split_scores =
-		    Util::parse_symmetric_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
+		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
 		std::vector<size_t> found_matching(split_scores.size(), 0);
 		MinFlowMatcher matcher;
 		auto our_solution = matcher.solve(split_scores, &found_matching);
@@ -210,6 +208,6 @@ double get_pairwise_tree_score(std::filesystem::path path) {
 	// open pairwise score file, which is in the same directory
 	path.remove_filename();
 	std::string tree_score_name = path.string() + "pairwise_trees";
-	auto res_mtx = Util::parse_symmetric_mtx_from_r(tree_score_name, '\n', ',');
-	return res_mtx.checked_at(row, col);
+	auto res_mtx = Util::parse_mtx_from_r(tree_score_name, '\n', ',');
+	return res_mtx.at(row, col);
 }

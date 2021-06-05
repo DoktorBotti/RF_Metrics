@@ -6,6 +6,7 @@
 #define INFORF_MINFLOWMATCHER_H
 #include "LoggingBackend.h"
 #include "Matcher.h"
+#include "RectMatrix.hpp"
 #include "ortools/graph/linear_assignment.h"
 #include <boost/log/sources/severity_logger.hpp>
 #include <ortools/graph/graph.h>
@@ -15,12 +16,12 @@ class MinFlowMatcher : public Matcher {
 	typedef util::StaticGraph<> Graph;
 
 	explicit MinFlowMatcher();
-	double solve(const SymmetricMatrix<double> &scores,
+	double solve(const RectMatrix<double> &scores,
 	             std::vector<size_t> *best_matching_out) override;
 
-	void debugAssignment(const SymmetricMatrix<double> &scores,
+	void debugAssignment(const RectMatrix<double> &scores,
 	                     operations_research::LinearSumAssignment<MinFlowMatcher::Graph> *out);
-	Graph getGraphCopy(const SymmetricMatrix<double> &scores);
+	Graph getGraphCopy(const RectMatrix<double> &scores);
 	// factor for more precision after rounding, normally private but testing stuff
 	static const long large_num = (long) 2 << 30;
 
@@ -39,7 +40,7 @@ class MinFlowMatcher : public Matcher {
 	                          operations_research::LinearSumAssignment<Graph> &graph);
 
 	operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &
-	parameterize_assignment(const SymmetricMatrix<double> &scores,
+	parameterize_assignment(const RectMatrix<double> &scores,
 	                        const long large_num,
 	                        operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &a);
 };
