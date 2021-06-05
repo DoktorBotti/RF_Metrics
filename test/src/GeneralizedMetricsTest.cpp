@@ -12,7 +12,7 @@ TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/SPI_10";
+	std::string base_path_res = "../test/samples/SPI_10/";
 	auto metr = RfMetricInterface::SPI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -21,7 +21,7 @@ TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/MSI_10";
+	std::string base_path_res = "../test/samples/MSI_10/";
 	auto metr = RfMetricInterface::MSI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -31,7 +31,7 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/MCI_10";
+	std::string base_path_res = "../test/samples/MCI_10/";
 	auto metr = RfMetricInterface::MCI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -58,7 +58,7 @@ static void test_metric(const std::string &base_path_splits,
 
 		// load solution matrix
 		SymmetricMatrix<double> true_mtx =
-		    Util::parse_symmetric_mtx_from_r(base_path_res + "pairwise_trees");
+		    Util::parse_symmetric_mtx_from_r(base_path_res + res_fname+ "/pairwise_trees");
 		io::IOData true_ioData;
 		true_ioData.pairwise_distance_mtx = true_mtx.to_vector();
 		CHECK(true_ioData.comparePairwiseDistances(res));

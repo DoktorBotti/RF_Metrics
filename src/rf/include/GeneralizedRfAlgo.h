@@ -49,6 +49,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
   private:
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;
     MinFlowMatcher match_solver;
+	static double double_fac(long x);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

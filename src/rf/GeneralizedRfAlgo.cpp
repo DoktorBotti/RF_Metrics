@@ -31,11 +31,12 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t sp
 }
 
 double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
+	// TODO MCI and MSI calls this function wih both a and b == 0
 	assert(a >= 2);
 	assert(b >= 2);
-	return boost::math::double_factorial<double>(2 * a - 3) *
-	       boost::math::double_factorial<double>(2 * b - 3) /
-	       boost::math::double_factorial<double>(2 * (a + b) - 5);
+	return double_fac(2 * a - 3) *
+	       double_fac(2 * b - 3) /
+	       double_fac(2 * (a + b) - 5);
 }
 
 double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
@@ -75,10 +76,10 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	// TODO: vergleiche dass A1 > A2
 	// TODO: Catch case a1 == a2
 	// TODO: falsch... auch auf folien. man muss die kompatiblen segmente vergleichen
-	return boost::math::double_factorial<double>(2 * (b1 + 1) - 5) *
-	       boost::math::double_factorial<double>(2 * (a2 + 1) - 5) *
-	       boost::math::double_factorial<double>(2 * (a1 - a2 + 2) - 5) /
-	       boost::math::double_factorial<double>(2 * (taxa) -5);
+	return double_fac(2 * (b1 + 1) - 5) *
+	       double_fac(2 * (a2 + 1) - 5) *
+	       double_fac(2 * (a1 - a2 + 2) - 5) /
+	       double_fac(2 * (taxa) -5);
 }
 
 size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
@@ -104,8 +105,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	// iterate through all tree combinations
 	for (auto a = std::as_const(all_splits).begin(); a != all_splits.end(); ++a) {
 		size_t idx_a = a - all_splits.begin();
-		for (auto b = a; b != all_splits.end(); ++b) {
-			size_t idx_b = b - a;
+		for (auto b = std::as_const(all_splits).begin(); b != a; ++b) {
+			size_t idx_b = b - all_splits.begin();
 			double dst = calc_tree_score(*a, *b);
 			res.pairwise_distances_relative.set_at(idx_b, idx_a, dst);
 			total_dst += dst;
@@ -163,4 +164,21 @@ std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const 
 	S2.intersect(PllSplit(&split_buffer[0]), split_len, &split_buffer[5 * split_len]);
 
 	return split_buffer;
+}
+double GeneralizedRfAlgo::double_fac(long x) {
+	if (x >= 0) {
+		try {
+			return boost::math::double_factorial<double>(x);
+		}catch (const std::exception& e){
+			std::stringstream ss;
+			ss << "Numerical overflow while calculating " << x << "!!\n";
+            ss<< "Exception text: " << e.what();
+			std::string str = ss.str();
+			throw std::out_of_range(str.c_str());
+		}
+	} else if (x == -1) {
+		return 1.;
+	} else {
+		throw std::invalid_argument("numbers less than -1 are not defined");
+	}
 }
