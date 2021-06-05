@@ -31,9 +31,9 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t sp
 }
 
 double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
-	// TODO MCI and MSI calls this function wih both a and b == 0
-	assert(a >= 2);
-	assert(b >= 2);
+	// if a or b < 1 then the double_factorial gets smaller than -1 which would be illegal
+	assert(a >= 1);
+	assert(b >= 1);
 	return double_fac(2 * a - 3) *
 	       double_fac(2 * b - 3) /
 	       double_fac(2 * (a + b) - 5);
@@ -67,9 +67,11 @@ double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	if (a1 == a2)
 		return p_phy(a1, b1);
 
-	assert(a1 >= 2);
-	assert(b1 >= 2);
-	assert(a2 >= 2);
+	// assertions so that the double factorials are defined
+	assert(a1 >= a2);
+	assert(b1 >= 1);
+	assert(a2 >= 1);
+	assert(taxa >= 2);
 
 	// TODO: Watch for numerical problems
 	// TODO: implement explicit a!!/b!! method
@@ -108,7 +110,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		for (auto b = std::as_const(all_splits).begin(); b != a; ++b) {
 			size_t idx_b = b - all_splits.begin();
 			double dst = calc_tree_score(*a, *b);
-			res.pairwise_distances_relative.set_at(idx_b, idx_a, dst);
+			res.pairwise_distances_relative.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 		}
 	}

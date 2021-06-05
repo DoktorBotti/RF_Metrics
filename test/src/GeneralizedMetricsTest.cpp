@@ -3,6 +3,7 @@
 #include "catch2/catch.hpp"
 #include <boost/log/sources/record_ostream.hpp>
 #include <filesystem>
+#include <fstream>
 
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
@@ -35,6 +36,28 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 	auto metr = RfMetricInterface::MCI;
 	test_metric(base_path, base_path_res, metr);
 }
+void write_to_file(std::string file, std::string content);
+TEST_CASE("Calculate simple trees", "[dbg]"){
+	// Edit your trees to test here
+	std::string tree1 = "((((F,C),B),A),(E,D));";
+	std::string tree2 = "(((B,C),(D,A)),(E,F));";
+	std::string tree_path = "/tmp/tmpTrees";
+
+	// write them to a temporary file
+	write_to_file(tree_path, tree1 + "\n" + tree2);
+
+	// init algo interface
+	RfMetricInterface::Params params;
+	params.normalize_output = false;
+	params.metric = RfMetricInterface::SPI;
+	params.input_file_path = tree_path;
+
+	RfMetricInterface iface(params);
+	iface.do_magical_high_performance_stuff();
+	INFO(iface.get_result().pairwise_distances_relative.print());
+	SUCCEED("Done.");
+}
+
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
                         const RfMetricInterface::Metric &metric) {
@@ -63,4 +86,13 @@ static void test_metric(const std::string &base_path_splits,
 		true_ioData.pairwise_distance_mtx = true_mtx.to_vector();
 		CHECK(true_ioData.comparePairwiseDistances(res));
 	}
+}
+
+void write_to_file(std::string file, std::string content){
+	std::ofstream ostr(file);
+	if(ostr.bad() || ! ostr.is_open()){
+		throw std::invalid_argument("Could not write to file " + file);
+	}
+	ostr << content;
+	ostr.close();
 }
