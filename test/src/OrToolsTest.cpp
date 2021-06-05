@@ -75,7 +75,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 	std::string base_path = "../test/samples/";
 	RfMetricInterface::Metric metric =
 	    GENERATE(RfMetricInterface::SPI, RfMetricInterface::MSI, RfMetricInterface::MCI);
-	std::string reference_path = base_path;
+	std::string reference_path = "/rf_metrics/";
 	switch (metric) {
 		case RfMetricInterface::SPI:
 			reference_path += "SPI_10/";
@@ -94,15 +94,14 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 	// now iterate over all inner directories, and pick ONE random tree score to validate against
 	for (const auto &sample_folder : std::filesystem::directory_iterator(reference_path)) {
 		// skip irrelevant files
-		if (sample_folder.path().filename() == "." || sample_folder.path().filename() == ".." ||
-		    !sample_folder.is_directory()) {
+		if (!sample_folder.is_directory()) {
 			continue;
 		}
 		int num_pairwise_scores =
 		    static_cast<int>(number_of_files_in_directory(sample_folder.path())) - 1;
 		std::uniform_int_distribution distr(0, num_pairwise_scores);
 		// pick random pairwise score file
-		int file_idx = 34; // distr(mt);
+		int file_idx = distr(mt);
 		auto score_file_iter = std::filesystem::directory_iterator(sample_folder.path());
 		std::advance(score_file_iter, file_idx);
 		BOOST_LOG_SEV(logger, lg::normal)
@@ -116,7 +115,10 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		MinFlowMatcher matcher;
 		auto our_solution = matcher.solve(split_scores, &found_matching);
 		double difference = std::abs(our_solution - solution);
-		CHECK(difference <= 1e-3);
+		bool correct = difference <= 1e-3;
+		CHECK(correct);
+        BOOST_LOG_SEV(logger, lg::normal)
+            << (correct? "correct." : "FAIL");
 	}
 }
 

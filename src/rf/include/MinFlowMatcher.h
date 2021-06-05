@@ -23,7 +23,7 @@ class MinFlowMatcher : public Matcher {
 	                     operations_research::LinearSumAssignment<MinFlowMatcher::Graph> *out);
 	Graph getGraphCopy(const RectMatrix<double> &scores);
 	// factor for more precision after rounding, normally private but testing stuff
-	static const long large_num = (long) 2 << 30;
+	static const long large_num = (long) 2 << 20;
 
   private:
 	// important private members

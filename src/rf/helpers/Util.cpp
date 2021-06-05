@@ -110,7 +110,7 @@ RectMatrix<double> Util::parse_mtx_from_r(const std::string &file_path,
 	size_t dim = dbl_mat.size();
 	RectMatrix<double> res(dim);
 	for (size_t i = 0; i < dim; ++i) {
-		for (size_t j = 0; j <= dim; ++j) {
+		for (size_t j = 0; j < dim; ++j) {
 			res.set(i, j, dbl_mat[i][j]);
 		}
 	}
