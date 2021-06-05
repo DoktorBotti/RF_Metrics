@@ -9,18 +9,18 @@ GeneralizedRfAlgo::GeneralizedRfAlgo() {
 }
 
 double GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
-	return (-1) * std::log(p_phy(S, taxa, split_len));
+	return (-1) * std::log2(p_phy(S, taxa, split_len));
 }
 
 double GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
                                          const PllSplit &S2,
                                          size_t taxa,
                                          size_t split_len) {
-	return (-1) * std::log(p_phy(S1, S2, taxa, split_len));
+	return (-1) * std::log2(p_phy(S1, S2, taxa, split_len));
 }
 
 double GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
-	return (-1) * std::log(p_phy(a, b));
+	return (-1) * std::log2(p_phy(a, b));
 }
 
 double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
