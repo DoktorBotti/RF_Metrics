@@ -17,7 +17,7 @@ class NaiveMatcher : public Matcher {
 	// Class not easily copyable because of the unique_ptr to solver
 	NaiveMatcher(NaiveMatcher &&) = default;
 	// solves the matching given pairwise scores between sets
-	double solve(const RectMatrix<double> &scores, std::vector<size_t> *best_matching_out) override;
+	Scalar solve(const RectMatrix<double> &scores, std::vector<size_t> *best_matching_out) override;
 
   private:
 	void init_constraints(size_t elems);

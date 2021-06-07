@@ -19,19 +19,19 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
 
   protected:
-	virtual double calc_tree_score(const PllSplitList &A, const PllSplitList &B);
-	static double p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
-	static double p_phy(const PllSplit &S, size_t taxa, size_t split_len);
+	virtual Scalar calc_tree_score(const PllSplitList &A, const PllSplitList &B);
+	static Scalar p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
+	static Scalar p_phy(const PllSplit &S, size_t taxa, size_t split_len);
 	/* Calculates the phylogenetic probability of a split with partition sizes a and b. */
-	static double p_phy(size_t a, size_t b);
-	static double h_info_content(const PllSplit &S, size_t taxa, size_t split_len);
-	static double
+	static Scalar p_phy(size_t a, size_t b);
+	static Scalar h_info_content(const PllSplit &S, size_t taxa, size_t split_len);
+	static Scalar
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
-	static double h_info_content(size_t a, size_t b);
-	RectMatrix<double> calc_pairwise_split_scores(const PllSplitList &S1,
+	static Scalar h_info_content(size_t a, size_t b);
+	RectMatrix<Scalar> calc_pairwise_split_scores(const PllSplitList &S1,
 	                                                   const PllSplitList &S2);
-	virtual double
+	virtual Scalar
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
 	static size_t bits_too_many(size_t taxa);
 	/*
@@ -50,7 +50,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
   private:
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;
     MinFlowMatcher match_solver;
-	static double double_fac(long x);
+	static Scalar double_fac(long x);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

@@ -6,6 +6,7 @@
 #include <vector>
 class RfAlgorithmInterface {
   public:
+	typedef double Scalar;
 	virtual RfMetricInterface::Results calculate(std::vector<PllTree> &trees) = 0;
 	virtual ~RfAlgorithmInterface() = default;
 };

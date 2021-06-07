@@ -17,7 +17,7 @@ NaiveMatcher::NaiveMatcher() {
     objective = solver->MutableObjective();
     objective->SetMaximization();
 }
-double NaiveMatcher::solve(const RectMatrix<double> &scores,
+Matcher::Scalar NaiveMatcher::solve(const RectMatrix<Matcher::Scalar> &scores,
                       std::vector<size_t> *best_matching_out) {
 	using namespace operations_research;
 	// initialize solver only once
@@ -47,7 +47,7 @@ double NaiveMatcher::solve(const RectMatrix<double> &scores,
 	}
 	// get solution
 	std::set<size_t> connected;
-	double total_score = 0;
+	Matcher::Scalar total_score = 0;
 		for (size_t i = 0; i < scores.size(); ++i) {
 			for (size_t j = 0; j < scores.size(); ++j) {
 				const auto &var = variables[i * scores.size() + j];

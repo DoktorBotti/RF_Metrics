@@ -128,39 +128,31 @@ TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
 	auto mtx = Util::create_random_mtx(mtx_dim);
 	auto graph = matcher.getGraphCopy(mtx);
 
-	CHECK(graph.num_nodes() == mtx_dim*2);
+	CHECK(graph.num_nodes() == mtx_dim * 2);
 	CHECK(graph.num_arcs() == mtx_dim * mtx_dim);
 	size_t counter = 0;
 	// Check if outdegree is always equal at left nodes
 	for (const auto &node : graph.AllNodes()) {
 		CHECK(graph.OutDegree(node) == mtx_dim);
-        ++counter;
-        if (counter == mtx_dim) {
-            break;
-        }
-    }
+		++counter;
+		if (counter == mtx_dim) {
+			break;
+		}
+	}
 }
 
-TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]"){
-    MinFlowMatcher matcher;
-    constexpr size_t mtx_dim = 3;
-    auto mtx = Util::create_random_mtx(mtx_dim);
+TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]") {
+	MinFlowMatcher matcher;
+	constexpr size_t mtx_dim = 3;
+	auto mtx = Util::create_random_mtx(mtx_dim);
 	auto mtx_vis = mtx.print();
-    auto graph = matcher.getGraphCopy(mtx);
-	std::vector<size_t> matching(mtx_dim,0);
-    double res = matcher.solve(mtx, &matching);
-    operations_research::LinearSumAssignment<util::StaticGraph<>> a(graph, mtx_dim);
-    matcher.debugAssignment(mtx, &a);
+	auto graph = matcher.getGraphCopy(mtx);
+	std::vector<size_t> matching(mtx_dim, 0);
+	double res = matcher.solve(mtx, &matching);
+	operations_research::LinearSumAssignment<util::StaticGraph<>> a(graph, mtx_dim);
+	matcher.debugAssignment(mtx, &a);
 	// checks that there will be no overflow
 	CHECK(a.FinalizeSetup());
-
-//	for(size_t row = 0; row < mtx_dim; ++row){
-//		for(size_t col =0; col <= row; ++col){
-//			long expected_cost = mtx.at(row,col)* MinFlowMatcher::large_num;
-//            int arc_idx = row * mtx_dim + col;
-//			auto cost = a.
-//		}
-//	}
 }
 void BasicExample() {
 	using namespace operations_research;

@@ -41,16 +41,16 @@ MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	assert(std::isfinite(pcl_b1_b2));
 
 	const auto sum_a1_b2 =
-	    pcl_a1_b2 == 0 ? 0 : pcl_a1_b2 * (std::log(pcl_a1_b2 * inv_pcl_a1 * inv_pcl_b2));
+	    pcl_a1_b2 == 0 ? 0 : pcl_a1_b2 * (std::log2(pcl_a1_b2 * inv_pcl_a1 * inv_pcl_b2));
 	const auto sum_a2_b1 =
-	    pcl_a2_b1 == 0 ? 0 : pcl_a2_b1 * (std::log(pcl_a2_b1 * inv_pcl_a2 * inv_pcl_b1));
+	    pcl_a2_b1 == 0 ? 0 : pcl_a2_b1 * (std::log2(pcl_a2_b1 * inv_pcl_a2 * inv_pcl_b1));
 	const auto sum_b1_b2 =
-	    pcl_b1_b2 == 0 ? 0 : pcl_b1_b2 * (std::log(pcl_b1_b2 * inv_pcl_a2 * inv_pcl_b2));
+	    pcl_b1_b2 == 0 ? 0 : pcl_b1_b2 * (std::log2(pcl_b1_b2 * inv_pcl_a2 * inv_pcl_b2));
 
     assert(std::isfinite(sum_a1_b2));
     assert(std::isfinite(sum_a2_b1));
     assert(std::isfinite(sum_b1_b2));
 
-	return pcl_a1_a2 * (std::log(pcl_a1_a2 * inv_pcl_a1 * inv_pcl_a2)) + sum_a1_b2 + sum_a2_b1 +
+	return pcl_a1_a2 * (std::log2(pcl_a1_a2 * inv_pcl_a1 * inv_pcl_a2)) + sum_a1_b2 + sum_a2_b1 +
 	       sum_b1_b2;
 }

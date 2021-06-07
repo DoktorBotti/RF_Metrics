@@ -1,7 +1,3 @@
-//
-// Created by Tobia on 16.05.2021.
-//
-
 #include "MsiAlgo.h"
 
 double
@@ -16,11 +12,15 @@ MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	const auto a1_b2 = PllSplit(&split_buffer[4 * split_len]).popcount(split_len);
 	const auto a2_b1 = PllSplit(&split_buffer[5 * split_len]).popcount(split_len);
 
-	// escape invalid calculations by discarding them early. (double factorials for x!!,  where x < -1)
-	if (!a1_a2 || !b1_b2) {
+	// trivial splits contain no information
+	if (std::min(a1_a2, b1_b2) <= 1 && std::min(a1_b2, a2_b1) <= 1) {
+		// all splits are trivial
+		return 0;
+	} else if (std::min(a1_a2, b1_b2) <= 1) {
+		// only second split is non-trivial
 		return h_info_content(a1_b2, a2_b1);
-	}
-	if (!a1_b2 || !a2_b1) {
+	} else if (std::min(a1_b2, a2_b1) <= 1) {
+		// only first split is non-trivial
 		return h_info_content(a1_a2, b1_b2);
 	}
 	return std::max(h_info_content(a1_a2, b1_b2), h_info_content(a1_b2, a2_b1));
