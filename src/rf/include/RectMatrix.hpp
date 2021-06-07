@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdio>
+#include <iomanip>
 #include <sstream>
 #include <vector>
 
@@ -72,10 +74,17 @@ std::pair<T, T> RectMatrix<T>::get_min_max() const {
 template <typename T>
 std::string RectMatrix<T>::print() const {
 	std::stringstream ss;
+	auto min_max = get_min_max();
+	long digits_pre_comma = std::log(min_max.second);
+	// expect one digit before comma. For all additional 4 digits, insert tab
+	std::string spacer = "\t\t";
+	for (size_t i = 0; i < std::max(digits_pre_comma / 4 - 1, 0l); ++i) {
+		spacer += "\t";
+	}
 	for (size_t row = 0; row < size(); ++row) {
 		for (size_t col = 0; col < size(); ++col) {
 			const auto &val = at(row, col);
-			ss << val << (val == 0 ? "\t\t " : " ");
+			ss << std::setprecision(5) << val << (val == 0 ? spacer : " ");
 		}
 		ss << "\n";
 	}

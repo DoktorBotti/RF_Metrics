@@ -7,51 +7,49 @@
 // TODO: test boolean transformation to reduce operations
 double
 MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
-	const auto d_taxa = static_cast<double>(taxa);
-	const auto a1 = static_cast<double>(S1.popcount(split_len));
-	const auto a2 = static_cast<double>(S2.popcount(split_len));
-
-	const double inv_pcl_a1 = d_taxa / a1;
-	const double inv_pcl_a2 = d_taxa / a2;
-	// TODO: compare performance to (double) (taxa - S1.popcount(split_len))
-	const double inv_pcl_b1 = d_taxa / (d_taxa - a1);
-	const double inv_pcl_b2 = d_taxa / (d_taxa - a2);
+	const auto a1 = S1.popcount(split_len);
+	const auto a2 = S2.popcount(split_len);
+	const auto b1 = taxa - a1;
+	const auto b2 = taxa - a2;
 
 	auto split_buffer = GeneralizedRfAlgo::compute_split_comparison(S1, S2, split_len);
-	auto not_triv = [](auto cnt) { return cnt <= 1 ? 0 : cnt; };
-	const double pcl_a1_a2 =
-	    static_cast<double>(not_triv(PllSplit(&split_buffer[2 * split_len]).popcount(split_len))) / d_taxa;
-	assert(std::isfinite(pcl_a1_a2));
 
-	double pcl_a1_b2 =
-	    static_cast<double>(not_triv(PllSplit(&split_buffer[4 * split_len]).popcount(split_len))) / d_taxa;
-	assert(std::isfinite(pcl_a1_b2));
-
-	const double pcl_a2_b1 =
-	    static_cast<double>(not_triv(PllSplit(&split_buffer[5 * split_len]).popcount(split_len))) / d_taxa;
-	assert(std::isfinite(pcl_a2_b1));
-
+	const auto a1_a2 = PllSplit(&split_buffer[2 * split_len]).popcount(split_len); // a_and_b
+	const auto a1_b2 = PllSplit(&split_buffer[4 * split_len]).popcount(split_len); // a_and_B
+	const auto a2_b1 = PllSplit(&split_buffer[5 * split_len]).popcount(split_len); // A_and_b
 	// Account for the bits counted at the end because of both inversions!
 	// TODO: test whether bitmask is faster
 	const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
-	const double pcl_b1_b2 =
-	    static_cast<double>(not_triv(PllSplit(&split_buffer[3 * split_len]).popcount(split_len) -
-	                        bits_too_many)) /
-	    d_taxa;
-	assert(std::isfinite(pcl_b1_b2));
+	const auto b1_b2 = PllSplit(&split_buffer[3 * split_len]).popcount(split_len) - bits_too_many; // A_and_B
+    assert(b1_b2 == taxa - (a1_a2 + a1_b2 + a2_b1));
 
-	const auto sum_a1_a2 =
-	    pcl_a1_a2 == 0 ? 0 : pcl_a1_a2 * (std::log2(pcl_a1_a2 * inv_pcl_a1 * inv_pcl_a2));
-	const auto sum_a1_b2 =
-	    pcl_a1_b2 == 0 ? 0 : pcl_a1_b2 * (std::log2(pcl_a1_b2 * inv_pcl_a1 * inv_pcl_b2));
-	const auto sum_a2_b1 =
-	    pcl_a2_b1 == 0 ? 0 : pcl_a2_b1 * (std::log2(pcl_a2_b1 * inv_pcl_a2 * inv_pcl_b1));
-	const auto sum_b1_b2 =
-	    pcl_b1_b2 == 0 ? 0 : pcl_b1_b2 * (std::log2(pcl_b1_b2 * inv_pcl_a2 * inv_pcl_b2));
+	assert(a1 == a1_a2 + a1_b2); // na
+	assert(a2 == a1_a2 + a2_b1); // nb
+    assert(b1 == a2_b1 + b1_b2); // nA
+    assert(b2 == a1_b2 + b1_b2); // nB
+	const auto sum_a1_a2 = to_prob(a1_a2, taxa, a1, a2);
+	const auto sum_a1_b2 = to_prob(a1_b2, taxa, a1,b2);
+	const auto sum_a2_b1 = to_prob(a2_b1, taxa, a2, b1);
+	const auto sum_b1_b2 = to_prob(b1_b2, taxa, b1,b2);
 
-	assert(std::isfinite(sum_a1_b2));
-	assert(std::isfinite(sum_a2_b1));
-	assert(std::isfinite(sum_b1_b2));
+	return (sum_a1_a2 + sum_a1_b2 + sum_a2_b1 + sum_b1_b2) / static_cast<Scalar>(taxa);
+}
+RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
+                                              size_t numerator_in_log,
+                                              size_t denom_a,
+                                              size_t denom_b) {
+	if (!numerator_inout_log || !denom_b || !denom_a) {
+		// return 0 if outer prod is zero or denominator is zeros
+		return 0;
+	}
+	// check case when log2(2) = 1
+	if (numerator_inout_log == denom_a && numerator_inout_log == denom_b &&
+	    numerator_inout_log + numerator_inout_log == numerator_in_log) {
+		return static_cast<Scalar>(numerator_inout_log);
+	}
+	const auto numerator = static_cast<Scalar>(numerator_inout_log * numerator_in_log);
+	const auto denominator = static_cast<Scalar>(denom_a * denom_b);
 
-	return sum_a1_a2 + sum_a1_b2 + sum_a2_b1 + sum_b1_b2;
+	// log first should result in a higher precision
+	return static_cast<Scalar>(numerator_inout_log) * (std::log2(numerator) - std::log2(denominator));
 }

@@ -8,11 +8,11 @@
 #include "GeneralizedRfAlgo.h"
 
 class MciAlgo : public GeneralizedRfAlgo {
-  protected:
-
+  private:
+    static inline Scalar to_prob(size_t numerator_inout_log, size_t numerator_in_log, size_t denom_a, size_t denom_b);
   public:
 	// TODO: make private and still testable?
-    double calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) override;
+    Scalar calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) override;
 };
 
 #endif // CONCURRENT_GROWTABLE_MCIALGO_H
