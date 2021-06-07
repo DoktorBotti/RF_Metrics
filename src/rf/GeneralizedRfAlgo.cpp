@@ -8,29 +8,29 @@ GeneralizedRfAlgo::GeneralizedRfAlgo() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 }
 
-double GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
 	return (-1) * std::log2(p_phy(S, taxa, split_len));
 }
 
-double GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
                                          const PllSplit &S2,
                                          size_t taxa,
                                          size_t split_len) {
 	return (-1) * std::log2(p_phy(S1, S2, taxa, split_len));
 }
 
-double GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
 	return (-1) * std::log2(p_phy(a, b));
 }
 
-double inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
 	const auto a = S.popcount(split_len);
 	const auto b = taxa - a;
 
 	return p_phy(a, b);
 }
 
-double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	// if a or b < 1 then the double_factorial gets smaller than -1 which would be illegal
 	assert(a >= 1);
 	assert(b >= 1);
@@ -39,7 +39,7 @@ double inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	       double_fac(2 * (a + b) - 5);
 }
 
-double inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
                                        const PllSplit &S2,
                                        size_t taxa,
                                        size_t split_len) {
@@ -102,27 +102,27 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		all_splits.emplace_back(t);
 	}
 	RfMetricInterface::Results res(trees.size());
-	double total_dst = 0;
+	Scalar total_dst = 0;
 
 	// iterate through all tree combinations
 	for (auto a = std::as_const(all_splits).begin(); a != all_splits.end(); ++a) {
 		size_t idx_a = a - all_splits.begin();
 		for (auto b = std::as_const(all_splits).begin(); b != a; ++b) {
 			size_t idx_b = b - all_splits.begin();
-			double dst = calc_tree_score(*a, *b);
+			Scalar dst = calc_tree_score(*a, *b);
 			res.pairwise_distances_relative.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 		}
 	}
 	// calc mean distance between trees
-	res.mean_distance = total_dst / static_cast<double>(trees.size());
+	res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
 	return res;
 }
 
-double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	std::vector<size_t> mapping(scores.size(), -1);
-	double total_score = match_solver.solve(scores, &mapping);
+	Scalar total_score = match_solver.solve(scores, &mapping);
 	std::stringstream out;
 
 	for (size_t i = 0; i < mapping.size(); ++i) {
@@ -132,9 +132,9 @@ double GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitL
 	return total_score;
 }
 
-SymmetricMatrix<double> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
+SymmetricMatrix<RfAlgorithmInterface::Scalar> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
                                                                       const PllSplitList &S2) {
-	SymmetricMatrix<double> scores(S1.size());
+	SymmetricMatrix<Scalar> scores(S1.size());
 	const auto taxa = S1.size() + 3;
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
@@ -167,7 +167,7 @@ std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const 
 
 	return split_buffer;
 }
-double GeneralizedRfAlgo::double_fac(long x) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::double_fac(long x) {
 	if (x >= 0) {
 		try {
 			return boost::math::double_factorial<double>(x);

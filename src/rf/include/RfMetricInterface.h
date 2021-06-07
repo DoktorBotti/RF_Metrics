@@ -17,6 +17,7 @@
 #include <vector>
 class RfMetricInterface {
   public:
+	typedef double Scalar;
 	enum Metric { RF, MCI, MSI, SPI };
 	struct Params {
 		size_t threads = 1;
@@ -33,10 +34,10 @@ class RfMetricInterface {
 		~Results() = default;
 
 		SymmetricMatrix<size_t> pairwise_distances_absolute;
-		SymmetricMatrix<double> pairwise_distances_relative;
-		SymmetricMatrix<double> pairwise_split_info;
+		SymmetricMatrix<Scalar> pairwise_distances_relative;
+		SymmetricMatrix<Scalar> pairwise_split_info;
 		size_t num_unique_trees = 0;
-		double mean_distance = static_cast<double>(NAN);
+		double mean_distance = static_cast<Scalar>(NAN);
 	};
 	// This should be our class which we expose to others. Like our commandline
 	// module

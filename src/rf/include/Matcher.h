@@ -5,6 +5,7 @@
 
 class Matcher {
   public:
-    virtual double solve(const SymmetricMatrix<double> &scores, std::vector<size_t> *best_matching_out) = 0;
+	typedef double Scalar;
+    virtual Scalar solve(const SymmetricMatrix<Scalar> &scores, std::vector<size_t> *best_matching_out) = 0;
 };
 #endif // INFORF_MATCHER_H

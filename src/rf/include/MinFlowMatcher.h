@@ -15,12 +15,12 @@ class MinFlowMatcher : public Matcher {
 	typedef util::StaticGraph<> Graph;
 
 	explicit MinFlowMatcher();
-	double solve(const SymmetricMatrix<double> &scores,
+	Scalar solve(const SymmetricMatrix<Scalar> &scores,
 	             std::vector<size_t> *best_matching_out) override;
 
-	void debugAssignment(const SymmetricMatrix<double> &scores,
+	void debugAssignment(const SymmetricMatrix<Scalar> &scores,
 	                     operations_research::LinearSumAssignment<MinFlowMatcher::Graph> *out);
-	Graph getGraphCopy(const SymmetricMatrix<double> &scores);
+	Graph getGraphCopy(const SymmetricMatrix<Scalar> &scores);
 	// factor for more precision after rounding, normally private but testing stuff
 	static const long large_num = (long) 2 << 30;
 
@@ -39,8 +39,8 @@ class MinFlowMatcher : public Matcher {
 	                          operations_research::LinearSumAssignment<Graph> &graph);
 
 	operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &
-	parameterize_assignment(const SymmetricMatrix<double> &scores,
-	                        const long large_num,
+	parameterize_assignment(const SymmetricMatrix<Scalar> &scores,
+	                        long large_num,
 	                        operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &a);
 };
 
