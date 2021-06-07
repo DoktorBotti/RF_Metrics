@@ -39,8 +39,8 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 void write_to_file(std::string file, std::string content);
 TEST_CASE("Calculate simple trees", "[dbg]"){
 	// Edit your trees to test here
-	std::string tree1 = "((((F,C),B),A),(E,D));";
-	std::string tree2 = "(((B,C),(D,A)),(E,F));";
+	std::string tree1 = "((((F,C),B),A),((E,D),(G,(H,J))));";
+	std::string tree2 = "(((B,(C,G)),(((H,J),D),A)),(E,F));";
 	std::string tree_path = "/tmp/tmpTrees";
 
 	// write them to a temporary file
@@ -49,7 +49,7 @@ TEST_CASE("Calculate simple trees", "[dbg]"){
 	// init algo interface
 	RfMetricInterface::Params params;
 	params.normalize_output = false;
-	params.metric = RfMetricInterface::SPI;
+	params.metric = RfMetricInterface::MCI;
 	params.input_file_path = tree_path;
 
 	RfMetricInterface iface(params);

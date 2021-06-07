@@ -74,7 +74,8 @@ std::string RectMatrix<T>::print() const {
 	std::stringstream ss;
 	for (size_t row = 0; row < size(); ++row) {
 		for (size_t col = 0; col < size(); ++col) {
-			ss << at(row, col) << " ";
+			const auto &val = at(row, col);
+			ss << val << (val == 0 ? "\t\t " : " ");
 		}
 		ss << "\n";
 	}
