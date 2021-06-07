@@ -31,12 +31,12 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S, 
 }
 
 RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
-	// if a or b < 1 then the double_factorial gets smaller than -1 which would be illegal
-	assert(a >= 1);
-	assert(b >= 1);
-	return double_fac(2 * a - 3) *
-	       double_fac(2 * b - 3) /
-	       double_fac(2 * (a + b) - 5);
+	// no trivial splits allowed here (outer log would return infty, because no information present)
+	assert(a >= 2);
+	assert(b >= 2);
+	return double_fac(static_cast<long>(2u * a - 3)) *
+	       double_fac(static_cast<long>(2u * b - 3)) /
+	       double_fac(static_cast<long>(2u * (a + b) - 5));
 }
 
 RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
@@ -174,7 +174,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::double_fac(long x) {
 		}catch (const std::exception& e){
 			std::stringstream ss;
 			ss << "Numerical overflow while calculating " << x << "!!\n";
-            ss<< "Exception text: " << e.what();
+            ss << "Exception text: " << e.what();
 			std::string str = ss.str();
 			throw std::out_of_range(str.c_str());
 		}
