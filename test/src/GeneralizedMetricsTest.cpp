@@ -4,6 +4,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
@@ -55,7 +56,7 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 
 	RfMetricInterface iface(params);
 	iface.do_magical_high_performance_stuff();
-	INFO(iface.get_result().pairwise_distances_relative.print());
+	std::cout << iface.get_result().pairwise_distances_relative.print() << std::endl << std::flush;
 	SUCCEED("Done.");
 }
 
@@ -89,7 +90,7 @@ static void test_metric(const std::string &base_path_splits,
 	}
 }
 
-static void write_to_file(const std::string &file, const std::string &content){
+static void write_to_file(const std::string &file, const std::string &content) {
 	std::ofstream ostr(file);
 	if (ostr.bad() || !ostr.is_open()) {
 		throw std::invalid_argument("Could not write to file " + file);
