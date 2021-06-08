@@ -4,12 +4,19 @@
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
+LogDblFact GeneralizedRfAlgo::factorials = LogDblFact();
 GeneralizedRfAlgo::GeneralizedRfAlgo() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 }
 
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
-	return (-1) * std::log2(p_phy(S, taxa, split_len));
+RfAlgorithmInterface::Scalar
+GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
+	long a = S.popcount(split_len);
+	long b = taxa - a;
+	Scalar res = factorials.lg_unrooted_dbl_fact_fast(a) + factorials.lg_unrooted_dbl_fact_fast(b) -
+	             factorials.lg_rooted_dbl_fact_fast(a + b);
+
+	return -res;
 }
 
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
@@ -34,8 +41,8 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, con
 	// no trivial splits allowed here (outer log would return infty, because no information present)
 	assert(a >= 2);
 	assert(b >= 2);
-	return double_fac(static_cast<long>(2u * a - 3)) *
-	       double_fac(static_cast<long>(2u * b - 3)) /
+	// precompute (maybe lazy) all double fac results for a and b separatly
+	return double_fac(static_cast<long>(2u * a - 3)) * double_fac(static_cast<long>(2u * b - 3)) /
 	       double_fac(static_cast<long>(2u * (a + b) - 5));
 }
 
