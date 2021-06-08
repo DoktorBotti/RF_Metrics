@@ -10,6 +10,7 @@ SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	if (!compatible(S1, S2, taxa, split_len)) {
 		return 0;
 	}
+	GeneralizedRfAlgo::factorials.reserve(taxa + taxa -5);
 	//TODO: throw triv splits in da garbage
 	return h_info_content(S1, taxa, split_len) + h_info_content(S2, taxa, split_len) -
 	       h_info_content(S1, S2, taxa, split_len);

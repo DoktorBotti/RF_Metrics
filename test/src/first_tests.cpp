@@ -2,6 +2,7 @@
 #include "PllSplits.hpp"
 #include "PllTree.hpp"
 #include "RfMetricInterface.h"
+#include "GeneralizedRfAlgo.h"
 #include <catch2/catch.hpp>
 #include <cstdlib>
 #include <fstream>
@@ -22,6 +23,15 @@ TEST_CASE("read first test tree", "[data]") {
 	REQUIRE(out.length() > 0);
 }
 
+TEST_CASE("Double fact. test", "[factorial]"){
+	auto& fac = GeneralizedRfAlgo::factorials;
+
+	CHECK(fac.lg(2) == 1);
+	CHECK(fac.lg_dbl_fact(-1) == 0);
+	CHECK((fac.lg_dbl_fact(15) - 20.950932) < 1e-4);
+	CHECK((fac.lg_rooted_dbl_fact(7) - 9.884170519) < 1e-4);
+	CHECK((fac.lg_unrooted_dbl_fact(7) - 13.34360213) < 1e-4);
+}
 TEST_CASE("Print first Split", "[useless]") {
 	auto tree_list = Util::create_trees(1, "/rf_data/BS/24");
 

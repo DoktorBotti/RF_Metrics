@@ -1,5 +1,6 @@
 add_library(rf_lib STATIC
         GeneralizedRfAlgo.cpp
+        LogDblFact.cpp
         LoggingBackend.cpp
         MciAlgo.cpp
         MinFlowMatcher.cpp
@@ -15,6 +16,7 @@ add_library(rf_lib STATIC
         include/GeneralizedRfAlgo.h
         include/HashingFunctor.hpp
         include/HashmapKey.hpp
+        include/LogDblFact.h
         include/LoggingBackend.h
         include/Matcher.h
         include/MciAlgo.h

@@ -10,6 +10,7 @@
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
+#include "LogDblFact.h"
 
 class GeneralizedRfAlgo : public RfAlgorithmInterface {
   public:
@@ -17,6 +18,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	GeneralizedRfAlgo(GeneralizedRfAlgo &&) = default;
 	~GeneralizedRfAlgo() override = default;
 	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
+    // should be protected but testing... (too lazy)
+	static LogDblFact factorials;
 
   protected:
 	virtual Scalar calc_tree_score(const PllSplitList &A, const PllSplitList &B);
@@ -46,6 +49,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	 */
 	static std::vector<pll_split_base_t>
 	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+
 
   private:
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;

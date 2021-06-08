@@ -171,7 +171,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::double_fac(long x) {
 	if (x >= 0) {
 		try {
 			return boost::math::double_factorial<double>(x);
-		}catch (const std::exception& e){
+		} catch (const std::exception &e) {
 			std::stringstream ss;
 			ss << "Numerical overflow while calculating " << x << "!!\n";
             ss << "Exception text: " << e.what();
