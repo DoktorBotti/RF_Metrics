@@ -128,14 +128,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A,
                                                                 const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
-	std::vector<size_t> mapping(scores.size()); // TODO: make mapping vector optional
-	Scalar total_score = match_solver.solve(scores, &mapping);
+	Scalar total_score = match_solver.solve(scores);
 	std::stringstream out;
 
-	for (size_t i = 0; i < mapping.size(); ++i) {
-		out << " " << i << "<>" << mapping[i] << " ";
-	}
-	BOOST_LOG_SEV(logger, lg::notification) << "Mapping solution: " << out.str();
+	//	for (size_t i = 0; i < mapping.size(); ++i) {
+	//		out << " " << i << "<>" << mapping[i] << " ";
+	//	}
+	//	BOOST_LOG_SEV(logger, lg::notification) << "Mapping solution: " << out.str();
 	return total_score;
 }
 
