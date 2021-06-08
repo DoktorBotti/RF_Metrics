@@ -1,5 +1,5 @@
 #include "../../src/rf/include/RfMetricInterface.h"
-#include "MinFlowMatcher.h"
+#include "Matcher.h"
 #include <RfAlgorithmInterface.h>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
@@ -24,8 +24,8 @@ TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	//			dst_mtx.set_at(row, col, std::log2(dst_mtx.at(row,col)));
 	//		}
 	//	}
-	MinFlowMatcher matcher;
-	std::vector<size_t> res_matching(dst_mtx.size(), -1);
+	Matcher matcher;
+	std::vector<size_t> res_matching(dst_mtx.size(), 0);
 	double res = matcher.solve(dst_mtx, &res_matching);
 	REQUIRE(res > 0);
 	std::stringstream out;
@@ -40,7 +40,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	std::cout << "number of possible matchings: " << dim_size
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
-	MinFlowMatcher matcher;
+	Matcher matcher;
 	std::vector<size_t> res_matching(dim_size, 0);
 	double res = matcher.solve(dst_mtx, &res_matching);
 	INFO(res);
@@ -112,7 +112,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		// calculate own solution by matching from pairwise split score matrix
 		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
 		std::vector<size_t> found_matching(split_scores.size(), 0);
-		MinFlowMatcher matcher;
+		Matcher matcher;
 		auto our_solution = matcher.solve(split_scores, &found_matching);
 		double difference = std::abs(our_solution - solution);
 		bool correct = difference <= 1e-3;
@@ -123,7 +123,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 }
 
 TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
-	MinFlowMatcher matcher;
+	Matcher matcher;
 	constexpr size_t mtx_dim = 3;
 	auto mtx = Util::create_random_mtx(mtx_dim);
 	auto graph = matcher.getGraphCopy(mtx);
@@ -142,7 +142,7 @@ TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
 }
 
 TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]") {
-	MinFlowMatcher matcher;
+	Matcher matcher;
 	constexpr size_t mtx_dim = 3;
 	auto mtx = Util::create_random_mtx(mtx_dim);
 	auto mtx_vis = mtx.print();
