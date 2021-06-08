@@ -132,7 +132,7 @@ TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
 	CHECK(graph.num_arcs() == mtx_dim * mtx_dim);
 	size_t counter = 0;
 	// Check if outdegree is always equal at left nodes
-	for (const auto &node : graph.AllNodes()) {
+	for (const auto node : graph.AllNodes()) {
 		CHECK(graph.OutDegree(node) == mtx_dim);
 		++counter;
 		if (counter == mtx_dim) {
@@ -188,7 +188,7 @@ void BasicExample() {
 
 std::size_t number_of_files_in_directory(std::filesystem::path path) {
 	using std::filesystem::directory_iterator;
-	return std::distance(directory_iterator(path), directory_iterator{});
+	return static_cast<size_t>(std::distance(directory_iterator(path), directory_iterator{}));
 }
 double get_pairwise_tree_score(std::filesystem::path path) {
 	// use filename to figure out pairwise tree comparison
