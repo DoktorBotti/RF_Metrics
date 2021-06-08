@@ -14,7 +14,8 @@ GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_l
 	size_t a = S.popcount(split_len);
 	size_t b = taxa - a;
 
-	Scalar res = factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) + factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b)) -
+	Scalar res = factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) +
+	             factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b)) -
 	             factorials.lg_unrooted_dbl_fact_fast(static_cast<long>(taxa));
 
 	return -res;
@@ -24,7 +25,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S
                                                                const PllSplit &S2,
                                                                size_t taxa,
                                                                size_t split_len) {
-	return - p_phy(S1, S2, taxa, split_len);
+	return -p_phy(S1, S2, taxa, split_len);
 }
 
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
@@ -45,7 +46,8 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, con
 	assert(a >= 2);
 	assert(b >= 2);
 	// precompute (maybe lazy) all double fac results for a and b separatly
-	return factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) + factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b)) -
+	return factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) +
+	       factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b)) -
 	       factorials.lg_unrooted_dbl_fact_fast(static_cast<long>(a + b));
 }
 
@@ -82,7 +84,8 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	assert(a2 >= 1);
 	assert(taxa >= 2);
 
-	return factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b1)) + factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a2)) +
+	return factorials.lg_rooted_dbl_fact_fast(static_cast<long>(b1)) +
+	       factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a2)) +
 	       factorials.lg_dbl_fact_fast(static_cast<long>(((a1 - a2) << 1) - 1)) -
 	       factorials.lg_unrooted_dbl_fact_fast(static_cast<long>(taxa));
 }
@@ -170,22 +173,4 @@ std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const 
 	S2.intersect(PllSplit(&split_buffer[0]), split_len, &split_buffer[5 * split_len]);
 
 	return split_buffer;
-}
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::double_fac(long x) {
-	assert(false);
-	if (x >= 0) {
-		try {
-			return boost::math::double_factorial<double>(x);
-		} catch (const std::exception &e) {
-			std::stringstream ss;
-			ss << "Numerical overflow while calculating " << x << "!!\n";
-			ss << "Exception text: " << e.what();
-			std::string str = ss.str();
-			throw std::out_of_range(str.c_str());
-		}
-	} else if (x == -1) {
-		return 1.;
-	} else {
-		throw std::invalid_argument("numbers less than -1 are not defined");
-	}
 }

@@ -95,7 +95,8 @@ RectMatrix<double> Util::parse_mtx_from_r(const std::string &file_path,
 	std::string file_content = read_file(file_path);
 	auto lines = Util::split(file_content, delim_row);
 	std::vector<std::vector<std::string>> mat;
-	for (const auto &el : lines) {
+	mat.reserve(lines.size());
+    for (const auto &el : lines) {
         mat.push_back(Util::split(el, delim_col));
     }
 

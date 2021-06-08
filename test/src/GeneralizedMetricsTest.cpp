@@ -36,15 +36,16 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 	auto metr = RfMetricInterface::MCI;
 	test_metric(base_path, base_path_res, metr);
 }
-void write_to_file(std::string file, std::string content);
-TEST_CASE("Calculate simple trees", "[dbg]"){
+static void write_to_file(const std::string &file, const std::string &content);
+TEST_CASE("Calculate simple trees", "[dbg]") {
 	// Edit your trees to test here
 	std::string tree1 = "((((F,C),B),A),(E,D));";
 	std::string tree2 = "(((B,C),(D,A)),(E,F));";
 	std::string tree_path = "/tmp/tmpTrees";
 
 	// write them to a temporary file
-	write_to_file(tree_path, tree1 + "\n" + tree2);
+	auto str = tree1 + "\n" + tree2;
+	write_to_file(tree_path, str);
 
 	// init algo interface
 	RfMetricInterface::Params params;
@@ -88,9 +89,9 @@ static void test_metric(const std::string &base_path_splits,
 	}
 }
 
-void write_to_file(std::string file, std::string content){
+static void write_to_file(const std::string &file, const std::string &content){
 	std::ofstream ostr(file);
-	if(ostr.bad() || ! ostr.is_open()){
+	if (ostr.bad() || !ostr.is_open()) {
 		throw std::invalid_argument("Could not write to file " + file);
 	}
 	ostr << content;

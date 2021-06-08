@@ -145,10 +145,10 @@ TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]") {
 	MinFlowMatcher matcher;
 	constexpr size_t mtx_dim = 3;
 	auto mtx = Util::create_random_mtx(mtx_dim);
-	auto mtx_vis = mtx.print();
+	// auto mtx_vis = mtx.print();
 	auto graph = matcher.getGraphCopy(mtx);
 	std::vector<size_t> matching(mtx_dim, 0);
-	double res = matcher.solve(mtx, &matching);
+	// double res = matcher.solve(mtx, &matching);
 	operations_research::LinearSumAssignment<util::StaticGraph<>> a(graph, mtx_dim);
 	matcher.debugAssignment(mtx, &a);
 	// checks that there will be no overflow
