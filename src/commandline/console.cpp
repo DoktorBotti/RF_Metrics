@@ -5,6 +5,7 @@
 #include "RfMetricInterface.h"
 #include <functional>
 #include <iostream>
+#include <array>
 
 struct Flag {
 	std::string name;
@@ -63,7 +64,7 @@ const static std::vector<Flag> flags = {
 	     params.threads = std::stoul(args[0]);
      }}};
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
 	try {
 		if (argc == 1) {
 			std::cout << "Please use the format: " << argv[0]
