@@ -33,14 +33,15 @@ Matcher::Scalar MinFlowMatcher::solve(const RectMatrix<Matcher::Scalar> &scores,
 	// Retrieve the node-node correspondence of the optimum assignment and the
 	// cost of each node pairing.
 	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
-		const size_t right_idx = a.GetMate(left_node) - scores.size();
+		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.size();
 		assert(right_idx >= 0 && right_idx < scores.size());
-		best_matching_out->operator[](left_node) = right_idx;
-		Matcher::Scalar arc_score = scores.at(left_node, right_idx);
+		best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
+		Matcher::Scalar arc_score = scores.at(static_cast<size_t>(left_node), right_idx);
 		{
 			// DEBUG verify that chosen arc index is left_id * size + right_id - size
 			auto arc_mate_id = a.GetAssignmentArc(left_node);
-			int arc_should_id = left_node * scores.size() + right_idx;
+			// Softwipe..
+			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx);
 			assert(arc_mate_id == arc_should_id);
 			// DEBUG if arc indices were as they should be
 			auto arc_score_diff = std::abs(arc_score + static_cast<Matcher::Scalar>( a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
@@ -61,13 +62,13 @@ MinFlowMatcher::parameterize_assignment(
     const RectMatrix<Matcher::Scalar> &scores,
     const long large_num,
     operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &a) { // tiny lambda helpers
-	auto getScore = [large_num, scores](auto i, auto j) -> long {
+	auto getScore = [large_num, scores](size_t i, size_t j) -> long {
 		// multiply score with a high value to make rounding errors less troublesome
-		Matcher::Scalar score = -scores.at(i, j) * large_num;
+		Matcher::Scalar score = -scores.at(i, j) * static_cast<double>(large_num);
 		return static_cast<long>(score);
 	};
-	for (int from = 0; from < scores.size() ; ++from) {
-		for (int to = 0; to < scores.size(); ++to) {
+	for (size_t from = 0; from < scores.size() ; ++from) {
+		for (size_t to = 0; to < scores.size(); ++to) {
 			// TODO problem that casted to long?
 			long arc_cost = getScore(from, to);
 			// from -> to
@@ -84,7 +85,7 @@ void MinFlowMatcher::assign_permuted_cost(
     long cost,
     operations_research::LinearSumAssignment<Graph> &assignment) {
 	int idx = static_cast<int>(unpermuted_index);
-	int perm_id = arc_permutation.empty() ? idx : arc_permutation[idx];
+	int perm_id = arc_permutation.empty() ? idx : arc_permutation[static_cast<size_t>(idx)];
 	assignment.SetArcCost(perm_id, cost);
 }
 void MinFlowMatcher::init(size_t num_matches) {
@@ -95,8 +96,8 @@ void MinFlowMatcher::init(size_t num_matches) {
 	const size_t num_arcs = num_matches * num_matches;
 	graph = Graph(static_cast<int>(num_nodes), static_cast<int>(num_arcs));
 	// create edges
-	for (int from = 0; from < num_matches; ++from) {
-		for (int to = num_matches; to < num_nodes; ++to) {
+	for (int from = 0; from < static_cast<int>(num_matches); ++from) {
+		for (int to = static_cast<int>(num_matches); to < static_cast<int>(num_nodes); ++to) {
 			const int arc_tail = from; // must be in [0, num_left_nodes)
 			const int arc_head = to;   // must be in [num_left_nodes,
 			                           // num_nodes)
@@ -114,7 +115,7 @@ void MinFlowMatcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores, 
         init(scores.size());
         is_ready = true;
     }
-    parameterize_assignment(scores, 2 << 30, *out);
+    parameterize_assignment(scores, static_cast<long>(2) << 30, *out);
 
 }
 MinFlowMatcher::Graph MinFlowMatcher::getGraphCopy(const RectMatrix<Matcher::Scalar> &scores) {

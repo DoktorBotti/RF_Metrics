@@ -14,7 +14,7 @@ class LogDblFact {
 	// fast function do not check array boundaries. Caller must guarantee enough capacity
 
     // calculates log2(x), does not check for enough storage
-    [[nodiscard]] Scalar lg_fast(long x) const;
+    [[nodiscard]] Scalar lg_fast(size_t x) const;
     // calculates log2((x)!!), does not check for enough storage
     [[nodiscard]] Scalar lg_dbl_fact_fast(long x) const;
 	// calculates log2((x+x-5)!!), does not check for enough storage
@@ -23,13 +23,13 @@ class LogDblFact {
     [[nodiscard]] Scalar lg_unrooted_dbl_fact_fast(long x) const;
 
 	//non-fast: reserves if too large with grow rate
-    [[nodiscard]] Scalar lg(long x);
+    [[nodiscard]] Scalar lg(size_t x);
     [[nodiscard]] Scalar lg_dbl_fact(long x);
     [[nodiscard]] Scalar lg_rooted_dbl_fact(long x);
     [[nodiscard]] Scalar lg_unrooted_dbl_fact(long x);
   private:
 	const static size_t PRECALC_NUM_ELEMS = 100;
-	constexpr static float GROW_RATE = 1.45;
+	constexpr static size_t GROW_RATE = 2;
 	size_t num_reserved = PRECALC_NUM_ELEMS;
 	// since -1!! exists, the array must start for x=-1
 	std::vector<Scalar> cache_fac;

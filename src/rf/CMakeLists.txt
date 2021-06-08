@@ -5,7 +5,6 @@ add_library(rf_lib STATIC
         MciAlgo.cpp
         MinFlowMatcher.cpp
         MsiAlgo.cpp
-        NaiveMatcher.cpp
         PllSplits.cpp
         PllTree.cpp
         RfMetricInterface.cpp

@@ -61,7 +61,7 @@ std::vector<std::vector<T>> RectMatrix<T>::to_vector() const {
 	for (size_t row = 0; row < dim; ++row) {
 		res.emplace_back();
 		auto start = matrix.begin() + row * dim;
-		auto end = matrix.begin() + (row + 1) * dim;
+		auto end = matrix.begin() + static_cast<long>((row + 1) * dim);
 		res[row].assign(start, end);
 	}
 	return res;
@@ -78,7 +78,7 @@ std::string RectMatrix<T>::print() const {
 	long digits_pre_comma = std::log(min_max.second);
 	// expect one digit before comma. For all additional 4 digits, insert tab
 	std::string spacer = "\t\t";
-	for (size_t i = 0; i < std::max(digits_pre_comma / 4 - 1, 0l); ++i) {
+	for (size_t i = 0; i < static_cast<size_t>(std::max(digits_pre_comma / 4 - 1, 0l)); ++i) {
 		spacer += "\t";
 	}
 	for (size_t row = 0; row < size(); ++row) {
