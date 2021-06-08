@@ -60,7 +60,7 @@ std::vector<std::vector<T>> RectMatrix<T>::to_vector() const {
 	std::vector<std::vector<T>> res;
 	for (size_t row = 0; row < dim; ++row) {
 		res.emplace_back();
-		auto start = matrix.begin() + row * dim;
+		auto start = matrix.begin() + static_cast<long>(row * dim);
 		auto end = matrix.begin() + static_cast<long>((row + 1) * dim);
 		res[row].assign(start, end);
 	}

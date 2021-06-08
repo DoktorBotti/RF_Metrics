@@ -109,9 +109,9 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 
 	// iterate through all tree combinations
 	for (auto a = std::as_const(all_splits).begin(); a != all_splits.end(); ++a) {
-		size_t idx_a = a - all_splits.begin();
+		size_t idx_a = static_cast<size_t>(a - all_splits.begin());
 		for (auto b = std::as_const(all_splits).begin(); b != a; ++b) {
-			size_t idx_b = b - all_splits.begin();
+			size_t idx_b = static_cast<size_t>(b - all_splits.begin());
 			Scalar dst = calc_tree_score(*a, *b);
 			res.pairwise_distances_relative.set_at(idx_a, idx_b, dst);
 			total_dst += dst;

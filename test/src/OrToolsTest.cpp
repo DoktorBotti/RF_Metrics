@@ -44,7 +44,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	std::vector<size_t> res_matching(dim_size, 0);
 	double res = matcher.solve(dst_mtx, &res_matching);
 	INFO(res);
-	REQUIRE(res != -1.);
+	REQUIRE(std::abs(res - 1.) >= 1e-5);
 	// create multiple random mappings
 	double closest_guess = 0;
 	for (size_t rnd_it = 0; rnd_it < 50000; ++rnd_it) {
