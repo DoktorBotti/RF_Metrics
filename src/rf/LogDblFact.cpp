@@ -30,11 +30,7 @@ void LogDblFact::reserve(size_t num_els) {
 	}
 	cache_fac.reserve(num_els);
 	cache_lg.reserve(num_els);
-	for (size_t x = num_reserved; x < num_els; ++x) {
-		cache_lg.emplace_back(std::log2(x));
-		cache_fac.emplace_back(cache_fac[x - 2] + cache_lg[x-1]);
-	}
-	num_reserved = num_els;
+	calc_vals(num_els);
 }
 LogDblFact::Scalar LogDblFact::lg(long x) {
     assert(x > -2);
@@ -75,9 +71,13 @@ LogDblFact::LogDblFact() noexcept : cache_fac(PRECALC_NUM_ELEMS), cache_lg(PRECA
     cache_lg[1] = 0;
     cache_lg[2] = 1;
     // calc factorials and log from here
-    for (size_t x = 3; x < PRECALC_NUM_ELEMS; ++x) {
-        cache_lg[x] = (std::log2(x));
+	calc_vals(PRECALC_NUM_ELEMS);
+}
+void LogDblFact::calc_vals(size_t new_num_els) {
+	for (size_t x = 3; x < new_num_els; ++x) {
+		cache_lg[x] = (std::log2(x));
         // calc lg((x-1)!!)
-        cache_fac[x] = cache_fac[x - 2] + cache_lg[x-1];
+		cache_fac[x] = cache_fac[x - 2] + cache_lg[x-1];
     }
+	num_reserved = new_num_els;
 }

@@ -82,7 +82,7 @@ elseif(UNIX)
 
         add_library(ortools INTERFACE)
         add_library(ortools::ortools ALIAS ortools)
-        target_include_directories(ortools INTERFACE ${ORTOOLS_INCLUDE_DIRS})
+        target_include_directories(ortools SYSTEM INTERFACE ${ORTOOLS_INCLUDE_DIRS})
         target_link_libraries(ortools INTERFACE ${ORTOOLS_LIBRARIES})
         target_compile_options(ortools INTERFACE ${ORTOOLS_DEFINITIONS})
 

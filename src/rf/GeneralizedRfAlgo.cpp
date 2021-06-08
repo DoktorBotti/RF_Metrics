@@ -13,24 +13,27 @@ RfAlgorithmInterface::Scalar
 GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
 	long a = S.popcount(split_len);
 	long b = taxa - a;
-	Scalar res = factorials.lg_unrooted_dbl_fact_fast(a) + factorials.lg_unrooted_dbl_fact_fast(b) -
-	             factorials.lg_rooted_dbl_fact_fast(a + b);
+
+	Scalar res = factorials.lg_rooted_dbl_fact_fast(a) + factorials.lg_rooted_dbl_fact_fast(b) -
+	             factorials.lg_unrooted_dbl_fact_fast(taxa);
 
 	return -res;
 }
 
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
-                                         const PllSplit &S2,
-                                         size_t taxa,
-                                         size_t split_len) {
-	return (-1) * std::log2(p_phy(S1, S2, taxa, split_len));
+                                                               const PllSplit &S2,
+                                                               size_t taxa,
+                                                               size_t split_len) {
+	return - p_phy(S1, S2, taxa, split_len);
 }
 
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const size_t a, const size_t b) {
-	return (-1) * std::log2(p_phy(a, b));
+	return -p_phy(a, b);
 }
 
-RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S,
+                                                             size_t taxa,
+                                                             size_t split_len) {
 	const auto a = S.popcount(split_len);
 	const auto b = taxa - a;
 
@@ -42,33 +45,32 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, con
 	assert(a >= 2);
 	assert(b >= 2);
 	// precompute (maybe lazy) all double fac results for a and b separatly
-	return double_fac(static_cast<long>(2u * a - 3)) * double_fac(static_cast<long>(2u * b - 3)) /
-	       double_fac(static_cast<long>(2u * (a + b) - 5));
+	return factorials.lg_rooted_dbl_fact_fast(a) + factorials.lg_rooted_dbl_fact_fast(b) -
+	       factorials.lg_unrooted_dbl_fact_fast(a + b);
 }
 
 RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
-                                       const PllSplit &S2,
-                                       size_t taxa,
-                                       size_t split_len) {
-	// TODO: ensure A2 \subseteq A1
+                                                             const PllSplit &S2,
+                                                             size_t taxa,
+                                                             size_t split_len) {
 	std::vector<pll_split_base_t> cut(split_len);
 	S1.intersect(S2, split_len, &cut[0]);
 
 	size_t a1, b1, a2;
 
 	if (S2.equals(PllSplit(&cut[0]), split_len)) {
-        a1 = S1.popcount(split_len);
-        b1 = taxa - a1;
-        a2 = S2.popcount(split_len);
+		a1 = S1.popcount(split_len);
+		b1 = taxa - a1;
+		a2 = S2.popcount(split_len);
 	} else if (S1.equals(PllSplit(&cut[0]), split_len)) {
-        a1 = S2.popcount(split_len);
-        b1 = taxa - a1;
-        a2 = S1.popcount(split_len);
+		a1 = S2.popcount(split_len);
+		b1 = taxa - a1;
+		a2 = S1.popcount(split_len);
 	} else {
-        a1 = S1.popcount(split_len);
-        b1 = taxa - a1;
-        auto b2 = S2.popcount(split_len);
-        a2 = taxa - b2;
+		a1 = S1.popcount(split_len);
+		b1 = taxa - a1;
+		auto b2 = S2.popcount(split_len);
+		a2 = taxa - b2;
 	}
 
 	if (a1 == a2)
@@ -80,15 +82,9 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	assert(a2 >= 1);
 	assert(taxa >= 2);
 
-	// TODO: Watch for numerical problems
-	// TODO: implement explicit a!!/b!! method
-	// TODO: vergleiche dass A1 > A2
-	// TODO: Catch case a1 == a2
-	// TODO: falsch... auch auf folien. man muss die kompatiblen segmente vergleichen
-	return double_fac(2 * (b1 + 1) - 5) *
-	       double_fac(2 * (a2 + 1) - 5) *
-	       double_fac(2 * (a1 - a2 + 2) - 5) /
-	       double_fac(2 * (taxa) -5);
+	return factorials.lg_rooted_dbl_fact_fast(b1) + factorials.lg_rooted_dbl_fact_fast(a2) +
+	       factorials.lg_dbl_fact_fast(((a1 - a2) << 1) - 1) -
+	       factorials.lg_unrooted_dbl_fact_fast(taxa);
 }
 
 size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
@@ -126,7 +122,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	return res;
 }
 
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A, const PllSplitList &B) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A,
+                                                                const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	std::vector<size_t> mapping(scores.size(), -1);
 	Scalar total_score = match_solver.solve(scores, &mapping);
@@ -139,13 +136,15 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
 	return total_score;
 }
 
-RectMatrix<RfAlgorithmInterface::Scalar> GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
-                                                                      const PllSplitList &S2) {
+RectMatrix<RfAlgorithmInterface::Scalar>
+GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
 	RectMatrix<Scalar> scores(S1.size());
 	const auto taxa = S1.size() + 3;
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
+			auto mem_S1 = *S1[row]();
+			auto mem_S2 = *S2[col]();
 			scores.set(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
 		}
 	}
@@ -175,13 +174,14 @@ std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const 
 	return split_buffer;
 }
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::double_fac(long x) {
+	assert(false);
 	if (x >= 0) {
 		try {
 			return boost::math::double_factorial<double>(x);
 		} catch (const std::exception &e) {
 			std::stringstream ss;
 			ss << "Numerical overflow while calculating " << x << "!!\n";
-            ss << "Exception text: " << e.what();
+			ss << "Exception text: " << e.what();
 			std::string str = ss.str();
 			throw std::out_of_range(str.c_str());
 		}

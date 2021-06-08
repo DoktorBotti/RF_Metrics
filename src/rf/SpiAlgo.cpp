@@ -12,8 +12,11 @@ SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	}
 	GeneralizedRfAlgo::factorials.reserve(taxa + taxa -5);
 	//TODO: throw triv splits in da garbage
-	return h_info_content(S1, taxa, split_len) + h_info_content(S2, taxa, split_len) -
-	       h_info_content(S1, S2, taxa, split_len);
+	auto s1_tmp = h_info_content(S1, taxa, split_len);
+	auto s2_tmp = h_info_content(S2, taxa, split_len);
+	auto mixed =  h_info_content(S1, S2, taxa, split_len);
+	return s1_tmp +  s2_tmp - mixed;
+
 }
 
 bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
@@ -26,7 +29,7 @@ bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, si
 	S2.set_not(split_len, &inv_bitset_buffer[split_len]);
 
 	auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
-	pll_split_base_t mask = (~0) << bits_too_many;
+	pll_split_base_t mask = static_cast<unsigned int>(~0) >> bits_too_many;
 	inv_bitset_buffer[split_len - 1] &= mask;
 
 	return S1.is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len) ||  // A1 <-> B2

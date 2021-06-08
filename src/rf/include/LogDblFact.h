@@ -34,6 +34,7 @@ class LogDblFact {
 	// since -1!! exists, the array must start for x=-1
 	std::vector<Scalar> cache_fac;
 	std::vector<Scalar> cache_lg;
+	void calc_vals(size_t new_num_els);
 };
 
 #endif // INFORF_LOGDBLFACT_H

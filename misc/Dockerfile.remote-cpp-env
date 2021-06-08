@@ -43,8 +43,8 @@ RUN apt-get update \
       ca-certificates software-properties-common \
       libssl-dev \
       libcurl4-openssl-dev \
-      libxml2-dev
-	  #curl sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo)
+      libxml2-dev \
+	  curl #sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo)
 
 # Add CRAN repository and install R
 RUN apt-get update && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
