@@ -16,13 +16,13 @@ LogDblFact::Scalar LogDblFact::lg_fast(long x) const {
 }
 LogDblFact::Scalar LogDblFact::lg_rooted_dbl_fact_fast(long x) const {
     assert(x >= 2);
-    assert(x + x - 4 < num_reserved);
-	return cache_fac[x + x - 4];
+    assert(x + x - 2 < num_reserved);
+	return cache_fac[x + x - 2];
 }
 LogDblFact::Scalar LogDblFact::lg_unrooted_dbl_fact_fast(long x) const {
     assert(x >= 1);
-    assert(x + x - 2 < num_reserved);
-	return cache_fac[x + x - 2];
+    assert(x + x - 4 < num_reserved);
+	return cache_fac[x + x - 4];
 }
 void LogDblFact::reserve(size_t num_els) {
 	if (num_els <= num_reserved) {
@@ -52,15 +52,15 @@ LogDblFact::Scalar LogDblFact::lg_dbl_fact(long x) {
 }
 LogDblFact::Scalar LogDblFact::lg_rooted_dbl_fact(long x) {
     assert(x > -2);
-    if (num_reserved <= static_cast<size_t>(std::abs(x+x-4))) {
-		reserve(std::floor(static_cast<float>(x + x - 4) * GROW_RATE));
+    if (num_reserved <= static_cast<size_t>(std::abs(x+x-2))) {
+		reserve(std::floor(static_cast<float>(x + x - 2) * GROW_RATE));
 	}
 	return lg_rooted_dbl_fact_fast(x);
 }
 LogDblFact::Scalar LogDblFact::lg_unrooted_dbl_fact(long x) {
     assert(x > -2);
-    if (num_reserved <= static_cast<size_t>(std::abs(x+x-2))) {
-		reserve(std::floor(static_cast<float>(x+x-2)*GROW_RATE));
+    if (num_reserved <= static_cast<size_t>(std::abs(x+x-4))) {
+		reserve(std::floor(static_cast<float>(x+x-4)*GROW_RATE));
 	}
 	return lg_unrooted_dbl_fact_fast(x);
 }
@@ -76,8 +76,8 @@ LogDblFact::LogDblFact() noexcept : cache_fac(PRECALC_NUM_ELEMS), cache_lg(PRECA
     cache_lg[2] = 1;
     // calc factorials and log from here
     for (size_t x = 3; x < PRECALC_NUM_ELEMS; ++x) {
-        cache_lg.emplace_back(std::log2(x));
+        cache_lg[x] = (std::log2(x));
         // calc lg((x-1)!!)
-        cache_fac.emplace_back(cache_fac[x - 2] + cache_lg[x-1]);
+        cache_fac[x] = cache_fac[x - 2] + cache_lg[x-1];
     }
 }
