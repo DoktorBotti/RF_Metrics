@@ -3,7 +3,7 @@ add_library(rf_lib STATIC
         LogDblFact.cpp
         LoggingBackend.cpp
         MciAlgo.cpp
-        MinFlowMatcher.cpp
+        Matcher.cpp
         MsiAlgo.cpp
         PllSplits.cpp
         PllTree.cpp
@@ -17,11 +17,9 @@ add_library(rf_lib STATIC
         include/HashmapKey.hpp
         include/LogDblFact.h
         include/LoggingBackend.h
-        include/Matcher.h
         include/MciAlgo.h
-        include/MinFlowMatcher.h
+        include/Matcher.h
         include/MsiAlgo.h
-        include/NaiveMatcher.h
         include/PllSplits.hpp
         include/PllTree.hpp
         include/RectMatrix.hpp

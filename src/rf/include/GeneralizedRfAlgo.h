@@ -1,16 +1,12 @@
-//
-// Created by Tobia on 16.05.2021.
-//
-
 #ifndef INFORF_GENERALIZEDRFALGO_H
 #define INFORF_GENERALIZEDRFALGO_H
-#include "MinFlowMatcher.h"
+#include "LogDblFact.h"
+#include "Matcher.h"
 #include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
-#include "LogDblFact.h"
 
 class GeneralizedRfAlgo : public RfAlgorithmInterface {
   public:
@@ -53,7 +49,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 
   private:
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;
-    MinFlowMatcher match_solver;
+	Matcher match_solver;
 	static Scalar double_fac(long x);
 };
 

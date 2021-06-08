@@ -1,8 +1,8 @@
-#include "MinFlowMatcher.h"
+#include "Matcher.h"
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-Matcher::Scalar MinFlowMatcher::solve(const RectMatrix<Matcher::Scalar> &scores,
+Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores,
                              std::vector<size_t> *best_matching_out) {
 	// initialize on first usage
 	if (!is_ready) {
@@ -28,40 +28,39 @@ Matcher::Scalar MinFlowMatcher::solve(const RectMatrix<Matcher::Scalar> &scores,
 		BOOST_LOG_SEV(logger, lg::error) << "Finished assignment with errors.";
 	}
 	// Retrieve the cost of the optimum assignment.
-	Matcher::Scalar optimum_cost = -a.GetCost() / static_cast<double>(large_num);
-	Matcher::Scalar summed_cost = 0;
-	// Retrieve the node-node correspondence of the optimum assignment and the
-	// cost of each node pairing.
-	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
-		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.size();
-		assert(right_idx >= 0 && right_idx < scores.size());
-		best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
-		Matcher::Scalar arc_score = scores.at(static_cast<size_t>(left_node), right_idx);
-		{
-			// DEBUG verify that chosen arc index is left_id * size + right_id - size
-			auto arc_mate_id = a.GetAssignmentArc(left_node);
-			// Softwipe..
-			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx);
-			assert(arc_mate_id == arc_should_id);
-			// DEBUG if arc indices were as they should be
-			auto arc_score_diff = std::abs(arc_score + static_cast<Matcher::Scalar>( a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
-			assert(arc_score_diff < 1e-6);
-		}
-		summed_cost += arc_score;
-	}
-	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << summed_cost;
+	Matcher::Scalar optimum_cost = static_cast<double>(-a.GetCost()) / static_cast<double>(large_num);
+//	Matcher::Scalar summed_cost = 0;
+//	// Retrieve the node-node correspondence of the optimum assignment and the
+//	// cost of each node pairing.
+//	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
+//		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.size();
+//		assert(right_idx >= 0 && right_idx < scores.size());
+//		best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
+//		Matcher::Scalar arc_score = scores.at(static_cast<size_t>(left_node), right_idx);
+//		{
+//			// DEBUG verify that chosen arc index is left_id * size + right_id - size
+//			auto arc_mate_id = a.GetAssignmentArc(left_node);
+//			// Softwipe..
+//			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx);
+//			assert(arc_mate_id == arc_should_id);
+//			// DEBUG if arc indices were as they should be
+//			auto arc_score_diff = std::abs(arc_score + static_cast<Matcher::Scalar>( a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
+//			assert(arc_score_diff < 1e-6);
+//		}
+//		summed_cost += arc_score;
+//	}
+	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
 	//	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by OrTools directly: " <<
 	// optimum_cost
 	//	                                  << " difference: " <<
 	// std::abs(static_cast<double>(summed_cost - optimum_cost));
 
-	return summed_cost;
+	return optimum_cost;
 }
-operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &
-MinFlowMatcher::parameterize_assignment(
+operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_assignment(
     const RectMatrix<Matcher::Scalar> &scores,
     const long large_num,
-    operations_research::LinearSumAssignment<MinFlowMatcher::Graph> &a) { // tiny lambda helpers
+    operations_research::LinearSumAssignment<Matcher::Graph> &a) { // tiny lambda helpers
 	auto getScore = [large_num, scores](size_t i, size_t j) -> long {
 		// multiply score with a high value to make rounding errors less troublesome
 		Matcher::Scalar score = -scores.at(i, j) * static_cast<double>(large_num);
@@ -77,10 +76,10 @@ MinFlowMatcher::parameterize_assignment(
 	}
 	return a;
 }
-MinFlowMatcher::MinFlowMatcher() {
-	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("MinFlowMatcher"));
+Matcher::Matcher() {
+	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("Matcher"));
 }
-void MinFlowMatcher::assign_permuted_cost(
+void Matcher::assign_permuted_cost(
     size_t unpermuted_index,
     long cost,
     operations_research::LinearSumAssignment<Graph> &assignment) {
@@ -88,7 +87,7 @@ void MinFlowMatcher::assign_permuted_cost(
 	int perm_id = arc_permutation.empty() ? idx : arc_permutation[static_cast<size_t>(idx)];
 	assignment.SetArcCost(perm_id, cost);
 }
-void MinFlowMatcher::init(size_t num_matches) {
+void Matcher::init(size_t num_matches) {
 	using namespace operations_research;
 	BOOST_LOG_SEV(logger, lg::normal) << "Initializing...";
 
@@ -108,7 +107,7 @@ void MinFlowMatcher::init(size_t num_matches) {
 	graph.Build(&arc_permutation);
 	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with " << num_nodes << " nodes.";
 }
-void MinFlowMatcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores, operations_research::LinearSumAssignment<MinFlowMatcher::Graph>* out) {
+void Matcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores, operations_research::LinearSumAssignment<Matcher::Graph>* out) {
 	using namespace operations_research;
     // initialize on first usage
     if (!is_ready) {
@@ -118,7 +117,7 @@ void MinFlowMatcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores, 
     parameterize_assignment(scores, static_cast<long>(2) << 30, *out);
 
 }
-MinFlowMatcher::Graph MinFlowMatcher::getGraphCopy(const RectMatrix<Matcher::Scalar> &scores) {
+Matcher::Graph Matcher::getGraphCopy(const RectMatrix<Matcher::Scalar> &scores) {
     using namespace operations_research;
     // initialize on first usage
     if (!is_ready) {
