@@ -47,9 +47,9 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 	    numerator_inout_log + numerator_inout_log == numerator_in_log) {
 		return static_cast<Scalar>(numerator_inout_log);
 	}
-	const auto numerator = static_cast<Scalar>(numerator_inout_log * numerator_in_log);
-	const auto denominator = static_cast<Scalar>(denom_a * denom_b);
+	const size_t numerator = numerator_inout_log * numerator_in_log;
+    const size_t denominator = denom_a * denom_b;
 
 	// log first should result in a higher precision
-	return static_cast<Scalar>(numerator_inout_log) * (std::log2(numerator) - std::log2(denominator));
+	return static_cast<Scalar>(numerator_inout_log)* (factorials.lg_fast(numerator) - factorials.lg_fast(denominator));
 }

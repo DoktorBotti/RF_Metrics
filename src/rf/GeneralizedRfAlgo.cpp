@@ -111,11 +111,9 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	Scalar total_dst = 0;
 
 	// iterate through all tree combinations
-	for (auto a = std::as_const(all_splits).begin(); a != all_splits.end(); ++a) {
-		size_t idx_a = static_cast<size_t>(a - all_splits.begin());
-		for (auto b = std::as_const(all_splits).begin(); b != a; ++b) {
-			size_t idx_b = static_cast<size_t>(b - all_splits.begin());
-			Scalar dst = calc_tree_score(*a, *b);
+	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
+		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
+			Scalar dst = calc_tree_score(all_splits[idx_a], all_splits[idx_b]);
 			res.pairwise_similarities.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 		}
@@ -141,8 +139,9 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
 RectMatrix<RfAlgorithmInterface::Scalar>
 GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
 	RectMatrix<Scalar> scores(S1.size());
-	const auto taxa = S1.size() + 3;
-	const auto split_len = S1.computeSplitLen();
+    const auto taxa = S1.size() + 3;
+    factorials.reserve(taxa);
+    const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
 			scores.set(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));

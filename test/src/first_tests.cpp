@@ -33,7 +33,7 @@ TEST_CASE("Double fact. test", "[factorial]"){
 	CHECK(std::abs(fac.lg_unrooted_dbl_fact(7) - 9.884170519) < 1e-4);
 }
 TEST_CASE("Print first Split", "[useless]") {
-	auto tree_list = Util::create_trees(1, "/rf_data/BS/24");
+	auto tree_list = Util::create_trees(1, "/rf_metrics/BS/24");
 
 	std::vector<PllSplitList> splits_list;
 

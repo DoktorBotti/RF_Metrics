@@ -12,7 +12,9 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	// extract splits
 	std::vector<PllSplitList> split_lists;
 	size_t curr_tree = 0;
-	assert(!trees.empty());
+	if(trees.size() <= 1){
+		return RfMetricInterface::Results(0);
+	}
 	for (auto &t : trees) {
 		t.alignNodeIndices(*trees.begin());
 		split_lists.emplace_back(t);

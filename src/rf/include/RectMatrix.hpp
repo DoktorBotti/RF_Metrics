@@ -1,8 +1,10 @@
 #ifndef INFORF_RECTMATRIX_H
 #define INFORF_RECTMATRIX_H
 
+#include "SymmetricMatrix.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cfloat>
 #include <cmath>
 #include <cstdio>
 #include <iomanip>
@@ -22,10 +24,13 @@ class RectMatrix {
 
 	[[nodiscard]] std::pair<T, T> get_min_max() const;
 	[[nodiscard]] std::string print() const;
+	SymmetricMatrix<T> to_symmetric_mtx() const;
+	bool is_symmetric() const;
 
   private:
 	std::vector<T> matrix;
 	size_t dim;
+	static bool nearlyEq(T a, T b);
 };
 
 // ------------- implementation ------------------
@@ -89,6 +94,36 @@ std::string RectMatrix<T>::print() const {
 		ss << "\n";
 	}
 	return ss.str();
+}
+template <typename T>
+SymmetricMatrix<T> RectMatrix<T>::to_symmetric_mtx() const {
+	SymmetricMatrix<T> res(size());
+	for (size_t row = 0; row < size(); ++row) {
+		for (size_t col = 0; col <= row; col++) {
+			assert(nearlyEq(at(row, col), at(col, row)));
+			res.set_at(row, col, at(row, col));
+		}
+	}
+	return res;
+}
+template <typename T>
+bool RectMatrix<T>::is_symmetric() const {
+	for (size_t row = 0; row < size(); ++row) {
+		for (size_t col = 0; col <= row; col++) {
+			if (!nearlyEq(at(row, col), at(col, row))) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+template <typename T>
+bool RectMatrix<T>::nearlyEq(T a, T b) {
+	auto absA = std::abs(a);
+	auto absB = std::abs(b);
+	auto largest = (absA < absB) ? absB : absA;
+	auto smallest = (absA < absB) ? absA : absB;
+	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e5;
 }
 
 #endif // INFORF_RECTMATRIX_H

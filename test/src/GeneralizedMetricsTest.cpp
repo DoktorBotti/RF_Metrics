@@ -14,7 +14,7 @@ TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "/rf_data/SPI_10/";
+	std::string base_path_res = "/rf_metrics/SPI_10/";
 	auto metr = RfMetricInterface::SPI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -23,7 +23,7 @@ TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "/rf_data/MSI_10/";
+	std::string base_path_res = "/rf_metrics/MSI_10/";
 	auto metr = RfMetricInterface::MSI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -33,7 +33,7 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "/rf_data/MCI_10/";
+	std::string base_path_res = "/rf_metrics/MCI_10/";
 	auto metr = RfMetricInterface::MCI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -84,8 +84,10 @@ static void test_metric(const std::string &base_path_splits,
 		// load solution matrix
 		RectMatrix<double> true_mtx =
 		    Util::parse_mtx_from_r(base_path_res + res_fname + "/pairwise_trees");
+		REQUIRE(true_mtx.is_symmetric());
+        auto symmetric_true_mtx = true_mtx.to_symmetric_mtx();
 		io::IOData true_ioData;
-		true_ioData.pairwise_distance_mtx = true_mtx.to_vector();
+		true_ioData.pairwise_distance_mtx = symmetric_true_mtx.to_vector();
 		CHECK(true_ioData.comparePairwiseDistances(res));
 	}
 }

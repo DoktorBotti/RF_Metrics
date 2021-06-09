@@ -47,7 +47,7 @@ TEST_CASE("Parse RAXML", "[io]") {
 }
 
 TEST_CASE("Result creation", "[io]") {
-	auto trees = Util::create_all_trees("/rf_data/BS/125");
+	auto trees = Util::create_all_trees("/rf_metrics/BS/125");
 	RfMetricInterface::Results res(trees.size());
 	SUCCEED("Results could be created");
 }

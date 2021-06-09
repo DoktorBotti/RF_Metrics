@@ -10,7 +10,7 @@ SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	if (!compatible(S1, S2, taxa, split_len)) {
 		return 0;
 	}
-	GeneralizedRfAlgo::factorials.reserve(taxa + taxa -5);
+	GeneralizedRfAlgo::factorials.reserve(taxa + taxa);
 
 	auto s1_tmp = h_info_content(S1, taxa, split_len);
 	auto s2_tmp = h_info_content(S2, taxa, split_len);

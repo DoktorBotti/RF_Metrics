@@ -19,7 +19,9 @@ Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores
 
 	// Compute the optimum assignment.
 	BOOST_LOG_SEV(logger, lg::normal) << "Calculating assignment";
-	assert(a.FinalizeSetup());
+	if(!a.FinalizeSetup()){
+		throw std::logic_error("The Linear Assignment Calculator cannot guarantee a valid result");
+	}
 	bool success = a.ComputeAssignment();
 	assert(success);
 	if (success) {
