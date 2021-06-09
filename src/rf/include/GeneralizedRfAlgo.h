@@ -32,6 +32,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	                                                   const PllSplitList &S2);
 	virtual Scalar
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
+	virtual Scalar calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len);
 	static size_t bits_too_many(size_t taxa);
 	/*
 	 * Returns a vec with 6 blocks of split_len size.
