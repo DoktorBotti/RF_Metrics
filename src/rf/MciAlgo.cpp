@@ -51,5 +51,5 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
     const size_t denominator = denom_a * denom_b;
 
 	// log first should result in a higher precision
-	return static_cast<Scalar>(numerator_inout_log)* (factorials.lg_fast(numerator) - factorials.lg_fast(denominator));
+	return static_cast<Scalar>(numerator_inout_log)* (factorials.lg(numerator) - factorials.lg(denominator));
 }

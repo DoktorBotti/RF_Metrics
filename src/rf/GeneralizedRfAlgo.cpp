@@ -140,7 +140,7 @@ RectMatrix<RfAlgorithmInterface::Scalar>
 GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
 	RectMatrix<Scalar> scores(S1.size());
     const auto taxa = S1.size() + 3;
-    factorials.reserve(taxa);
+    factorials.reserve(taxa + taxa);
     const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {

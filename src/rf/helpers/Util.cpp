@@ -83,7 +83,7 @@ RectMatrix<double> Util::create_random_mtx(const size_t dim) {
     std::uniform_real_distribution<> distr(0., 500.);
 
     for (size_t i = 0; i < dim; ++i) {
-        for (size_t j = 0; j <= dim; ++j) {
+        for (size_t j = 0; j < dim; ++j) {
             res.set(i, j, distr(rand_engine));
         }
     }

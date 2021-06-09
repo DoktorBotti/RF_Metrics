@@ -9,7 +9,7 @@
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
                         const RfMetricInterface::Metric &metric);
-TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized]") {
+TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized][long]") {
 	// This test needs the pre-calculated results in /rf_metrics/SPI_10/
 	// misc/createTestingData.R generates this content
 
@@ -18,7 +18,7 @@ TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized]") {
 	auto metr = RfMetricInterface::SPI;
 	test_metric(base_path, base_path_res, metr);
 }
-TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized]") {
+TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized][long]") {
 	// This test needs the pre-calculated results in /rf_metrics/MSI_10/
 	// misc/createTestingData.R generates this content
 
@@ -28,7 +28,7 @@ TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized]") {
 	test_metric(base_path, base_path_res, metr);
 }
 
-TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
+TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized][long]") {
 	// This test needs the pre-calculated results in /rf_metrics/SPI_10/
 	// misc/createTestingData.R generates this content
 
@@ -77,6 +77,9 @@ static void test_metric(const std::string &base_path_splits,
 		params.input_file_path = base_path_splits + res_fname;
 		params.metric = metric;
 		params.normalize_output = false;
+		INFO("This might indicate an exception inside the metrics calculations.")
+		INFO("Calculating distances from " + res_fname)
+		CHECK(!res_fname.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();
 		io::IOData res = iface.get_result_as_IOData();
@@ -88,6 +91,7 @@ static void test_metric(const std::string &base_path_splits,
         auto symmetric_true_mtx = true_mtx.to_symmetric_mtx();
 		io::IOData true_ioData;
 		true_ioData.pairwise_distance_mtx = symmetric_true_mtx.to_vector();
+		INFO("Comparing ours to reference")
 		CHECK(true_ioData.comparePairwiseDistances(res));
 	}
 }

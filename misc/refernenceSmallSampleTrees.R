@@ -11,3 +11,7 @@ attr(spi, "pairScores")
 matr <- attr(spi, "pairScores")
 output_path <- "/rf_metrics/smallmtx"
 write.table(matr, file = output_path, row.names=FALSE, col.names=FALSE)
+
+MatchingSplitInfoDistance(tree1 ,tree2)
+DifferentPhylogeneticInfo(tree1, tree2)
+ClusteringInfoDist(tree1,tree2)

@@ -20,7 +20,7 @@ static size_t ref_popcount(const PllSplit & split, size_t len) {
 }
 
 TEST_CASE("popcount", "[primitives]") {
-	auto split_lists = Util::create_splits(20, "/rf_data/BS/125");
+	auto split_lists = Util::create_splits(20, "/rf_metrics/BS/125");
 	unsigned int tip_count = static_cast<unsigned int>(split_lists[0].size()) + 3;
 	unsigned int tip_ints = (tip_count + 31) / 32;
 
