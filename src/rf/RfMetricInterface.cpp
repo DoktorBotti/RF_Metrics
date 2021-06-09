@@ -87,5 +87,5 @@ io::IOData RfMetricInterface::get_result_as_IOData() const {
 }
 
 RfMetricInterface::Results::Results(size_t num_trees)
-    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees), pairwise_split_info(num_trees) {
+    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees), pairwise_distances(num_trees) ,pairwise_split_info(num_trees) {
 }
