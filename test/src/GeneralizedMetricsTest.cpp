@@ -14,7 +14,7 @@ TEST_CASE("SPI compare un-normalized", "[SPI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/SPI_10/";
+	std::string base_path_res = "/rf_data/SPI_10/";
 	auto metr = RfMetricInterface::SPI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -23,7 +23,7 @@ TEST_CASE("MSI compare un-normalized", "[MSI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/MSI_10/";
+	std::string base_path_res = "/rf_data/MSI_10/";
 	auto metr = RfMetricInterface::MSI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -33,7 +33,7 @@ TEST_CASE("MCI compare un-normalized", "[MCI][un-normalized]") {
 	// misc/createTestingData.R generates this content
 
 	std::string base_path = "../test/samples/data/heads/BS/";
-	std::string base_path_res = "../test/samples/MCI_10/";
+	std::string base_path_res = "/rf_data/MCI_10/";
 	auto metr = RfMetricInterface::MCI;
 	test_metric(base_path, base_path_res, metr);
 }
@@ -56,7 +56,7 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 
 	RfMetricInterface iface(params);
 	iface.do_magical_high_performance_stuff();
-	std::cout << iface.get_result().pairwise_distances_relative.print() << std::endl << std::flush;
+	std::cout << iface.get_result().pairwise_similarities.print() << std::endl << std::flush;
 	SUCCEED("Done.");
 }
 

@@ -34,7 +34,8 @@ class RfMetricInterface {
 		~Results() = default;
 
 		SymmetricMatrix<size_t> pairwise_distances_absolute;
-		SymmetricMatrix<Scalar> pairwise_distances_relative;
+		SymmetricMatrix<Scalar> pairwise_similarities;
+		SymmetricMatrix<Scalar> pairwise_distances;
 		SymmetricMatrix<Scalar> pairwise_split_info;
 		size_t num_unique_trees = 0;
 		double mean_distance = static_cast<Scalar>(NAN);

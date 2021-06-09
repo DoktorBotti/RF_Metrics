@@ -46,7 +46,7 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	res.pairwise_distances_absolute = pairwise_dst;
 	for (size_t i = 0; i < res.pairwise_distances_absolute.size(); ++i) {
 		for (size_t j = 0; j < i; ++j) {
-			res.pairwise_distances_relative.set_at(
+			res.pairwise_similarities.set_at(
 			    i,
 			    j,
 			    static_cast<double>(res.pairwise_distances_absolute.at(i, j)) /

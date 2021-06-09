@@ -31,7 +31,7 @@ class RectMatrix {
 // ------------- implementation ------------------
 
 template <typename T>
-RectMatrix<T>::RectMatrix(size_t num_elems) : matrix(num_elems * num_elems, 0) {
+RectMatrix<T>::RectMatrix(size_t num_elems) : matrix(num_elems * num_elems) {
 	dim = num_elems;
 }
 

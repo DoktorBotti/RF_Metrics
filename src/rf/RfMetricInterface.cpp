@@ -80,12 +80,12 @@ bool RfMetricInterface::write_result_to_file() {
 io::IOData RfMetricInterface::get_result_as_IOData() const {
 	assert(has_calculated);
 	io::IOData output;
-	output.pairwise_distance_mtx = result_ptr->pairwise_distances_relative.to_vector();
+	output.pairwise_distance_mtx = result_ptr->pairwise_similarities.to_vector();
 	output.mean_rf_dst = result_ptr->mean_distance;
 	output.number_of_unique_trees = result_ptr->num_unique_trees;
 	return output;
 }
 
 RfMetricInterface::Results::Results(size_t num_trees)
-    : pairwise_distances_absolute(num_trees), pairwise_distances_relative(num_trees), pairwise_split_info(num_trees) {
+    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees), pairwise_split_info(num_trees) {
 }
