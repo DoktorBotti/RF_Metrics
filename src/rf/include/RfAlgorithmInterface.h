@@ -8,7 +8,9 @@ class RfAlgorithmInterface {
   public:
 	typedef double Scalar;
 	virtual RfMetricInterface::Results calculate(std::vector<PllTree> &trees) = 0;
-	virtual ~RfAlgorithmInterface() = default;
+	// avoid v-table issues by defining trivial destructor in its own compile unit
+	virtual ~RfAlgorithmInterface();
 };
+
 
 #endif // INFORF_RFALGORITHMINTERFACE_H

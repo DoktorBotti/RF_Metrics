@@ -7,6 +7,7 @@ add_library(rf_lib STATIC
         MsiAlgo.cpp
         PllSplits.cpp
         PllTree.cpp
+        RfAlgorithmInterface.cpp
         RfMetricInterface.cpp
         SpiAlgo.cpp
         StandardRfAlgo.cpp

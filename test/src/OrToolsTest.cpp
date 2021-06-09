@@ -40,7 +40,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	Matcher matcher;
 	double res = matcher.solve(dst_mtx);
-	INFO(res);
+	INFO(res)
 	REQUIRE(std::abs(res - 1.) >= 1e-5);
 	// create multiple random mappings
 	double closest_guess = 0;
@@ -82,6 +82,9 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 			break;
 		case RfMetricInterface::MCI:
 			reference_path += "MCI_10/";
+			break;
+		case RfMetricInterface::RF:
+			throw std::invalid_argument("softwipe...");
 			break;
 	}
 	BOOST_LOG_SEV(logger, lg::normal) << "Checking inside metric path " << reference_path;

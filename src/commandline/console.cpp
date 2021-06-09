@@ -16,17 +16,17 @@ struct Flag {
 	Flag(std::string name_in,
 	     int parameter_count_in,
 	     std::string description_in,
-	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> func)
+	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> func_in)
 	    : name(move(name_in)), parameter_count(parameter_count_in), description(move(description_in)),
-	      func(move(func)) {
+	      func(move(func_in)) {
 	}
 
 	Flag(std::string name_in,
 	     std::string description_in,
-	     const std::function<void(RfMetricInterface::Params &)> &func)
+	     const std::function<void(RfMetricInterface::Params &)> &func_in)
 	    : name(move(name_in)), parameter_count(0), description(move(description_in)),
 	      func([=](RfMetricInterface::Params &params, const std::vector<std::string> &) {
-		      func(params);
+		      func_in(params);
 	      }) {
 	}
 };

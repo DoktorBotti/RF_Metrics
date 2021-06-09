@@ -46,7 +46,7 @@ TEST_CASE("Print first Split", "[useless]") {
 
 TEST_CASE("Check CPU output", "[useless]") {
 	const std::string command = "lscpu";
-	INFO(Util::get_output_of_bash_command(command));
+	INFO(Util::get_output_of_bash_command(command))
 	REQUIRE(false);
 }
 

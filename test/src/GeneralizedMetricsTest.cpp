@@ -69,7 +69,7 @@ static void test_metric(const std::string &base_path_splits,
                         const RfMetricInterface::Metric &metric) {
 	std::random_device rand_dev;
 	std::mt19937 rnd(rand_dev());
-	std::uniform_int_distribution tree_idx_distr(0, 9);
+	std::uniform_int_distribution<int> tree_idx_distr(0, 9);
 	// For each result, run our <metric> algorithm on two (random) contained trees
 	for (const auto &entry : std::filesystem::directory_iterator(base_path_res)) {
 		// skip irrelevant files
@@ -80,8 +80,8 @@ static void test_metric(const std::string &base_path_splits,
 		std::string res_fname = entry.path().filename();
 
 		// generate problem instance between only two trees from data
-		size_t tree_idx_a = tree_idx_distr(rnd);
-		size_t tree_idx_b = tree_idx_distr(rnd);
+		auto tree_idx_a = static_cast<size_t >(tree_idx_distr(rnd));
+		auto tree_idx_b = static_cast<size_t >(tree_idx_distr(rnd));
 		std::string trees_path =
 		    combine_trees_to_file(base_path_splits + res_fname, tree_idx_a, tree_idx_b);
 
