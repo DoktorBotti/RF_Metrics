@@ -59,7 +59,7 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 RfAlgorithmInterface::Scalar
 calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
 	GeneralizedRfAlgo::Scalar sum = 0;
-    for (size_t i = 0; i < taxa - 3; ++i) {
+    for (size_t i = 0; i < S.size(); ++i) {
 		auto a = S[i].popcount(split_len);
 		auto pcl_a = static_cast<GeneralizedRfAlgo::Scalar>(a) / static_cast<GeneralizedRfAlgo::Scalar>(taxa);
 		auto lg_pcl_b = std::log((1-pcl_a));

@@ -175,7 +175,7 @@ std::vector<pll_split_base_t> GeneralizedRfAlgo::compute_split_comparison(const 
 RfAlgorithmInterface::Scalar
 GeneralizedRfAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
 	Scalar sum = 0;
-	for (size_t i = 0; i < taxa - 3; ++i) {
+	for (size_t i = 0; i < S.size(); ++i) {
 		sum += h_info_content(S[i], taxa, split_len);
 	}
 	return sum;
