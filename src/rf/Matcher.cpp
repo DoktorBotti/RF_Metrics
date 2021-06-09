@@ -2,8 +2,8 @@
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores,
-                               std::vector<size_t> *best_matching_out) {
+Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores
+                               /*,std::vector<size_t> *best_matching_out*/) {
 	// initialize on first usage
 	if (!is_ready) {
 		init(scores.size());
@@ -15,7 +15,7 @@ Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores,
 	BOOST_LOG_SEV(logger, lg::normal) << "Creating assignment";
 	int num_left_nodes = static_cast<int>(scores.size());
 	LinearSumAssignment<Graph> a(graph, num_left_nodes);
-	parameterize_assignment(scores, large_num, a);
+	parameterize_assignment(scores, a);
 
 	// Compute the optimum assignment.
 	BOOST_LOG_SEV(logger, lg::normal) << "Calculating assignment";
@@ -42,11 +42,11 @@ Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores,
 	//			// DEBUG verify that chosen arc index is left_id * size + right_id - size
 	//			auto arc_mate_id = a.GetAssignmentArc(left_node);
 	//			// Softwipe..
-	//			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size() +
-	//right_idx); 			assert(arc_mate_id == arc_should_id);
+	//			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size()
+	//+ right_idx); 			assert(arc_mate_id == arc_should_id);
 	//			// DEBUG if arc indices were as they should be
 	//			auto arc_score_diff = std::abs(arc_score + static_cast<Matcher::Scalar>(
-	//a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
+	// a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
 	//			assert(arc_score_diff < 1e-6);
 	//		}
 	//		summed_cost += arc_score;
@@ -61,9 +61,8 @@ Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores,
 }
 operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_assignment(
     const RectMatrix<Matcher::Scalar> &scores,
-    const long large_num,
     operations_research::LinearSumAssignment<Matcher::Graph> &a) { // tiny lambda helpers
-	auto getScore = [large_num, scores](size_t i, size_t j) -> long {
+	auto getScore = [scores](size_t i, size_t j) -> long {
 		// multiply score with a high value to make rounding errors less troublesome
 		Matcher::Scalar score = -scores.at(i, j) * static_cast<double>(large_num);
 		return static_cast<long>(score);
@@ -116,7 +115,7 @@ void Matcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores,
 		init(scores.size());
 		is_ready = true;
 	}
-	parameterize_assignment(scores, static_cast<long>(2) << 30, *out);
+	parameterize_assignment(scores, *out);
 }
 Matcher::Graph Matcher::getGraphCopy(const RectMatrix<Matcher::Scalar> &scores) {
 	using namespace operations_research;

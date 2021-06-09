@@ -13,18 +13,18 @@ struct Flag {
 	std::string description;
 	std::function<void(RfMetricInterface::Params &params, std::vector<std::string>)> func;
 
-	Flag(std::string name,
-	     int parameter_count,
-	     std::string description,
+	Flag(std::string name_in,
+	     int parameter_count_in,
+	     std::string description_in,
 	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> func)
-	    : name(move(name)), parameter_count(parameter_count), description(move(description)),
+	    : name(move(name_in)), parameter_count(parameter_count_in), description(move(description_in)),
 	      func(move(func)) {
 	}
 
-	Flag(std::string name,
-	     std::string description,
+	Flag(std::string name_in,
+	     std::string description_in,
 	     const std::function<void(RfMetricInterface::Params &)> &func)
-	    : name(move(name)), parameter_count(0), description(move(description)),
+	    : name(move(name_in)), parameter_count(0), description(move(description_in)),
 	      func([=](RfMetricInterface::Params &params, const std::vector<std::string> &) {
 		      func(params);
 	      }) {

@@ -1,10 +1,10 @@
 #ifndef INFORF_MATCHER_H
 #define INFORF_MATCHER_H
 #include "LoggingBackend.h"
+#include "RectMatrix.hpp"
 #include "ortools/graph/linear_assignment.h"
 #include <boost/log/sources/severity_logger.hpp>
 #include <ortools/graph/graph.h>
-#include "RectMatrix.hpp"
 
 class Matcher {
   public:
@@ -13,8 +13,7 @@ class Matcher {
 
 	explicit Matcher();
 
-	double solve(const RectMatrix<Scalar> &scores,
-	             std::vector<size_t> *best_matching_out);
+	double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
 
 	void debugAssignment(const RectMatrix<Scalar> &scores,
 	                     operations_research::LinearSumAssignment<Matcher::Graph> *out);
@@ -38,7 +37,6 @@ class Matcher {
 
 	operations_research::LinearSumAssignment<Matcher::Graph> &
 	parameterize_assignment(const RectMatrix<Scalar> &scores,
-	                        const long large_num,
 	                        operations_research::LinearSumAssignment<Matcher::Graph> &a);
 };
 

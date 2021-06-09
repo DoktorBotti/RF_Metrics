@@ -10,10 +10,9 @@
 #include <ortools/linear_solver/linear_solver.h>
 #include <random>
 #include <rf/helpers/Util.h>
-
+static void BasicExample();
 TEST_CASE("execute or-tools example", "[OR_TOOLS]") {
 	// forward declare to put function at end of file
-	void BasicExample();
 	BasicExample();
 }
 TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
@@ -25,15 +24,14 @@ TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	//		}
 	//	}
 	Matcher matcher;
-	std::vector<size_t> res_matching(dst_mtx.size(), 0);
-	double res = matcher.solve(dst_mtx, &res_matching);
+	double res = matcher.solve(dst_mtx);
 	REQUIRE(res > 0);
 	std::stringstream out;
 
-	for (size_t i = 0; i < res_matching.size(); ++i) {
-		out << res_matching[i] << ", ";
-	}
-	std::cout << out.str() << std::endl << "summed score: " << res;
+//	for (size_t i = 0; i < res_matching.size(); ++i) {
+//		out << res_matching[i] << ", ";
+//	}
+//	std::cout << out.str() << std::endl << "summed score: " << res;
 }
 TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	const size_t dim_size = 9;
@@ -41,8 +39,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	Matcher matcher;
-	std::vector<size_t> res_matching(dim_size, 0);
-	double res = matcher.solve(dst_mtx, &res_matching);
+	double res = matcher.solve(dst_mtx);
 	INFO(res);
 	REQUIRE(std::abs(res - 1.) >= 1e-5);
 	// create multiple random mappings
@@ -111,9 +108,8 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 
 		// calculate own solution by matching from pairwise split score matrix
 		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
-		std::vector<size_t> found_matching(split_scores.size(), 0);
 		Matcher matcher;
-		auto our_solution = matcher.solve(split_scores, &found_matching);
+		auto our_solution = matcher.solve(split_scores);
 		double difference = std::abs(our_solution - solution);
 		bool correct = difference <= 1e-3;
 		CHECK(correct);
@@ -132,7 +128,7 @@ TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
 	CHECK(graph.num_arcs() == mtx_dim * mtx_dim);
 	size_t counter = 0;
 	// Check if outdegree is always equal at left nodes
-	for (const auto &node : graph.AllNodes()) {
+	for (const auto node : graph.AllNodes()) {
 		CHECK(graph.OutDegree(node) == mtx_dim);
 		++counter;
 		if (counter == mtx_dim) {
@@ -154,41 +150,10 @@ TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]") {
 	// checks that there will be no overflow
 	CHECK(a.FinalizeSetup());
 }
-void BasicExample() {
-	using namespace operations_research;
-	// Create the linear solver with the GLOP backend.
-	std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("GLOP"));
-
-	// Create the variables x and y.
-	MPVariable *const x = solver->MakeNumVar(0.0, 1, "x");
-	MPVariable *const y = solver->MakeNumVar(0.0, 2, "y");
-
-	std::cout << "Number of variables = " << solver->NumVariables() << std::endl;
-
-	// Create a linear constraint, 0 <= x + y <= 2.
-	MPConstraint *const ct = solver->MakeRowConstraint(0.0, 2.0, "ct");
-	ct->SetCoefficient(x, 1);
-	ct->SetCoefficient(y, 1);
-
-	std::cout << "Number of constraints = " << solver->NumConstraints() << std::endl;
-
-	// Create the objective function, 3 * x + y.
-	MPObjective *const objective = solver->MutableObjective();
-	objective->SetCoefficient(x, 3);
-	objective->SetCoefficient(y, 1);
-	objective->SetMaximization();
-
-	solver->Solve();
-
-	std::cout << "Solution:" << std::endl;
-	std::cout << "Objective value = " << objective->Value() << std::endl;
-	std::cout << "x = " << x->solution_value() << std::endl;
-	std::cout << "y = " << y->solution_value() << std::endl;
-}
 
 std::size_t number_of_files_in_directory(std::filesystem::path path) {
 	using std::filesystem::directory_iterator;
-	return std::distance(directory_iterator(path), directory_iterator{});
+	return static_cast<size_t>(std::distance(directory_iterator(path), directory_iterator{}));
 }
 double get_pairwise_tree_score(std::filesystem::path path) {
 	// use filename to figure out pairwise tree comparison
@@ -204,4 +169,36 @@ double get_pairwise_tree_score(std::filesystem::path path) {
 	std::string tree_score_name = path.string() + "pairwise_trees";
 	auto res_mtx = Util::parse_mtx_from_r(tree_score_name, '\n', ',');
 	return res_mtx.at(row, col);
+}
+
+static void BasicExample() {
+    using namespace operations_research;
+    // Create the linear solver with the GLOP backend.
+    std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("GLOP"));
+
+    // Create the variables x and y.
+    MPVariable *const x = solver->MakeNumVar(0.0, 1, "x");
+    MPVariable *const y = solver->MakeNumVar(0.0, 2, "y");
+
+    std::cout << "Number of variables = " << solver->NumVariables() << std::endl;
+
+    // Create a linear constraint, 0 <= x + y <= 2.
+    MPConstraint *const ct = solver->MakeRowConstraint(0.0, 2.0, "ct");
+    ct->SetCoefficient(x, 1);
+    ct->SetCoefficient(y, 1);
+
+    std::cout << "Number of constraints = " << solver->NumConstraints() << std::endl;
+
+    // Create the objective function, 3 * x + y.
+    MPObjective *const objective = solver->MutableObjective();
+    objective->SetCoefficient(x, 3);
+    objective->SetCoefficient(y, 1);
+    objective->SetMaximization();
+
+    solver->Solve();
+
+    std::cout << "Solution:" << std::endl;
+    std::cout << "Objective value = " << objective->Value() << std::endl;
+    std::cout << "x = " << x->solution_value() << std::endl;
+    std::cout << "y = " << y->solution_value() << std::endl;
 }
