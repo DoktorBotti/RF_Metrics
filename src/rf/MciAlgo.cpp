@@ -63,7 +63,7 @@ calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
 		auto a = S[i].popcount(split_len);
 		auto pcl_a = static_cast<GeneralizedRfAlgo::Scalar>(a) / static_cast<GeneralizedRfAlgo::Scalar>(taxa);
 		auto lg_pcl_b = std::log((1-pcl_a));
-        sum += -pcl_a * std::log2(pcl_a) - lg_pcl_b + pcl_a * lg_pcl_b;
+        sum += -pcl_a * std::log2(pcl_a) - lg_pcl_b + pcl_a * lg_pcl_b; // TODO: Perf: log2(a) - log2(x);
     }
     return sum;
 }

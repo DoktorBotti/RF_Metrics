@@ -180,3 +180,24 @@ GeneralizedRfAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, si
 	}
 	return sum;
 }
+void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> &trees,
+                                                RfMetricInterface::Results &res) {
+	std::vector<GeneralizedRfAlgo::Scalar> tree_info(trees.size());
+	auto taxa = trees[0].size() + 3;
+	auto split_len = trees[0].computeSplitLen();
+	for (size_t i = 0; i < trees.size(); ++i) {
+		tree_info[i] = calc_tree_info_content(trees[i], taxa, split_len);
+	}
+
+	GeneralizedRfAlgo::Scalar summed_dist = 0;
+	for (size_t row = 0; row < trees.size(); ++row) {
+        for (size_t col = 0; col <= row; ++col) {
+            auto score = res.pairwise_similarities.at(row, col);
+			auto max = (tree_info[row] + tree_info[col]) / 2.;
+			res.pairwise_distances.set_at(row, col, (max - score));
+			summed_dist += max / score;
+        }
+	}
+
+	res.mean_distance = summed_dist / (static_cast<Scalar>(trees.size() + 1) * (static_cast<Scalar>(trees.size()) / 2.));
+}
