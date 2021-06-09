@@ -57,13 +57,15 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 }
 
 RfAlgorithmInterface::Scalar
-calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
+MciAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
 	GeneralizedRfAlgo::Scalar sum = 0;
-    for (size_t i = 0; i < S.size(); ++i) {
-		auto a = S[i].popcount(split_len);
-		auto pcl_a = static_cast<GeneralizedRfAlgo::Scalar>(a) / static_cast<GeneralizedRfAlgo::Scalar>(taxa);
-		auto lg_pcl_b = std::log((1-pcl_a));
-        sum += -pcl_a * std::log2(pcl_a) - lg_pcl_b + pcl_a * lg_pcl_b; // TODO: Perf: log2(a) - log2(x);
-    }
-    return sum;
+	for (size_t i = 0; i < S.size(); ++i) {
+		// TODO: Perf: log2(a) - log2(x);
+		auto a = static_cast<Scalar>(S[i].popcount(split_len));
+		auto b = static_cast<Scalar>(taxa - a);
+		auto taxa_f = static_cast<Scalar>(taxa);
+		auto entropy = -a / taxa_f * std::log2(a / taxa_f) - b / taxa_f * std::log2(b / taxa_f);
+		sum += entropy;
+	}
+	return sum;
 }

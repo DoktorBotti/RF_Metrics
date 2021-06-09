@@ -118,8 +118,12 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 			total_dst += dst;
 		}
 	}
+
 	// calc mean distance between trees
-	res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
+    res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
+
+	// calculate distances
+	calc_pairwise_tree_dist(all_splits, res);
 	return res;
 }
 
@@ -193,8 +197,8 @@ void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> 
 	for (size_t row = 0; row < trees.size(); ++row) {
         for (size_t col = 0; col <= row; ++col) {
             auto score = res.pairwise_similarities.at(row, col);
-			auto max = (tree_info[row] + tree_info[col]) / 2.;
-			res.pairwise_distances.set_at(row, col, (max - score));
+			auto max = tree_info[row] + tree_info[col];
+			res.pairwise_distances.set_at(row, col, (max - score - score));
 			summed_dist += max / score;
         }
 	}
