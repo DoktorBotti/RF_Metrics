@@ -27,6 +27,8 @@ class Util {
     static RectMatrix<double>
 	parse_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
                                char delim_col = ',');
+	static SymmetricMatrix<double> parse_sym_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
+                                                        char delim_col = ',');
 
 	static RectMatrix<double> create_random_mtx(const size_t dim);
 

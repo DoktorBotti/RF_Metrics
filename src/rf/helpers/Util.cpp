@@ -117,6 +117,35 @@ RectMatrix<double> Util::parse_mtx_from_r(const std::string &file_path,
 	}
 	return res;
 }
+SymmetricMatrix<double>
+Util::parse_sym_mtx_from_r(const std::string &file_path,
+                       char delim_row,
+                       char delim_col ) {
+    std::string file_content = read_file(file_path);
+    auto lines = Util::split(file_content, delim_row);
+    std::vector<std::vector<std::string>> mat;
+    mat.reserve(lines.size());
+    for (const auto &el : lines) {
+        mat.push_back(Util::split(el, delim_col));
+    }
+
+    std::vector<std::vector<double>> dbl_mat;
+    for(const auto& el : mat) {
+        dbl_mat.emplace_back();
+        std::for_each(el.begin(), el.end(), [&dbl_mat](auto elem) {
+          dbl_mat.back().push_back(std::stod(elem));
+        });
+    }
+    // copy out matrix
+    size_t dim = dbl_mat.size();
+    SymmetricMatrix<double> res(dim);
+    for (size_t i = 0; i < dim; ++i) {
+        for (size_t j = 0; j <= i; ++j) {
+            res.set_at(i, j, dbl_mat[i][j]);
+        }
+    }
+    return res;
+}
 std::vector<PllTree> Util::create_all_trees_from_string(const std::string &trees) {
     auto tree_str = Util::split(trees, '\n');
     return get_tree_from_string_list(tree_str);

@@ -41,7 +41,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	Matcher matcher;
 	double res = matcher.solve(dst_mtx);
 	INFO(res)
-	REQUIRE(std::abs(res - 1.) >= 1e-5);
+	REQUIRE(std::abs(res - 1.) >= 1e-5); // TODO: whaaa?
 	// create multiple random mappings
 	double closest_guess = 0;
 	for (size_t rnd_it = 0; rnd_it < 50000; ++rnd_it) {
