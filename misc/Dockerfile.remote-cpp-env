@@ -44,6 +44,7 @@ RUN apt-get update \
       libssl-dev \
       libcurl4-openssl-dev \
       libxml2-dev \
+      valgrind \
 	  curl #sudo #apparently, the softwipe install needs curl to install lizard (and "needs" sudo)
 
 # Add CRAN repository and install R

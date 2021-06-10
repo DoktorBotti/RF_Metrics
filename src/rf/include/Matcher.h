@@ -19,7 +19,7 @@ class Matcher {
 	                     operations_research::LinearSumAssignment<Matcher::Graph> *out);
 	Graph getGraphCopy(const RectMatrix<Scalar> &scores);
 	// factor for more precision after rounding, normally private but testing stuff
-	static const long large_num = 2l << 10;
+	static const long large_num = 2l << 25;
 
   private:
 	// important private members

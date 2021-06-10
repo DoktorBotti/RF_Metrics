@@ -90,8 +90,8 @@ static void test_metric(const std::string &base_path_splits,
 		params.input_file_path = trees_path;
 		params.metric = metric;
 		params.normalize_output = false;
-		INFO("This might indicate an exception inside the metrics calculations.")
 		INFO("Calculating distances from " + res_fname)
+		INFO("Indices a: "+ std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b))
 		CHECK(!res_fname.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();
@@ -101,17 +101,17 @@ static void test_metric(const std::string &base_path_splits,
 		SymmetricMatrix<double> true_mtx =
 		    Util::parse_sym_mtx_from_r(base_path_res + res_fname + "/pairwise_trees");
 		// compare tree score with it self
-		double a_a = true_mtx.at(tree_idx_a, tree_idx_a);
-        INFO("Comparing ours to reference: "+ std::to_string(a_a)+ " <-> " +  std::to_string(res.at(0, 0)))
-        CHECK(nearly_eq_floating(a_a, res.at(0, 0)));
+		double a_a = true_mtx.checked_at(tree_idx_a, tree_idx_a);
+        INFO("Comparing ours to reference: "+ std::to_string(a_a)+ " <-> " +  std::to_string(res.checked_at(0, 0)))
+        CHECK(nearly_eq_floating(a_a, res.checked_at(0, 0)));
 
-		double b_b = true_mtx.at(tree_idx_b, tree_idx_b);
-        INFO("Comparing ours to reference: "+ std::to_string(b_b) + " <-> " +  std::to_string(res.at(1,1)))
-        CHECK(nearly_eq_floating(b_b, res.at(1, 1)));
+		double b_b = true_mtx.checked_at(tree_idx_b, tree_idx_b);
+        INFO("Comparing ours to reference: "+ std::to_string(b_b) + " <-> " +  std::to_string(res.checked_at(1,1)))
+        CHECK(nearly_eq_floating(b_b, res.checked_at(1, 1)));
 		// compare across trees
-		double a_b = true_mtx.at(tree_idx_a, tree_idx_b);
-        INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.at(1,0)))
-        CHECK(nearly_eq_floating(a_b, res.at(1, 0)));
+		double a_b = true_mtx.checked_at(tree_idx_a, tree_idx_b);
+        INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.checked_at(1,0)))
+        CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
 
 	}
 }
@@ -170,5 +170,5 @@ bool nearly_eq_floating(double a, double b) {
 	auto absB = std::abs(b);
 	auto largest = (absA < absB) ? absB : absA;
 	auto smallest = (absA < absB) ? absA : absB;
-	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e5;
+	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e6;
 }
