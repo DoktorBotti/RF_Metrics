@@ -8,7 +8,7 @@
 #include "PllSplits.hpp"
 class MsiAlgo : public GeneralizedRfAlgo {
   protected:
-	// TODO:
+  public:
     double calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) override;
 };
 

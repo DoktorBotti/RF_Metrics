@@ -85,7 +85,6 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 			break;
 		case RfMetricInterface::RF:
 			throw std::invalid_argument("softwipe...");
-			break;
 	}
 	BOOST_LOG_SEV(logger, lg::normal) << "Checking inside metric path " << reference_path;
 	// init randomness for later
@@ -99,7 +98,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		}
 		int num_pairwise_scores =
 		    static_cast<int>(number_of_files_in_directory(sample_folder.path())) - 1;
-		std::uniform_int_distribution distr(0, num_pairwise_scores);
+		std::uniform_int_distribution<int> distr(0, num_pairwise_scores);
 		// pick random pairwise score file
 		int file_idx = distr(mt);
 		auto score_file_iter = std::filesystem::directory_iterator(sample_folder.path());

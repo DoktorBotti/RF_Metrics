@@ -22,7 +22,8 @@ class Util {
 	/* Create the PllSplitLists of the first n trees in the specified file. */
 	static std::vector<PllSplitList> create_splits(int n, const std::string &file_name);
 	static std::vector<PllTree> create_trees(int n, const std::string &file_name);
-	static std::vector<PllTree> create_all_trees(const std::string &file_name);
+	static std::vector<PllTree> create_all_trees_from_file(const std::string &file_name);
+	static std::vector<PllTree> create_all_trees_from_string(const std::string &trees);
     static RectMatrix<double>
 	parse_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
                                char delim_col = ',');

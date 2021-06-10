@@ -62,7 +62,7 @@ MciAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split
 	for (size_t i = 0; i < S.size(); ++i) {
 		// TODO: Perf: log2(a) - log2(x);
 		auto a = static_cast<Scalar>(S[i].popcount(split_len));
-		auto b = static_cast<Scalar>(taxa - a);
+		auto b = static_cast<Scalar>(taxa) - static_cast<Scalar>(a);
 		auto taxa_f = static_cast<Scalar>(taxa);
 		auto entropy = -a / taxa_f * std::log2(a / taxa_f) - b / taxa_f * std::log2(b / taxa_f);
 		sum += entropy;

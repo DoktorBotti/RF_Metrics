@@ -60,7 +60,7 @@ std::vector<PllTree> Util::get_tree_from_string_list(std::vector<std::string> &t
 	std::vector<PllTree> trees(tree_str.begin(), tree_str.end());
 	return trees;
 }
-std::vector<PllTree> Util::create_all_trees(const std::string &file_name) {
+std::vector<PllTree> Util::create_all_trees_from_file(const std::string &file_name) {
 	std::string file_content = read_file(file_name);
 	auto tree_str = Util::split(file_content, '\n');
 	return get_tree_from_string_list(tree_str);
@@ -116,4 +116,8 @@ RectMatrix<double> Util::parse_mtx_from_r(const std::string &file_path,
 		}
 	}
 	return res;
+}
+std::vector<PllTree> Util::create_all_trees_from_string(const std::string &trees) {
+    auto tree_str = Util::split(trees, '\n');
+    return get_tree_from_string_list(tree_str);
 }

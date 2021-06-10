@@ -10,6 +10,7 @@ add_executable(catch2_tests
         ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
         OrToolsTest.cpp
         GeneralizedMetricsTest.cpp
+        SymmetryDebug.cpp
         )
 
 target_link_libraries(catch2_tests PUBLIC
@@ -17,6 +18,7 @@ target_link_libraries(catch2_tests PUBLIC
         PRIVATE
         Catch2::Catch2
         rf_io_lib
+        datagen
         )
 include(CTest)
 include(Catch)

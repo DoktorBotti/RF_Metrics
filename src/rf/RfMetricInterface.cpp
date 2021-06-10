@@ -21,7 +21,7 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 		    << "No support for multi-core processing yet. Continuing with singular core.";
 	}
 	try {
-		tree_list = Util::create_all_trees(parameters.input_file_path);
+		tree_list = Util::create_all_trees_from_file(parameters.input_file_path);
 	} catch (const std::invalid_argument &ex) {
 		BOOST_LOG_SEV(logger, lg::error) << ex.what();
 		throw;
@@ -69,8 +69,9 @@ bool RfMetricInterface::write_result_to_file() {
 		io::IOData output = get_result_as_IOData();
 		nlohmann::json j;
 		io::to_json(j, output);
+        std::string pretty_format = j.dump(2);
 
-		out_stream << j;
+		out_stream << pretty_format;
 		out_stream.close();
 		return true;
 	}
