@@ -2,7 +2,7 @@
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores
+Matcher::Scalar Matcher::solve(const SymmetricMatrix<Scalar> &scores
                                /*,std::vector<size_t> *best_matching_out*/) {
 	// initialize on first usage
 	if (!is_ready) {
@@ -62,7 +62,7 @@ Matcher::Scalar Matcher::solve(const RectMatrix<Matcher::Scalar> &scores
 	return optimum_cost;
 }
 operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_assignment(
-    const RectMatrix<Matcher::Scalar> &scores,
+    const SymmetricMatrix<Scalar> &scores,
     operations_research::LinearSumAssignment<Matcher::Graph> &a) { // tiny lambda helpers
 	auto getScore = [scores](size_t i, size_t j) -> long {
 		// multiply score with a high value to make rounding errors less troublesome
@@ -70,13 +70,15 @@ operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_
 		return static_cast<long>(score);
 	};
 	for (size_t from = 0; from < scores.size(); ++from) {
-		for (size_t to = 0; to < scores.size(); ++to) {
+		for (size_t to = 0; to < from; ++to) {
 			// TODO problem that casted to long?
 			long arc_cost = getScore(from, to);
 			// from -> to
 			assign_permuted_cost(from * scores.size() + to, arc_cost, a);
+			assign_permuted_cost(to * scores.size() + from, arc_cost, a);
 		}
-	}
+        assign_permuted_cost(from * scores.size() + from, getScore(from,from), a);
+    }
 	return a;
 }
 Matcher::Matcher() {
@@ -109,7 +111,7 @@ void Matcher::init(size_t num_matches) {
 	graph.Build(&arc_permutation);
 	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with " << num_nodes << " nodes.";
 }
-void Matcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores,
+void Matcher::debugAssignment(const SymmetricMatrix<Scalar> &scores,
                               operations_research::LinearSumAssignment<Matcher::Graph> *out) {
 	using namespace operations_research;
 	// initialize on first usage
@@ -119,7 +121,7 @@ void Matcher::debugAssignment(const RectMatrix<Matcher::Scalar> &scores,
 	}
 	parameterize_assignment(scores, *out);
 }
-Matcher::Graph Matcher::getGraphCopy(const RectMatrix<Matcher::Scalar> &scores) {
+Matcher::Graph Matcher::getGraphCopy(const SymmetricMatrix<Scalar> &scores) {
 	using namespace operations_research;
 	// initialize on first usage
 	if (!is_ready) {

@@ -13,11 +13,11 @@ class Matcher {
 
 	explicit Matcher();
 
-	double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
+	double solve(const SymmetricMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
 
-	void debugAssignment(const RectMatrix<Scalar> &scores,
+	void debugAssignment(const SymmetricMatrix<Scalar> &scores,
 	                     operations_research::LinearSumAssignment<Matcher::Graph> *out);
-	Graph getGraphCopy(const RectMatrix<Scalar> &scores);
+	Graph getGraphCopy(const SymmetricMatrix<Scalar> &scores);
 	// factor for more precision after rounding, normally private but testing stuff
 	static const long large_num = 2l << 10;
 
@@ -36,7 +36,7 @@ class Matcher {
 	                          operations_research::LinearSumAssignment<Graph> &graph);
 
 	operations_research::LinearSumAssignment<Matcher::Graph> &
-	parameterize_assignment(const RectMatrix<Scalar> &scores,
+	parameterize_assignment(const SymmetricMatrix<Scalar> &scores,
 	                        operations_research::LinearSumAssignment<Matcher::Graph> &a);
 };
 

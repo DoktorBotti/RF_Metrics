@@ -140,15 +140,15 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
 	return total_score;
 }
 
-RectMatrix<RfAlgorithmInterface::Scalar>
+SymmetricMatrix<RfAlgorithmInterface::Scalar>
 GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
-	RectMatrix<Scalar> scores(S1.size());
+	SymmetricMatrix<Scalar> scores(S1.size());
     const auto taxa = S1.size() + 3;
     factorials.reserve(taxa + taxa);
     const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
-		for (size_t col = 0; col < S1.size(); ++col) {
-			scores.set(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
+		for (size_t col = 0; col <= row; ++col) {
+			scores.set_at(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
 		}
 	}
 

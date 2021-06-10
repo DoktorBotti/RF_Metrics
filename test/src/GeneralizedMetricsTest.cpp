@@ -98,15 +98,20 @@ static void test_metric(const std::string &base_path_splits,
 		auto res = iface.get_result().pairwise_similarities;
 
 		// load solution matrix
-		RectMatrix<double> true_mtx =
+		SymmetricMatrix<double> true_mtx =
 		    Util::parse_mtx_from_r(base_path_res + res_fname + "/pairwise_trees");
-        REQUIRE(true_mtx.is_symmetric());
 		// compare tree score with it self
-        INFO("Comparing ours to reference")
-        CHECK(nearly_eq_floating(true_mtx.at(tree_idx_a, tree_idx_a), res.at(0, 0)));
-		CHECK(nearly_eq_floating(true_mtx.at(tree_idx_b, tree_idx_b), res.at(1, 1)));
+		double a_a = true_mtx.at(tree_idx_a, tree_idx_a);
+        INFO("Comparing ours to reference: "+ std::to_string(a_a)+ " <-> " +  std::to_string(res.at(0, 0)))
+        CHECK(nearly_eq_floating(a_a, res.at(0, 0)));
+
+		double b_b = true_mtx.at(tree_idx_b, tree_idx_b);
+        INFO("Comparing ours to reference: "+ std::to_string(b_b) + " <-> " +  std::to_string(res.at(1,1)))
+        CHECK(nearly_eq_floating(b_b, res.at(1, 1)));
 		// compare across trees
-        CHECK(nearly_eq_floating(true_mtx.at(tree_idx_a, tree_idx_b), res.at(1, 0)));
+		double a_b = true_mtx.at(tree_idx_a, tree_idx_b);
+        INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.at(1,0)))
+        CHECK(nearly_eq_floating(a_b, res.at(1, 0)));
 
 	}
 }

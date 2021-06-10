@@ -24,11 +24,11 @@ class Util {
 	static std::vector<PllTree> create_trees(int n, const std::string &file_name);
 	static std::vector<PllTree> create_all_trees_from_file(const std::string &file_name);
 	static std::vector<PllTree> create_all_trees_from_string(const std::string &trees);
-    static RectMatrix<double>
+    static SymmetricMatrix<double>
 	parse_mtx_from_r(const std::string &file_path,  char delim_row = '\n',
                                char delim_col = ',');
 
-	static RectMatrix<double> create_random_mtx(const size_t dim);
+	static SymmetricMatrix<double> create_random_mtx(const size_t dim);
 
 	static std::string read_file(const std::string &file_name);
   private:

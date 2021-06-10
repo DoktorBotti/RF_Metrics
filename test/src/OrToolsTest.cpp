@@ -16,7 +16,7 @@ TEST_CASE("execute or-tools example", "[OR_TOOLS]") {
 	BasicExample();
 }
 TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
-	RectMatrix<double> dst_mtx = Util::parse_mtx_from_r("/rf_metrics/smallmtx", '\n', ' ');
+	SymmetricMatrix<double> dst_mtx = Util::parse_mtx_from_r("/rf_metrics/smallmtx", '\n', ' ');
 	// maybe only correct results when elements are applied with log2(el)? -> No
 	//	for(size_t row = 0; row < dst_mtx.size(); ++row){
 	//		for(size_t col = 0; col <= row; ++col){
@@ -37,11 +37,9 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	const size_t dim_size = 9;
 	std::cout << "number of possible matchings: " << dim_size
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
-	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
+	SymmetricMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	Matcher matcher;
 	double res = matcher.solve(dst_mtx);
-	INFO(res)
-	REQUIRE(std::abs(res - 1.) >= 1e-5);
 	// create multiple random mappings
 	double closest_guess = 0;
 	for (size_t rnd_it = 0; rnd_it < 50000; ++rnd_it) {
@@ -55,7 +53,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 		// verify that res is (probably) best mapping
 		double oth_score = 0;
 		for (size_t i = 0; i < dim_size; ++i) {
-			oth_score += dst_mtx.at(i, bad_mapping[i]);
+			oth_score += dst_mtx.checked_at(i, bad_mapping[i]);
 		}
 		if (oth_score > closest_guess) {
 			closest_guess = oth_score;
