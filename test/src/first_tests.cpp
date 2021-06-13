@@ -12,7 +12,7 @@
 
 TEST_CASE("read first test tree", "[data]") {
 	std::string temporaryPath = "/home/user/tmpoutput.txt";
-	std::string command = "head -n 1 /rf_data/BS/24 >" + temporaryPath;
+	std::string command = "head -n 1 /rf_metrics/BS/24 >" + temporaryPath;
 	// command = "ls /";
 	std::system(command.c_str());
 	std::stringstream ss;

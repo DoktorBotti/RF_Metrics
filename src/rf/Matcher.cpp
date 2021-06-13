@@ -19,7 +19,7 @@ Matcher::Scalar Matcher::solve(const SymmetricMatrix<Scalar> &scores
 
 	// Compute the optimum assignment.
 	BOOST_LOG_SEV(logger, lg::normal) << "Calculating assignment";
-	if(!a.FinalizeSetup()){
+	if (!a.FinalizeSetup()) {
 		throw std::logic_error("The Linear Assignment Calculator cannot guarantee a valid result");
 	}
 	bool success = a.ComputeAssignment();
@@ -32,32 +32,33 @@ Matcher::Scalar Matcher::solve(const SymmetricMatrix<Scalar> &scores
 	// Retrieve the cost of the optimum assignment.
 	Matcher::Scalar optimum_cost =
 	    static_cast<double>(-a.GetCost()) / static_cast<double>(large_num);
-	//	Matcher::Scalar summed_cost = 0;
-	//	// Retrieve the node-node correspondence of the optimum assignment and the
-	//	// cost of each node pairing.
-	//	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
-	//		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.size();
-	//		assert(right_idx >= 0 && right_idx < scores.size());
-	//		best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
-	//		Matcher::Scalar arc_score = scores.at(static_cast<size_t>(left_node), right_idx);
-	//		{
-	//			// DEBUG verify that chosen arc index is left_id * size + right_id - size
-	//			auto arc_mate_id = a.GetAssignmentArc(left_node);
-	//			// Softwipe..
-	//			int arc_should_id = static_cast<int>(static_cast<size_t>(left_node) * scores.size()
-	//+ right_idx); 			assert(arc_mate_id == arc_should_id);
-	//			// DEBUG if arc indices were as they should be
-	//			auto arc_score_diff = std::abs(arc_score + static_cast<Matcher::Scalar>(
-	// a.GetAssignmentCost(left_node)) / static_cast<Matcher::Scalar>( large_num));
-	//			assert(arc_score_diff < 1e-6);
-	//		}
-	//		summed_cost += arc_score;
-	//	}
+	Matcher::Scalar summed_cost = 0;
+	// Retrieve the node-node correspondence of the optimum assignment and the
+	// cost of each node pairing.
+	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
+		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.size();
+		assert(right_idx >= 0 && right_idx < scores.size());
+		//			best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
+		Matcher::Scalar arc_score = scores.checked_at(static_cast<size_t>(left_node), right_idx);
+		{
+			// DEBUG verify that chosen arc index is left_id * size + right_id - size
+			auto arc_mate_id = a.GetAssignmentArc(left_node);
+			// Softwipe..
+			int arc_should_id =
+			    static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx);
+			assert(arc_mate_id == arc_should_id);
+			// DEBUG if arc indices were as they should be
+			auto arc_score_diff =
+			    std::abs(arc_score + static_cast<Matcher::Scalar>(a.GetAssignmentCost(left_node)) /
+			                             static_cast<Matcher::Scalar>(large_num));
+			assert(arc_score_diff < 1e-5);
+		}
+		summed_cost += arc_score;
+	}
 	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
-	//	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by OrTools directly: " <<
-	// optimum_cost
-	//	                                  << " difference: " <<
-	// std::abs(static_cast<double>(summed_cost - optimum_cost));
+	BOOST_LOG_SEV(logger, lg::normal)
+	    << "Total score result by OrTools directly: " << optimum_cost
+	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
 	return optimum_cost;
 }
@@ -66,19 +67,23 @@ operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_
     operations_research::LinearSumAssignment<Matcher::Graph> &a) { // tiny lambda helpers
 	auto getScore = [scores](size_t i, size_t j) -> long {
 		// multiply score with a high value to make rounding errors less troublesome
-		Matcher::Scalar score = -scores.at(i, j) * static_cast<double>(large_num);
+		Matcher::Scalar score = -scores.checked_at(i, j) * static_cast<double>(large_num);
 		return static_cast<long>(score);
 	};
-	for (size_t from = 0; from < scores.size(); ++from) {
-		for (size_t to = 0; to < from; ++to) {
-			// TODO problem that casted to long?
+	const auto dim = scores.size();
+	for (size_t from = 0; from < dim; ++from) {
+        for (size_t to = 0; to < dim; ++to) {
+
 			long arc_cost = getScore(from, to);
-			// from -> to
-			assign_permuted_cost(from * scores.size() + to, arc_cost, a);
-			assign_permuted_cost(to * scores.size() + from, arc_cost, a);
+			auto arc_idx = from * dim + to;
+
+			auto checked_idx = debug_from_to_arc_idx[from][to];
+			assert(arc_idx == checked_idx);
+			assign_permuted_cost(arc_idx, arc_cost, a);
+			assert(graph.Tail(arc_idx) == static_cast<int>(from));
+			assert(graph.Head(arc_idx) == static_cast<int>(to) + dim);
 		}
-        assign_permuted_cost(from * scores.size() + from, getScore(from,from), a);
-    }
+	}
 	return a;
 }
 Matcher::Matcher() {
@@ -98,12 +103,16 @@ void Matcher::init(size_t num_matches) {
 	const size_t num_nodes = 2 * num_matches;
 	const size_t num_arcs = num_matches * num_matches;
 	graph = Graph(static_cast<int>(num_nodes), static_cast<int>(num_arcs));
+	size_t arc_idx = 0;
 	// create edges
 	for (int from = 0; from < static_cast<int>(num_matches); ++from) {
+		debug_from_to_arc_idx.emplace_back();
+		auto & dbg_from = debug_from_to_arc_idx.back();
 		for (int to = static_cast<int>(num_matches); to < static_cast<int>(num_nodes); ++to) {
 			const int arc_tail = from; // must be in [0, num_left_nodes)
 			const int arc_head = to;   // must be in [num_left_nodes,
 			                           // num_nodes)
+			dbg_from.push_back(arc_idx++);
 			graph.AddArc(arc_tail, arc_head);
 		}
 	}

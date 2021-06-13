@@ -26,6 +26,8 @@ class Matcher {
 	Graph graph;
 	std::vector<Graph::ArcIndex> arc_permutation;
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+	// TODO: remove array
+	std::vector<std::vector<size_t>> debug_from_to_arc_idx;
 
 	// used for init on first usage
 	bool is_ready = false;
