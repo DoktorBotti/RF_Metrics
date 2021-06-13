@@ -16,21 +16,24 @@ TEST_CASE("Print random trees", "[Sym]") {
 	CHECK(Util::split(Util::split(res_str, '\n').front(), ',').size() == 7);
 }
 static inline void checkSymmetry(GeneralizedRfAlgo &algo,
-                          const PllSplit &split_a,
-                          const PllSplit &split_b,
-                          const size_t num_taxa,
-                          const size_t split_len);
-TEST_CASE("Find un-symmetric compatible() method", "[Sym]")
-{
-	// config
-	const size_t num_taxa = GENERATE(14,18,21,80);
-
-	// create random trees, many
-	RndTreeGenerator::cli_options_t creation_opts;
-	creation_opts.trees = 100;
-	creation_opts.taxa = num_taxa;
-	auto res_str = RndTreeGenerator::create_random_trees(creation_opts);
-	auto trees = Util::create_all_trees_from_string(res_str);
+                                 const PllSplit &split_a,
+                                 const PllSplit &split_b,
+                                 const size_t num_taxa,
+                                 const size_t split_len);
+TEST_CASE("Find un-symmetric compatible() method", "[Sym]") {
+	std::string trees_str = "";
+	size_t num_taxa =  GENERATE(14,18,21,80,125);
+	if (false) {
+		// config
+		// create random trees, many
+		RndTreeGenerator::cli_options_t creation_opts;
+		creation_opts.trees = 100;
+		creation_opts.taxa = num_taxa;
+		trees_str = RndTreeGenerator::create_random_trees(creation_opts);
+	} else {
+		trees_str = Util::read_file("../test/samples/data/heads/BS/141");
+	}
+	auto trees = Util::create_all_trees_from_string(trees_str);
 	// extract splits. Each tree now identifies by its index in all_splits
 	std::vector<PllSplitList> all_splits;
 	all_splits.reserve(trees.size());
@@ -39,6 +42,7 @@ TEST_CASE("Find un-symmetric compatible() method", "[Sym]")
 		all_splits.emplace_back(t);
 	}
 	const size_t split_len = all_splits.front().computeSplitLen();
+	num_taxa = all_splits.front().size() + 3;
 	SpiAlgo algo_spi;
 	MciAlgo algo_mci;
 	MsiAlgo algo_msi;
@@ -62,6 +66,34 @@ TEST_CASE("Find un-symmetric compatible() method", "[Sym]")
 		}
 	}
 }
+
+TEST_CASE("Verify correct SymmetricMatrix", "[Sym][SymmetricMatrix][RectMatrix]") {
+	const size_t dim = 21;
+	// put things in matrix and confirm with vec
+	// create a crude triangular matrix with vector
+	std::vector<std::vector<size_t>> comparison(dim, std::vector<size_t>());
+	SymmetricMatrix<size_t> mtx(dim);
+	size_t counter = 0;
+	for (size_t row = 0; row < dim; ++row) {
+		for (size_t col = 0; col <= row; ++col) {
+			auto cnt = counter++;
+			comparison[row].push_back(cnt);
+			CHECK(mtx.at(row, col) == 0);
+			mtx.set_at(row, col, cnt);
+			CHECK(mtx.at(row, col) == cnt);
+		}
+	}
+	// verify equality
+	for (size_t row = 0; row < dim; ++row) {
+		for (size_t col = 0; col <= row; ++col) {
+            auto should_be = comparison[row][col];
+			auto res = mtx.at(row,col);
+			CHECK(should_be == res);
+			CHECK(mtx.checked_at(row,col) == should_be);
+			CHECK(mtx.checked_at(col,row) == should_be);
+		}
+	}
+}
 static void checkSymmetry(GeneralizedRfAlgo &algo,
                           const PllSplit &split_a,
                           const PllSplit &split_b,
@@ -69,7 +101,7 @@ static void checkSymmetry(GeneralizedRfAlgo &algo,
                           const size_t split_len) {
 	double score_a = algo.calc_split_score(split_a, split_b, num_taxa, split_len);
 	double score_b = algo.calc_split_score(split_b, split_a, num_taxa, split_len);
-	if(std::abs(score_a - score_b)> 1e-8) {
+	if (std::abs(score_a - score_b) > 1e-8) {
 		pllmod_utree_split_show(split_a(), num_taxa);
 		putchar('\n');
 		pllmod_utree_split_show(split_b(), num_taxa);
@@ -77,6 +109,5 @@ static void checkSymmetry(GeneralizedRfAlgo &algo,
 		putchar('\n');
 	}
 
-
-	CHECK(std::abs(score_a - score_b)<= 1e-8);
+	CHECK(std::abs(score_a - score_b) <= 1e-8);
 }

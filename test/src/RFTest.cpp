@@ -11,7 +11,7 @@
 
 TEST_CASE("Calc standard RF distance", "[RF][long]") {
 	RfMetricInterface::Params libParams = {
-	    1, "/rf_data/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
+	    1, "/rf_metrics/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo(libParams);
 	algo.do_magical_high_performance_stuff();
 	INFO(algo.get_result().num_unique_trees)
