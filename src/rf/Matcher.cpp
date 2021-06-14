@@ -72,11 +72,10 @@ operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_
 	};
 	const auto dim = scores.size();
 	for (size_t from = 0; from < dim; ++from) {
-		for (size_t to = 0; to < dim; ++to) {
-			// TODO problem that casted to long?
-			long arc_cost = getScore(from, to);
-			// from -> to
-            auto arc_idx = from * dim + to;
+        for (size_t to = 0; to < dim; ++to) {
+
+			const long arc_cost = getScore(from, to);
+            const auto arc_idx = from * dim + to;
             assign_permuted_cost(arc_idx, arc_cost, a);
             // Debug:
 			assert(graph.Tail(arc_idx) == static_cast<int>(from));
