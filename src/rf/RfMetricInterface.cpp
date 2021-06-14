@@ -48,6 +48,7 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 			break;
 		}
 	}
+	BOOST_LOG_SEV(logger, lg::notification) << "Calculated results.";
 	has_calculated = true;
 }
 void RfMetricInterface::disable_logging() {

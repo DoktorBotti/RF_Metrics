@@ -107,8 +107,11 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		t.alignNodeIndices(*trees.begin());
 		all_splits.emplace_back(t);
 	}
+	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
 	RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
+	size_t tree_num = 0;
+	const size_t num_tree_calcs = all_splits.size() * (all_splits.size() + 1) / 2;
 
 	// iterate through all tree combinations
 	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
@@ -116,6 +119,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 			Scalar dst = calc_tree_score(all_splits[idx_a], all_splits[idx_b]);
 			res.pairwise_similarities.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
+			++tree_num;
+			if (tree_num % 50 == 0) {
+				// print update
+				BOOST_LOG_SEV(logger, lg::notification)
+				    << "Processed " << tree_num << " of " << num_tree_calcs
+				    << " total tree calculations";
+			}
 		}
 	}
 
