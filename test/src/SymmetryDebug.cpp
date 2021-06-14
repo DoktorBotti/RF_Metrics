@@ -48,7 +48,7 @@ TEST_CASE("Find un-symmetric compatible() method", "[Sym]")
 		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
 			const auto &tree_a = all_splits[idx_a];
 			const auto &tree_b = all_splits[idx_b];
-			// iterate through all split combinations IN SYMMETRIC WAY
+			// iterate through all split combinations IN SYMMETRIC WAY. This is the way
 			for (size_t spl_a = 0; spl_a < all_splits.front().size(); ++spl_a) {
 				for (size_t spl_b = 0; spl_b <= spl_a; ++spl_b) {
 					// check score symmetric

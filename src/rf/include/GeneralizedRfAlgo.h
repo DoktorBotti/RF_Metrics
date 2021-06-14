@@ -14,7 +14,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	GeneralizedRfAlgo(GeneralizedRfAlgo &&) = default;
 	~GeneralizedRfAlgo() override = default;
 	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
-    // should be protected but testing... (too lazy)
+	// should be protected but testing... (too lazy)
 	static LogDblFact factorials;
 
   protected:
@@ -28,8 +28,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static Scalar h_info_content(size_t a, size_t b);
-	RectMatrix<Scalar> calc_pairwise_split_scores(const PllSplitList &S1,
-	                                                   const PllSplitList &S2);
+	RectMatrix<Scalar> calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
 
   public:
 	virtual Scalar
@@ -37,7 +36,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 
   protected:
 	virtual Scalar calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len);
-	void calc_pairwise_tree_dist(const std::vector<PllSplitList> &trees, RfMetricInterface::Results &res);
+	void calc_pairwise_tree_dist(const std::vector<PllSplitList> &trees,
+	                             RfMetricInterface::Results &res);
 	static size_t bits_too_many(size_t taxa);
 	/*
 	 * Returns a vec with 6 blocks of split_len size.
@@ -52,9 +52,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	static std::vector<pll_split_base_t>
 	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
 
-
   private:
-    boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	Matcher match_solver;
 	static Scalar double_fac(long x);
 };

@@ -120,7 +120,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	}
 
 	// calc mean distance between trees
-    res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
+	res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
 
 	// calculate distances
 	calc_pairwise_tree_dist(all_splits, res);
@@ -143,9 +143,9 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
 RectMatrix<RfAlgorithmInterface::Scalar>
 GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
 	RectMatrix<Scalar> scores(S1.size());
-    const auto taxa = S1.size() + 3;
-    factorials.reserve(taxa + taxa);
-    const auto split_len = S1.computeSplitLen();
+	const auto taxa = S1.size() + 3;
+	factorials.reserve(taxa + taxa);
+	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
 			scores.set(row, col, calc_split_score(S1[row], S2[col], taxa, split_len));
@@ -195,13 +195,14 @@ void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> 
 
 	GeneralizedRfAlgo::Scalar summed_dist = 0;
 	for (size_t row = 0; row < trees.size(); ++row) {
-        for (size_t col = 0; col <= row; ++col) {
-            auto score = res.pairwise_similarities.at(row, col);
+		for (size_t col = 0; col <= row; ++col) {
+			auto score = res.pairwise_similarities.at(row, col);
 			auto max = tree_info[row] + tree_info[col];
 			res.pairwise_distances.set_at(row, col, (max - score - score));
 			summed_dist += max / score;
-        }
+		}
 	}
 
-	res.mean_distance = summed_dist / (static_cast<Scalar>(trees.size() + 1) * (static_cast<Scalar>(trees.size()) / 2.));
+	res.mean_distance = summed_dist / (static_cast<Scalar>(trees.size() + 1) *
+	                                   (static_cast<Scalar>(trees.size()) / 2.));
 }

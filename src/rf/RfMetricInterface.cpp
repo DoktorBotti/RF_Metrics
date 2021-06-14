@@ -35,8 +35,8 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 		case Metric::MCI: {
 			MciAlgo genAlgo;
 			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
-            break;
-        }
+			break;
+		}
 		case Metric::MSI: {
 			MsiAlgo genAlgo;
 			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
@@ -69,7 +69,7 @@ bool RfMetricInterface::write_result_to_file() {
 		io::IOData output = get_result_as_IOData();
 		nlohmann::json j;
 		io::to_json(j, output);
-        std::string pretty_format = j.dump(2);
+		std::string pretty_format = j.dump(2);
 
 		out_stream << pretty_format;
 		out_stream.close();
@@ -88,5 +88,6 @@ io::IOData RfMetricInterface::get_result_as_IOData() const {
 }
 
 RfMetricInterface::Results::Results(size_t num_trees)
-    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees), pairwise_distances(num_trees) ,pairwise_split_info(num_trees) {
+    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees),
+      pairwise_distances(num_trees), pairwise_split_info(num_trees) {
 }
