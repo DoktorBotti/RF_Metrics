@@ -56,4 +56,4 @@ target_link_libraries(rf_lib PUBLIC
         )
 
 # only generate loads of warnings for our lib - does not propagate to dependencies
-target_compile_options(rf_lib PRIVATE ${COMPILER_WARNING_FLAGS})
+target_compile_options(rf_lib PRIVATE -mpopcnt ${COMPILER_WARNING_FLAGS})
