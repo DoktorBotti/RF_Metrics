@@ -6,7 +6,6 @@
 #include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/utility/empty_deleter.hpp>
 
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -63,8 +62,18 @@ LoggingBackend::LoggingBackend() {
 	                     << expressions::message;
 
 	sink = boost::make_shared<text_sink>();
+    //! A function object that does nothing and can be used as an empty deleter for \c shared_ptr
+    struct empty_deleter
+    {
+        //! Function object result type
+        typedef void result_type;
+        /*!
+         * Does nothing
+         */
+        void operator() (const volatile void*) const BOOST_NOEXCEPT {}
+    };
 	sink->locked_backend()->add_stream(
-	    boost::shared_ptr<std::ostream>(&std::cout, boost::empty_deleter()));
+	    boost::shared_ptr<std::ostream>(&std::cout, empty_deleter()));
 	sink->set_formatter(cout_fmt);
 	sink->set_filter(severity == lg::notification);
 	core::get()->add_sink(sink);
