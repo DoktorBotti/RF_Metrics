@@ -24,7 +24,7 @@ TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	//		}
 	//	}
 	Matcher matcher;
-	double res = matcher.solve(dst_mtx);
+	double res = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(dst_mtx)));
 	REQUIRE(res > 0);
 	std::stringstream out;
 
@@ -39,7 +39,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	Matcher matcher;
-	double res = matcher.solve(dst_mtx);
+	double res = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(dst_mtx)));
 	INFO(res)
 	REQUIRE(std::abs(res - 1.) >= 1e-5); // TODO: whaaa?
 	// create multiple random mappings
@@ -111,7 +111,7 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		// calculate own solution by matching from pairwise split score matrix
 		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
 		Matcher matcher;
-		auto our_solution = matcher.solve(split_scores);
+		auto our_solution = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(split_scores)));
 		double difference = std::abs(our_solution - solution);
 		bool correct = difference <= 1e-3;
 		CHECK(correct);
@@ -137,20 +137,6 @@ TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
 			break;
 		}
 	}
-}
-
-TEST_CASE("matcher arc cost assignment", "[OR_TOOLS]") {
-	Matcher matcher;
-	constexpr size_t mtx_dim = 3;
-	auto mtx = Util::create_random_mtx(mtx_dim);
-	// auto mtx_vis = mtx.print();
-	auto graph = matcher.getGraphCopy(mtx);
-	std::vector<size_t> matching(mtx_dim, 0);
-	// double res = matcher.solve(mtx, &matching);
-	operations_research::LinearSumAssignment<util::StaticGraph<>> a(graph, mtx_dim);
-	matcher.debugAssignment(mtx, &a);
-	// checks that there will be no overflow
-	CHECK(a.FinalizeSetup());
 }
 
 std::size_t number_of_files_in_directory(std::filesystem::path path) {

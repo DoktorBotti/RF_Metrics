@@ -113,6 +113,9 @@ static void test_metric(const std::string &base_path_splits,
         INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.checked_at(1,0)))
         CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
 
+		UNSCOPED_INFO(a_b - res.checked_at(1, 0));
+		REQUIRE(false);
+
 	}
 }
 static std::string
@@ -170,5 +173,5 @@ bool nearly_eq_floating(double a, double b) {
 	auto absB = std::abs(b);
 	auto largest = (absA < absB) ? absB : absA;
 	auto smallest = (absA < absB) ? absA : absB;
-	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e6;
+	return largest - smallest <= largest * static_cast<double>(FLT_EPSILON) * 1e-3;
 }

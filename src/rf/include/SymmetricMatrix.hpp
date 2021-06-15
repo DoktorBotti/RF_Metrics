@@ -24,6 +24,8 @@ class SymmetricMatrix {
 
 	[[nodiscard]] std::pair<T,T> get_min_max() const;
 	std::string print() const;
+
+	SymmetricMatrix<T> operator-(const SymmetricMatrix<T> &other) const;
   private:
 	std::vector<T> matrix;
 	size_t dim;
@@ -95,6 +97,15 @@ std::string SymmetricMatrix<T>::print() const {
 		ss <<"\n";
 	}
 	return ss.str();
+}
+template <typename T>
+SymmetricMatrix<T> SymmetricMatrix<T>::operator-(const SymmetricMatrix<T> &other) const {
+	assert(this->size() == other.size());
+	SymmetricMatrix<T> out(this->size());
+	for (size_t i = 0; i < this->matrix.size(); ++i) {
+		out[i] = this->matrix[i] - other.matrix[i];
+	}
+	return out;
 }
 
 #endif // INFORF_SYMMETRICMATRIX_H

@@ -28,7 +28,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static Scalar h_info_content(size_t a, size_t b);
-	RectMatrix<Scalar> calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
+	SplitScores calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
 
   public:
 	virtual Scalar
