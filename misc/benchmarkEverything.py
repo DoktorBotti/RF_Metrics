@@ -61,7 +61,7 @@ try:
         for m_idx, metric in enumerate(metrics):
             # Reference impl
             reference_args = ["Rscript", "--vanilla",reference_script , metric , path]
-            print(f"processing {metric} in {test_names[num]}, {num} of {len(test_paths)}. Running Reference:")
+            print(f"processing {metric} in {test_names[num]}, {num+1} of {len(test_paths)}. Running Reference:")
             ref_start = time.time_ns()
             proc = subprocess.call(reference_args, stdout=FNULL)
             ref_end = time.time_ns()

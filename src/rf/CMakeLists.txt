@@ -2,8 +2,9 @@ add_library(rf_lib STATIC
         GeneralizedRfAlgo.cpp
         LogDblFact.cpp
         LoggingBackend.cpp
-        MciAlgo.cpp
         Matcher.cpp
+        MatcherOrTools.cpp
+        MciAlgo.cpp
         MsiAlgo.cpp
         PllSplits.cpp
         PllTree.cpp
@@ -18,8 +19,9 @@ add_library(rf_lib STATIC
         include/HashmapKey.hpp
         include/LogDblFact.h
         include/LoggingBackend.h
-        include/MciAlgo.h
         include/Matcher.h
+        include/MatcherOrTools.h
+        include/MciAlgo.h
         include/MsiAlgo.h
         include/PllSplits.hpp
         include/PllTree.hpp
