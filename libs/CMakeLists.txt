@@ -31,3 +31,4 @@ target_include_directories(growt_lib
 
 add_subdirectory(catch2)
 add_subdirectory(growt)
+add_subdirectory(weighted-bipartite-perfect-matching)

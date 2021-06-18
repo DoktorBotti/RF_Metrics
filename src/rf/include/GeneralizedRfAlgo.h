@@ -1,6 +1,7 @@
 #ifndef INFORF_GENERALIZEDRFALGO_H
 #define INFORF_GENERALIZEDRFALGO_H
 #include "LogDblFact.h"
+#include "MatcherHungarian.h"
 #include "MatcherOrTools.h"
 #include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
@@ -54,8 +55,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
-	MatcherOrTools match_solver;
-	static Scalar double_fac(long x);
+	MatcherHungarian match_solver;
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

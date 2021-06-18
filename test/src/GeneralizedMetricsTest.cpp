@@ -78,7 +78,7 @@ static void test_metric(const std::string &base_path_splits,
 		}
 		CHECK(entry.is_directory());
 		std::string res_fname = entry.path().filename();
-
+        res_fname = "1481";
 		// generate problem instance between only two trees from data
 		auto tree_idx_a = static_cast<size_t >(tree_idx_distr(rnd));
 		auto tree_idx_b = static_cast<size_t >(tree_idx_distr(rnd));
@@ -109,12 +109,11 @@ static void test_metric(const std::string &base_path_splits,
         INFO("Comparing ours to reference: "+ std::to_string(b_b) + " <-> " +  std::to_string(res.checked_at(1,1)))
         CHECK(nearly_eq_floating(b_b, res.checked_at(1, 1)));
 		// compare across trees
-		double a_b = true_mtx.checked_at(tree_idx_a, tree_idx_b);
+        double a_b = true_mtx.checked_at(tree_idx_a, tree_idx_b);
+        INFO(a_b - res.checked_at(1, 0));
         INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.checked_at(1,0)))
         CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
 
-		UNSCOPED_INFO(a_b - res.checked_at(1, 0));
-		REQUIRE(false);
 
 	}
 }

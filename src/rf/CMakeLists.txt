@@ -31,6 +31,8 @@ add_library(rf_lib STATIC
         include/SpiAlgo.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
+        MatcherHungarian.cpp
+        include/MatcherHungarian.h
         )
 
 set_target_properties(rf_lib PROPERTIES
@@ -55,6 +57,7 @@ target_link_libraries(rf_lib PUBLIC
         rf_io_lib
         ortools
         GMP::gmpxx
+        hungairan_lib
         )
 
 # only generate loads of warnings for our lib - does not propagate to dependencies

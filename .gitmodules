@@ -10,3 +10,6 @@
 [submodule "src/commandline/IO"]
 	path = src/commandline/IO
 	url = https://github.com/DoktorBotti/RF_Metrics_IO.git
+[submodule "libs/weighted-bipartite-perfect-matching"]
+	path = libs/weighted-bipartite-perfect-matching
+	url = https://github.com/jamespayor/weighted-bipartite-perfect-matching.git

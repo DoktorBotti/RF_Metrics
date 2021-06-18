@@ -141,8 +141,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
                                                                 const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	Scalar total_score = match_solver.solve(scores);
-	std::stringstream out;
-
+	// std::stringstream out;
 	//	for (size_t i = 0; i < mapping.size(); ++i) {
 	//		out << " " << i << "<>" << mapping[i] << " ";
 	//	}
