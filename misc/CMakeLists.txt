@@ -32,3 +32,6 @@ IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/gitVersionHeader.h.in  ${CMAKE_CURRENT_BINARY_DIR}/include/gitVersionHeader.h @ONLY)
+
+add_executable(min_example ${CMAKE_CURRENT_SOURCE_DIR}/sample_main.cpp)
+target_link_libraries(min_example growt_lib)

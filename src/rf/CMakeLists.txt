@@ -1,4 +1,6 @@
 add_library(rf_lib STATIC
+        Cacher.cpp
+        CacherKey.cpp
         GeneralizedRfAlgo.cpp
         LogDblFact.cpp
         LoggingBackend.cpp
@@ -14,6 +16,8 @@ add_library(rf_lib STATIC
         StandardRfAlgo.cpp
         helpers/Util.cpp
         helpers/Util.h
+        include/Cacher/Cacher.h
+        include/Cacher/CacherKey.h
         include/GeneralizedRfAlgo.h
         include/HashingFunctor.hpp
         include/HashmapKey.hpp

@@ -107,6 +107,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		t.alignNodeIndices(*trees.begin());
 		all_splits.emplace_back(t);
 	}
+	PllSplit::split_len = all_splits[0].computeSplitLen();
 	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
 	RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
@@ -141,8 +142,8 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
                                                                 const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	Scalar total_score = match_solver.solve(scores);
-	std::stringstream out;
-
+	//	std::stringstream out;
+	//	for (size_t i = 0; i < mapping.size(); ++i) {
 	//	for (size_t i = 0; i < mapping.size(); ++i) {
 	//		out << " " << i << "<>" << mapping[i] << " ";
 	//	}
