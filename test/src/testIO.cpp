@@ -15,7 +15,7 @@ static io::IOData generateSampleData() {
 			row.emplace_back(taxon_row * 10 + i);
 		}
 	}
-	data.split_score_calc = io::IOData::SPI;
+	data.metric = io::IOData::SPI;
 	for (size_t taxon = 0; taxon < num_taxa; ++taxon) {
 		data.taxa_names.emplace_back(1, static_cast<char>('A' + taxon));
 	}
