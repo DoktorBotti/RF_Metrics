@@ -64,6 +64,72 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 	SUCCEED("Done.");
 }
 
+TEST_CASE("Compare to other Team", "[other_team]") {
+	std::string base_path_res = "../test/samples/luise_reference/";
+	std::string base_path = "../test/samples/data/heads/BS/";
+
+	for (const auto &entry : std::filesystem::directory_iterator(base_path_res)) {
+		// skip irrelevant files
+		if (entry.path().filename() == "." || entry.path().filename() == "..") {
+			continue;
+		}
+		CHECK_FALSE(entry.is_directory());
+		// parse which parameters to pass
+		std::string res_fname = entry.path().filename();
+		auto splitted_name = Util::split(res_fname, '_');
+		auto metr = RfMetricInterface::MCI;
+		{
+			if (splitted_name[0] == "MCI") {
+				metr = RfMetricInterface::MCI;
+			} else if (splitted_name[0] == "MSI") {
+				metr = RfMetricInterface::MSI;
+			} else if (splitted_name[0] == "SPI") {
+				metr = RfMetricInterface::SPI;
+			} else {
+				INFO("Failed to parse metric from other teams reference")
+				INFO(splitted_name[0])
+				REQUIRE(false);
+			}
+		}
+		std::string test_name = Util::split(splitted_name[1], '.')[0];
+
+		// load other team IOData
+		auto res_string = Util::read_file(entry.path().string());
+		nlohmann::json res_json = nlohmann::json::parse(res_string);
+		io::IOData res;
+		io::from_json(res_json, res);
+		// our execution
+		RfMetricInterface::Params params;
+		params.input_file_path = base_path + test_name;
+		params.metric = metr;
+		RfMetricInterface iface(params);
+		iface.do_magical_high_performance_stuff();
+		auto our_res = iface.get_result_as_IOData();
+		// compare results
+		CHECK(our_res.comparePairwiseDistances(res));
+
+		// report maximal total difference
+		double max_diff = 0.0;
+		double mean_diff = 0.;
+		size_t el_counter = 0;
+		size_t n_rows = our_res.pairwise_distance_mtx.size();
+		REQUIRE(n_rows == res.pairwise_distance_mtx.size());
+		for (size_t row = 0; row < n_rows; ++row) {
+			size_t n_cols = our_res.pairwise_distance_mtx[row].size();
+			REQUIRE(n_cols == res.pairwise_distance_mtx[row].size());
+			for(size_t col = 0; col < n_cols; ++col){
+				auto diff = std::abs(our_res.pairwise_distance_mtx[row][col] - res.pairwise_distance_mtx[row][col]);
+				if(diff > max_diff){
+					max_diff  = diff;
+				}
+				++el_counter;
+				mean_diff += diff;
+			}
+		}
+		mean_diff /= static_cast<double>(el_counter);
+		WARN("[" << splitted_name[0] << "] Mean Difference: " << mean_diff << "\n[" << splitted_name[0] << " Max Difference: " << max_diff);
+	}
+}
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
                         const RfMetricInterface::Metric &metric) {
@@ -80,8 +146,8 @@ static void test_metric(const std::string &base_path_splits,
 		std::string res_fname = entry.path().filename();
 
 		// generate problem instance between only two trees from data
-		auto tree_idx_a = static_cast<size_t >(tree_idx_distr(rnd));
-		auto tree_idx_b = static_cast<size_t >(tree_idx_distr(rnd));
+		auto tree_idx_a = static_cast<size_t>(tree_idx_distr(rnd));
+		auto tree_idx_b = static_cast<size_t>(tree_idx_distr(rnd));
 		std::string trees_path =
 		    combine_trees_to_file(base_path_splits + res_fname, tree_idx_a, tree_idx_b);
 
@@ -91,7 +157,7 @@ static void test_metric(const std::string &base_path_splits,
 		params.metric = metric;
 		params.normalize_output = false;
 		INFO("Calculating distances from " + res_fname)
-		INFO("Indices a: "+ std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b))
+		INFO("Indices a: " + std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b))
 		CHECK(!res_fname.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();
@@ -102,19 +168,21 @@ static void test_metric(const std::string &base_path_splits,
 		    Util::parse_sym_mtx_from_r(base_path_res + res_fname + "/pairwise_trees");
 		// compare tree score with it self
 		double a_a = true_mtx.checked_at(tree_idx_a, tree_idx_a);
-        INFO("Comparing ours to reference: "+ std::to_string(a_a)+ " <-> " +  std::to_string(res.checked_at(0, 0)))
-        CHECK(nearly_eq_floating(a_a, res.checked_at(0, 0)));
+		INFO("Comparing ours to reference: " + std::to_string(a_a) + " <-> " +
+		     std::to_string(res.checked_at(0, 0)))
+		CHECK(nearly_eq_floating(a_a, res.checked_at(0, 0)));
 
 		double b_b = true_mtx.checked_at(tree_idx_b, tree_idx_b);
-        INFO("Comparing ours to reference: "+ std::to_string(b_b) + " <-> " +  std::to_string(res.checked_at(1,1)))
-        CHECK(nearly_eq_floating(b_b, res.checked_at(1, 1)));
+		INFO("Comparing ours to reference: " + std::to_string(b_b) + " <-> " +
+		     std::to_string(res.checked_at(1, 1)))
+		CHECK(nearly_eq_floating(b_b, res.checked_at(1, 1)));
 		// compare across trees
 		double a_b = true_mtx.checked_at(tree_idx_a, tree_idx_b);
-        INFO("Comparing ours to reference: "+ std::to_string(a_b) + " <-> " +  std::to_string(res.checked_at(1,0)))
-        CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
+		INFO("Comparing ours to reference: " + std::to_string(a_b) + " <-> " +
+		     std::to_string(res.checked_at(1, 0)))
+		CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
 
-		UNSCOPED_INFO(a_b - res.checked_at(1, 0));
-		REQUIRE(false);
+		WARN(a_b - res.checked_at(1, 0));
 
 	}
 }
