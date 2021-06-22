@@ -68,6 +68,16 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 	std::string base_path_res = "../test/samples/luise_reference/";
 	std::string base_path = "../test/samples/data/heads/BS/";
 
+	RfMetricInterface::Scalar mean_mci = 0.;
+	RfMetricInterface::Scalar mean_msi = 0.;
+	RfMetricInterface::Scalar mean_spi = 0.;
+	RfMetricInterface::Scalar max_spi = 0.;
+	RfMetricInterface::Scalar max_mci = 0.;
+	RfMetricInterface::Scalar max_msi = 0.;
+	size_t num_msi = 0;
+	size_t num_mci = 0;
+	size_t num_spi = 0;
+
 	for (const auto &entry : std::filesystem::directory_iterator(base_path_res)) {
 		// skip irrelevant files
 		if (entry.path().filename() == "." || entry.path().filename() == "..") {
@@ -117,18 +127,54 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 		for (size_t row = 0; row < n_rows; ++row) {
 			size_t n_cols = our_res.pairwise_distance_mtx[row].size();
 			REQUIRE(n_cols == res.pairwise_distance_mtx[row].size());
-			for(size_t col = 0; col < n_cols; ++col){
-				auto diff = std::abs(our_res.pairwise_distance_mtx[row][col] - res.pairwise_distance_mtx[row][col]);
-				if(diff > max_diff){
-					max_diff  = diff;
+			for (size_t col = 0; col < n_cols; ++col) {
+				auto diff = our_res.pairwise_distance_mtx[row][col] -
+				                     res.pairwise_distance_mtx[row][col];
+				if (std::abs(diff) > max_diff) {
+					max_diff = diff;
 				}
 				++el_counter;
 				mean_diff += diff;
 			}
 		}
 		mean_diff /= static_cast<double>(el_counter);
-		WARN("[" << splitted_name[0] << "] Mean Difference: " << mean_diff << "\n[" << splitted_name[0] << " Max Difference: " << max_diff);
+		WARN("[" << splitted_name[0] << "] Mean Difference: " << mean_diff << "\n["
+		         << splitted_name[0] << " Max Difference: " << max_diff);
+		switch (metr) {
+			case RfMetricInterface::MCI: {
+				if (std::abs(max_diff) > std::abs(max_mci)) {
+					max_mci = max_diff;
+				}
+				mean_mci += mean_diff;
+				++num_mci;
+				break;
+			}
+			case RfMetricInterface::RF: {
+				throw std::invalid_argument("Not compairing normal RF distance.");
+			}
+			case RfMetricInterface::MSI: {
+				if (std::abs(max_diff) > std::abs(max_msi)) {
+					max_msi = max_diff;
+				}
+				mean_msi += mean_diff;
+				++num_msi;
+				break;
+			}
+			case RfMetricInterface::SPI: {
+				if (std::abs(max_diff) > std::abs(max_spi)) {
+					max_spi = max_diff;
+				}
+				mean_spi += mean_diff;
+				++num_spi;
+				break;
+			}
+		}
 	}
+	// make summary over all executions
+	WARN("Summary of all comparisons:\n MSI mean: "
+	     << mean_msi / num_msi << " worst: " << max_msi << "\n MCI mean: " << mean_mci / num_mci
+	     << " worst: " << max_mci << "\n SPI mean: " << mean_spi / num_spi
+	     << " worst: " << max_spi);
 }
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
@@ -183,7 +229,6 @@ static void test_metric(const std::string &base_path_splits,
 		CHECK(nearly_eq_floating(a_b, res.checked_at(1, 0)));
 
 		WARN(a_b - res.checked_at(1, 0));
-
 	}
 }
 static std::string

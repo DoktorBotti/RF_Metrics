@@ -2,6 +2,7 @@
 #include <GeneralizedRfAlgo.h>
 #include <boost/log/sources/record_ostream.hpp>
 #include <climits>
+#include <queue>
 
 Matcher::Scalar Matcher::solve(const GeneralizedRfAlgo::SplitScores &scores
                                /*,std::vector<size_t> *best_matching_out*/) {
@@ -38,35 +39,30 @@ Matcher::Scalar Matcher::solve(const GeneralizedRfAlgo::SplitScores &scores
 	// Retrieve the cost of the optimum assignment.
 	Matcher::Scalar optimum_cost =
 	    static_cast<double>(-a.GetCost()) / lap_factor;
-	Matcher::Scalar summed_cost = 0;
 	// Retrieve the node-node correspondence of the optimum assignment and the
 	// cost of each node pairing.
+	std::priority_queue<Matcher::Scalar> ordered_scores;
 	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
 		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.scores.size();
 		assert(right_idx >= 0 && right_idx < scores.scores.size());
-		//			best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
 		Matcher::Scalar arc_score = scores.scores.at(static_cast<size_t>(left_node), right_idx);
-//		{
-//			// DEBUG verify that chosen arc index is left_id * size + right_id - size
-//			auto arc_mate_id = a.GetAssignmentArc(left_node);
-//			// Softwipe..
-//			int arc_should_id =
-//			    static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx);
-//			assert(arc_mate_id == arc_should_id);
-//			// DEBUG if arc indices were as they should be
-//			auto arc_score_diff =
-//			    std::abs(arc_score + static_cast<Matcher::Scalar>(a.GetAssignmentCost(left_node)) /
-//			                             static_cast<Matcher::Scalar>(large_num));
-//			assert(arc_score_diff < 1e-5);
-//		}
-		summed_cost += arc_score;
+		ordered_scores.push(arc_score);
 	}
-	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
+	while(ordered_scores.size() > 1){
+		// add smallest two numbers together and add them back into the pq for best stability
+		auto scoreA = ordered_scores.top();
+		ordered_scores.pop();
+		auto scoreB = ordered_scores.top();
+		ordered_scores.pop();
+		ordered_scores.push(scoreA+scoreB);
+	}
+	auto summed_cost = ordered_scores.top();
+	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << summed_cost;
 	BOOST_LOG_SEV(logger, lg::normal)
 	    << "Total score result by OrTools directly: " << optimum_cost
 	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
-	return optimum_cost;
+	return summed_cost;
 }
 operations_research::LinearSumAssignment<Matcher::Graph> &Matcher::parameterize_assignment(
     const RfAlgorithmInterface::SplitScores &scores,
