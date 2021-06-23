@@ -1,5 +1,5 @@
-#include "include/Cacher/CacherKey.h"
-bool CacherKey::operator==(const CacherKey &rhs) const {
+#include "include/HashmapUtil/TwoSplitHashmapKey.h"
+bool TwoSplitHashmapKey::operator==(const TwoSplitHashmapKey &rhs) const {
 	bool a_a = split_a()[0] == rhs.split_a()[0];
 	bool b_b = split_b()[0] == rhs.split_b()[0];
 	bool b_a = split_b()[0] == rhs.split_a()[0];
@@ -27,21 +27,11 @@ bool CacherKey::operator==(const CacherKey &rhs) const {
 	}
 	return true;
 }
-bool CacherKey::operator!=(const CacherKey &rhs) const {
+bool TwoSplitHashmapKey::operator!=(const TwoSplitHashmapKey &rhs) const {
 	return !(rhs == *this);
 }
-CacherKey::CacherKey() : split_a(nullptr), split_b(nullptr) {
+TwoSplitHashmapKey::TwoSplitHashmapKey() : split_a(nullptr), split_b(nullptr) {
 }
-int CacherKey::size() const {
-	return static_cast<int>(sizeof(split_b()[0])) * PllSplit::split_len;
-}
-const void *CacherKey::data() const {
-	// need to xor all split a_s and b_s to range somewhere in storage and pass the pointer to it.
-	return static_cast<const void *>(&pre_hash[0]);
-}
-CacherKey::CacherKey(const PllSplit *copy_split_a, const PllSplit *copy_split_b)
-    : split_a(*copy_split_a), split_b(*copy_split_b), pre_hash(PllSplit::split_len) {
-	for (size_t i = 0; i < PllSplit::split_len; ++i) {
-		pre_hash[i] = split_b()[i] ^ split_a()[i];
-	}
+TwoSplitHashmapKey::TwoSplitHashmapKey(const PllSplit *copy_split_a, const PllSplit *copy_split_b)
+    : split_a(*copy_split_a), split_b(*copy_split_b){
 }

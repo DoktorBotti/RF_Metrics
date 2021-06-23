@@ -32,10 +32,7 @@ class TwoSplitHashmapKey {
 	TwoSplitHashmapKey(const TwoSplitHashmapKey &oth) = default;
 	TwoSplitHashmapKey(TwoSplitHashmapKey &&oth) = default;
 	explicit TwoSplitHashmapKey(unsigned int const *dataA, unsigned int const *dataB)
-	    : split_a(dataA), split_b(dataB), pre_hash(5) {
-		for (size_t i = 0; i < 5; ++i) {
-			pre_hash[i] = split_b[i] ^ split_a[i];
-		}
+	    : split_a(dataA), split_b(dataB){
 	}
 	~TwoSplitHashmapKey() = default;
 	// either a must match a or a must match b

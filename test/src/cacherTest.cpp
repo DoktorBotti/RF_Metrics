@@ -4,7 +4,7 @@
 #include <catch2/catch.hpp>
 #include <string.h>
 
-TEST_CASE("Key equality", "[Cacher]") {
+TEST_CASE("Key equality", "[HashmapUtil]") {
 	std::string tree_str = "((((F,C),B),A),(E,D));";
 	auto tree = Util::create_all_trees_from_string(tree_str)[0];
 	auto split_list = PllSplitList(tree);
@@ -36,7 +36,7 @@ TEST_CASE("Key equality", "[Cacher]") {
     }
 }
 
-TEST_CASE("Cache some values", "[Cacher]"){
+TEST_CASE("Cache some values", "[HashmapUtil]"){
 	Cacher cache;
     std::string tree_str = "((((F,C),B),A),(E,D));";
     auto tree = Util::create_all_trees_from_string(tree_str)[0];

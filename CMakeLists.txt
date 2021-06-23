@@ -44,6 +44,10 @@ set(COMPILER_WARNING_FLAGS $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:App
 add_subdirectory(src/commandline)
 add_subdirectory(src/rf)
 add_subdirectory(utils)
+
+add_executable(growt_main src/sample_main.cpp)
+target_link_libraries(growt_main growt_lib)
+
 add_subdirectory(test)
 #adds automatic softwipe execution
 add_subdirectory(misc)

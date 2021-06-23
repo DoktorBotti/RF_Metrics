@@ -159,7 +159,11 @@ GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllS
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
-			auto val = calc_split_score(S1[row], S2[col], taxa, split_len);
+			Scalar val;
+			if (true && !pairwise_score_cacher.lookupTrees(S1[row], S2[col], val)) {
+				val = calc_split_score(S1[row], S2[col], taxa, split_len);
+				pairwise_score_cacher.putTrees(S1[row], S2[col], val);
+			}
 			if (scores.max_score < val) {
 				scores.max_score = val;
 			}

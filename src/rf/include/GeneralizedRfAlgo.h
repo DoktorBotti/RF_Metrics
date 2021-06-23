@@ -4,6 +4,7 @@
 #include "MatcherOrTools.h"
 #include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
+#include <HashmapUtil/Cacher.h>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -51,11 +52,10 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	 */
 	static std::vector<pll_split_base_t>
 	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
-
+    Cacher pairwise_score_cacher;
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	MatcherOrTools match_solver;
-	static Scalar double_fac(long x);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H
