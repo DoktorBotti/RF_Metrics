@@ -40,22 +40,23 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	                             RfMetricInterface::Results &res);
 	static size_t bits_too_many(size_t taxa);
 	/*
-	 * Returns a vec with 6 blocks of split_len size.
+	 * Calculates PllSplits inside temporary_splits
 	 * It contains:
-	 * split_buffer[0] : B1
-	 * split_buffer[split_len] : B2
-	 * split_buffer[2 * split_len] : A1 and A2
-	 * split_buffer[3 * split_len] : B1 and B2
-	 * split_buffer[4 * split_len] : A1 and B2
-	 * split_buffer[5 * split_len] : A2 and B1
+	 * temporary_splits[0] : B1
+	 * temporary_splits[1] : B2
+	 * temporary_splits[2] : A1 and A2
+	 * temporary_splits[3] : B1 and B2
+	 * temporary_splits[4] : A1 and B2
+	 * temporary_splits[5] : A2 and B1
 	 */
-	static std::vector<pll_split_base_t>
-	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	std::vector<PllSplit> temporary_splits;
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+	std::vector<pll_split_base_t> temporary_split_content;
 	Matcher match_solver;
-	static Scalar double_fac(long x);
+	void setup_temporary_storage(size_t split_len);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H
