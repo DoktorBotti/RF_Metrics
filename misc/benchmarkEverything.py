@@ -23,6 +23,8 @@ def writeToFile(file_names, ours_times, reference_times):
             file.write(str(ours_out) + '\n')
             file.write("\tReference: ")
             file.write(str(ref_out) + '\n')
+
+        file.write('\n' + print_ex_times(ours_times, reference_times))
 def print_single_instance(ours, ref):
     return f"( {sum(ours)/len(ours) * 1e-9 } vs. {sum(ref)/len(ref)*1e-9} )"
 
