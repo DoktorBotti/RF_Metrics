@@ -171,8 +171,8 @@ GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllS
 }
 
 void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
-                                                                          const PllSplit &S2,
-                                                                          size_t split_len) {
+                                                 const PllSplit &S2,
+                                                 size_t split_len) {
 	// B1 -> &split_buffer[0]
 	S1.set_not(split_len, &temporary_split_content[0]);
 	// B2 -> &split_buffer[split_len]
@@ -180,12 +180,12 @@ void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
 	// A1 and A2 -> &split_buffer[2 * split_len]
 	S1.intersect(S2, split_len, &temporary_split_content[2 * split_len]);
 	// B1 and B2 -> &split_buffer[3 * split_len]
-	PllSplit(&temporary_split_content[0])
-	    .intersect(PllSplit(&temporary_split_content[split_len]), split_len, &temporary_split_content[3 * split_len]);
+	temporary_splits[0].intersect(
+	    temporary_splits[1], split_len, &temporary_split_content[3 * split_len]);
 	// A1 and B2 -> &split_buffer[4 * split_len]
-	S1.intersect(PllSplit(&temporary_split_content[split_len]), split_len, &temporary_split_content[4 * split_len]);
+	S1.intersect(temporary_splits[1], split_len, &temporary_split_content[4 * split_len]);
 	// A2 and B1 -> &split_buffer[5 * split_len]
-	S2.intersect(PllSplit(&temporary_split_content[0]), split_len, &temporary_split_content[5 * split_len]);
+	S2.intersect(temporary_splits[0], split_len, &temporary_split_content[5 * split_len]);
 }
 RfAlgorithmInterface::Scalar
 GeneralizedRfAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
@@ -218,9 +218,9 @@ void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> 
 	                                   (static_cast<Scalar>(trees.size()) / 2.));
 }
 void GeneralizedRfAlgo::setup_temporary_storage(size_t split_len) {
-	temporary_split_content.reserve(split_len*6);
+	temporary_split_content.reserve(split_len * 6);
 	temporary_splits.reserve(6);
-	for(size_t i = 0; i < 6; ++i){
-		temporary_splits[i] = PllSplit(&temporary_split_content[i*split_len]);
+	for (size_t i = 0; i < 6; ++i) {
+		temporary_splits[i] = PllSplit(&temporary_split_content[i * split_len]);
 	}
 }
