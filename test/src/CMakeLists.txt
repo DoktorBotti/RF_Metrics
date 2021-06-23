@@ -11,6 +11,7 @@ add_executable(catch2_tests
         OrToolsTest.cpp
         GeneralizedMetricsTest.cpp
         SymmetryDebug.cpp
+        TimingTests.cpp
         )
 
 target_link_libraries(catch2_tests PUBLIC

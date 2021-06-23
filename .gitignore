@@ -8,3 +8,4 @@ cmake-build-*
 roberts_paths.txt
 .idea
 .DS_Store
+venv
