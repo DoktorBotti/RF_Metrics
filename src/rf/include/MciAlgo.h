@@ -14,12 +14,15 @@ class MciAlgo : public GeneralizedRfAlgo {
 
   public:
 	// TODO: make private and still testable?
-	Scalar calc_split_score(const PllSplit &S1,
-	                        const PllSplit &S2,
+	Scalar calc_split_score( PllSplit &S1,
+	                         PllSplit &S2,
 	                        size_t taxa,
 	                        size_t split_len) override;
 	RfAlgorithmInterface::Scalar
-	calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) override;
+	calc_tree_info_content( PllSplitList &S, size_t taxa, size_t split_len) override;
+    GeneralizedRfAlgo::SplitScores
+    calc_pairwise_split_scores(PllSplitList &S1, PllSplitList &S2) override;
+	void compute_split_comparison(PllSplit &S1, PllSplit &S2, size_t split_len) override;
 };
 
 #endif // CONCURRENT_GROWTABLE_MCIALGO_H

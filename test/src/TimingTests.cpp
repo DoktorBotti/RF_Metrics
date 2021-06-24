@@ -43,8 +43,10 @@ static void time_metric(const RfMetricInterface::Metric &metric) {
 		CHECK(!ts.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();
-		auto res = iface.get_result().pairwise_similarities;
+		auto res = iface.get_result();
 
-		// TODO: do smth with res
+		WARN("Result size: " + std::to_string(res.pairwise_similarities.size()));
+		WARN("One value: " + std::to_string(res.pairwise_similarities.checked_at(4, 5)));
+		WARN("Mean dist?: " + std::to_string(res.mean_distance));
 	}
 }

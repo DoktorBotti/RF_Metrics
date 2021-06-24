@@ -6,7 +6,7 @@
 #include <boost/math/special_functions/factorials.hpp>
 
 double
-SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
+SpiAlgo::calc_split_score( PllSplit &S1,  PllSplit &S2, size_t taxa, size_t split_len) {
 	if (!compatible(S1, S2, taxa, split_len)) {
 		return 0;
 	}
@@ -15,11 +15,11 @@ SpiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	auto s1_tmp = h_info_content(S1, taxa, split_len);
 	auto s2_tmp = h_info_content(S2, taxa, split_len);
 	auto mixed =  h_info_content(S1, S2, taxa, split_len);
-	return s1_tmp +  s2_tmp - mixed;
+	return s1_tmp + s2_tmp - mixed;
 
 }
 
-bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
+bool SpiAlgo::compatible(PllSplit &S1, PllSplit &S2, size_t taxa, size_t split_len) {
 	// TODO: Maybe vectorize
 
 	assert(split_len >= 1);
@@ -32,10 +32,10 @@ bool SpiAlgo::compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, si
 	pll_split_base_t mask = static_cast<unsigned int>(~0) >> bits_too_many;
 	inv_bitset_buffer[split_len - 1] &= mask;
 
-	return S1.is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len) ||  // A1 <-> B2
-	       S2.is_disjoint(PllSplit(&inv_bitset_buffer[0]), split_len) ||  // A2 <-> B1
-	       PllSplit(&inv_bitset_buffer[0])
-	           .is_disjoint(PllSplit(&inv_bitset_buffer[split_len]), split_len);
+	return S1.is_disjoint(PllSplit(&inv_bitset_buffer[split_len], split_len), split_len) ||  // A1 <-> B2
+	       S2.is_disjoint(PllSplit(&inv_bitset_buffer[0], split_len), split_len) ||  // A2 <-> B1
+	       PllSplit(&inv_bitset_buffer[0], split_len)
+	           .is_disjoint(PllSplit(&inv_bitset_buffer[split_len], split_len), split_len);
 }
 
 // AB | DEFC

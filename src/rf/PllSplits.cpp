@@ -2,7 +2,9 @@
 #include "PllTree.hpp"
 
 /*  Calculates the Hamming weight of the split. */
-size_t PllSplit::popcount(size_t len) const {
+size_t PllSplit::popcount(size_t len) {
+	++popcount_count;
+	++operation_count;
 	size_t popcount = 0;
 	for (size_t i = 0; i < len; ++i) {
 		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
@@ -22,13 +24,15 @@ uint32_t PllSplit::bit_extract(size_t bit_index) const {
 	return (split_part & (1u << computeMinorIndex(bit_index))) >> computeMinorIndex(bit_index);
 }
 
-void PllSplit::intersect(const PllSplit &other, const size_t len, pll_split_base_t *res) const {
+void PllSplit::intersect(const PllSplit &other, const size_t len, pll_split_base_t *res) {
+	++operation_count;
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] & other._split[i];
 	}
 }
 
-bool PllSplit::is_disjoint(const PllSplit &other, size_t len) const {
+bool PllSplit::is_disjoint(const PllSplit &other, size_t len) {
+    ++operation_count;
 	for (size_t i = 0; i < len; ++i) {
 		if ((_split[i] & other._split[i]) != 0) {
 			return false;
@@ -39,19 +43,22 @@ bool PllSplit::is_disjoint(const PllSplit &other, size_t len) const {
 
 size_t PllSplit::split_len = 1337;
 
-void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) const {
+void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res)  {
+    ++operation_count;
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] | other._split[i];
 	}
 }
 
-void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const {
+void PllSplit::set_minus(const PllSplit &other, size_t len, pll_split_base_t *res)  {
+    ++operation_count;
 	for (size_t i = 0; i < len; ++i) {
 		res[i] = _split[i] ^ other._split[i];
 	}
 }
 
-bool PllSplit::equals(const PllSplit &other, size_t len) const {
+bool PllSplit::equals(const PllSplit &other, size_t len)  {
+    ++operation_count;
 	for (size_t i = 0; i < len; ++i) {
 		if (_split[i] != other._split[i]) {
 			return false;
@@ -60,7 +67,9 @@ bool PllSplit::equals(const PllSplit &other, size_t len) const {
 	return true;
 }
 
-void PllSplit::set_not(size_t len, pll_split_base_t *res) const {
+void PllSplit::set_not(size_t len, pll_split_base_t *res)  {
+	++not_count;
+    ++operation_count;
 	for (size_t i = 0; i < len; i++) {
 		res[i] = ~_split[i];
 	}
@@ -72,8 +81,14 @@ PllSplitList::PllSplitList(const PllTree &tree) {
 	auto tmp_splits =
 	    pllmod_utree_split_create(tree.tree()->vroot, tree.tree()->tip_count, nullptr);
 
+    size_t split_len = (tree.tree()->tip_count / computeSplitBaseSize());
+    if ((tree.tree()->tip_count % computeSplitBaseSize()) > 0) {
+        split_len += 1;
+    }
+
+	_splits.reserve(tree.tree()->tip_count - 3);
 	for (size_t i = 0; i < tree.tree()->tip_count - 3; ++i) {
-		_splits.emplace_back(tmp_splits[i]);
+		_splits.emplace_back(PllSplit(tmp_splits[i], split_len));
 	}
 
 	free(tmp_splits);
@@ -87,7 +102,7 @@ PllSplitList::PllSplitList(const PllSplitList &other) {
 	    tmp_splits, other._splits[0](), other.computeSplitArraySize() * sizeof(pll_split_base_t));
 
 	for (size_t i = 0; i < other.computeSplitArraySize(); ++i) {
-		_splits.emplace_back(tmp_splits + (i * other.computeSplitLen()));
+		_splits.emplace_back(PllSplit(tmp_splits + (i * other.computeSplitLen()), other.computeSplitLen()));
 	}
 }
 
