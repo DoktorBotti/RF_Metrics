@@ -1,8 +1,8 @@
 #include "../helpers/Util.h"
-#include "PllSplits.hpp"
+#include "GeneralizedRfAlgo.h"
+#include "PllSplit.hpp"
 #include "PllTree.hpp"
 #include "RfMetricInterface.h"
-#include "GeneralizedRfAlgo.h"
 #include <catch2/catch.hpp>
 #include <cstdlib>
 #include <fstream>
@@ -23,8 +23,8 @@ TEST_CASE("read first test tree", "[data]") {
 	REQUIRE(out.length() > 0);
 }
 
-TEST_CASE("Double fact. test", "[factorial]"){
-	auto& fac = GeneralizedRfAlgo::factorials;
+TEST_CASE("Double fact. test", "[factorial]") {
+	auto &fac = GeneralizedRfAlgo::factorials;
 
 	CHECK(std::abs(fac.lg(2) - 1) <= 1e-8);
 	CHECK(std::abs(fac.lg_dbl_fact(-1) - 0) <= 1e-8);
@@ -53,7 +53,7 @@ TEST_CASE("Check CPU output", "[useless]") {
 TEST_CASE("Checked methods SymmetricMatrix", "[SymMtx]") {
 	SymmetricMatrix<size_t> mat(2);
 	const size_t val = 1337;
-	mat.checked_set_at(0,1,val);
-	REQUIRE(mat.checked_at(0,1) == val);
-	REQUIRE(mat.at(1,0) == val);
+	mat.checked_set_at(0, 1, val);
+	REQUIRE(mat.checked_at(0, 1) == val);
+	REQUIRE(mat.at(1, 0) == val);
 }

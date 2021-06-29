@@ -1,9 +1,5 @@
-//
-// Created by Tobias Bodmer on 03.05.2021.
-//
-
 #pragma once
-#include "PllSplits.hpp"
+#include "PllSplit.hpp"
 
 struct HashmapKey {
   public:

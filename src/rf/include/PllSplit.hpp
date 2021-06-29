@@ -9,8 +9,6 @@ extern "C" {
 #include <utility>
 #include <vector>
 
-class PllTree;
-
 /*
  * A convenience class for the purposes of doing math on the individual splits.
  * The pll_split_t is a non-owning pointer, so this class does not have a
@@ -76,70 +74,3 @@ class PllSplit {
 
 };
 
-class PllSplitList {
-  public:
-	explicit PllSplitList(const PllTree &tree);
-
-	/* Rule of 5 constructors/destructors */
-	~PllSplitList();
-
-	PllSplitList(const PllSplitList &other);
-
-	PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
-	}
-
-	PllSplitList &operator=(const PllSplitList &other) {
-		*this = PllSplitList(other);
-		return *this;
-	}
-
-	PllSplitList &operator=(PllSplitList &&other) noexcept {
-		std::swap(_splits, other._splits);
-		return *this;
-	}
-
-	PllSplit operator[](size_t index) const {
-		return _splits[index];
-	}
-
-	[[nodiscard]] size_t size() const {
-		return _splits.size();
-	}
-
-	/* Computes the number of pll_split_base_t's that are needed to store a
-	 * single split
-	 */
-	[[nodiscard]] size_t computeSplitLen() const {
-		size_t tip_count = _splits.size() + 3;
-		size_t split_len = (tip_count / computeSplitBaseSize());
-
-		if ((tip_count % computeSplitBaseSize()) > 0) {
-			split_len += 1;
-		}
-
-		return split_len;
-	}
-	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const {
-		return &_splits.at(i);
-	}
-
-	[[nodiscard]] size_t inline getTreeId() const {
-		return _tree_id;
-	}
-	void inline setTreeId(size_t id) {
-		_tree_id = id;
-	}
-
-  private:
-	/* Computes the number of bits per split base */
-	static constexpr size_t computeSplitBaseSize() {
-		return sizeof(pll_split_base_t) * 8;
-	}
-
-	[[nodiscard]] size_t computeSplitArraySize() const {
-		return computeSplitLen() * _splits.size();
-	}
-
-	std::vector<PllSplit> _splits;
-	size_t _tree_id = 0;
-};

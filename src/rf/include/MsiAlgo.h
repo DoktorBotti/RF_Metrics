@@ -5,7 +5,7 @@
 #ifndef INFORF_MSIALGO_H
 #define INFORF_MSIALGO_H
 #include "GeneralizedRfAlgo.h"
-#include "PllSplits.hpp"
+#include "PllSplit.hpp"
 class MsiAlgo : public GeneralizedRfAlgo {
   protected:
   public:

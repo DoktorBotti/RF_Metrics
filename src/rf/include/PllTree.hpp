@@ -1,6 +1,7 @@
 #pragma once
 
-#include "PllSplits.hpp"
+#include "PllSplit.hpp"
+#include "PllSplitList.h"
 
 extern "C" {
 #include "libpll/pll.h"
