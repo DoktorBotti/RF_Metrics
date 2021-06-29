@@ -1,4 +1,4 @@
-#include "../libs/growt/allocator/alignedallocator.hpp"
+#include "../libs/growt/allocator/poolallocator.hpp"
 #include "../libs/growt/data-structures/hash_table_mods.hpp"
 #include "../libs/growt/data-structures/table_config.hpp"
 #include "../libs/growt/utils/default_hash.hpp"
@@ -28,7 +28,9 @@ class TwoSplitHashmapKey {
 
   public:
 	// constructors
-	TwoSplitHashmapKey();
+	TwoSplitHashmapKey(): split_a(nullptr), split_b(nullptr){
+
+	                        };
 	TwoSplitHashmapKey(const TwoSplitHashmapKey &oth) = default;
 	TwoSplitHashmapKey(TwoSplitHashmapKey &&oth) = default;
 	explicit TwoSplitHashmapKey(unsigned int const *dataA, unsigned int const *dataB)
@@ -36,14 +38,29 @@ class TwoSplitHashmapKey {
 	}
 	~TwoSplitHashmapKey() = default;
 	// either a must match a or a must match b
-	bool operator==(const TwoSplitHashmapKey &rhs) const;
-	bool operator!=(const TwoSplitHashmapKey &rhs) const;
+	bool operator==(const TwoSplitHashmapKey &rhs) const{
+		if (!this->split_a ||!this->split_b){
+			return false;
+		}
+        if (!rhs.split_a ||!rhs.split_b){
+            return false;
+        }
+	    for(int i = 0; i < 5 ; ++i){
+			if (split_a[i] != split_b[i]){
+				return false;
+			}
+		}
+		return true;
+	};
+	bool operator!=(const TwoSplitHashmapKey &rhs) const{
+	    return !(*this == rhs);
+	};
 };
 
 class Cacher {
 	using value_type = double;
 	using key_type = TwoSplitHashmapKey;
-	using allocator_type = growt::AlignedAllocator<>;
+	using allocator_type = growt::PoolAllocator<>;
 	using table_conf_instance = growt::table_config<key_type,
 	                                                value_type,
 	                                                utils_tm::hash_tm::default_hash,

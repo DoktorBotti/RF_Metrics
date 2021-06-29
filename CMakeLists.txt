@@ -45,8 +45,24 @@ add_subdirectory(src/commandline)
 add_subdirectory(src/rf)
 add_subdirectory(utils)
 
+find_package(TBB REQUIRED COMPONENTS tbb tbbmalloc)
 add_executable(growt_main src/sample_main.cpp)
-target_link_libraries(growt_main growt_lib)
+target_include_directories(growt_main
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/growt/misc/submodules/xxhash
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/growt/
+        ${TBB_INCLUDE_DIRS}
+        )
+target_link_libraries(growt_main ${TBB_LIBRARIES})
+target_compile_definitions(growt_main PRIVATE
+        -D UAGROW # hier habe ich alle Optionen durchprobiert
+        -D ${GROWT_HASHFCT} # habe ich nirgends gesetzt, ist XXH3
+        -D ${GROWT_ALLOCATOR} # auch nirgends gesetzt, ist ALIGNED
+        )
+
+
+message(WARNING ${TBB_LIBRARIES}\n ${GROWT_HASHFCT}\n ${GROWT_ALLOCATOR} \n${TBB_INCLUDE_DIRS} )
+
 
 add_subdirectory(test)
 #adds automatic softwipe execution
