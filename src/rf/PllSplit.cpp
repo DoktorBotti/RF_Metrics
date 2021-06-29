@@ -3,18 +3,7 @@
 
 /*  Calculates the Hamming weight of the split. */
 size_t PllSplit::popcount(size_t len) const {
-	size_t popcount = 0;
-	for (size_t i = 0; i < len; ++i) {
-		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
-		//		if constexpr (sizeof(pll_split_base_t) == 4) {
-		popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
-		//		} else if constexpr (sizeof(pll_split_base_t) == 8) {
-		//			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
-		//		} else {
-		//			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
-		//		}
-	}
-	return popcount;
+	return priv_popcount(len);
 }
 
 uint32_t PllSplit::bit_extract(size_t bit_index) const {
@@ -64,4 +53,22 @@ void PllSplit::set_not(size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; i++) {
 		res[i] = ~_split[i];
 	}
+}
+size_t inline PllSplit::priv_popcount(size_t len) const {
+    size_t popcount = 0;
+    for (size_t i = 0; i < len; ++i) {
+        // Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
+        //		if constexpr (sizeof(pll_split_base_t) == 4) {
+        popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
+        //		} else if constexpr (sizeof(pll_split_base_t) == 8) {
+        //			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
+        //		} else {
+        //			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
+        //		}
+    }
+	precalc_popcount = popcount;
+	return  popcount;
+}
+void PllSplit::perform_popcount_precalc(size_t len) const {
+	priv_popcount(len);
 }

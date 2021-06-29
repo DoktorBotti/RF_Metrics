@@ -36,6 +36,9 @@ class PllSplit {
 	pll_split_t operator()() const {
 		return _split;
 	}
+	mutable size_t precalc_popcount = 0;
+
+	void perform_popcount_precalc(size_t len) const;
 
 	[[nodiscard]] size_t popcount(size_t len) const;
 
@@ -52,10 +55,10 @@ class PllSplit {
 	/* Trivial xor operation. Not optimized as of now. */
 	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
-    /* Trivial not operation. Not optimized as of now. */
-    void set_not(size_t len, pll_split_base_t *res) const;
+	/* Trivial not operation. Not optimized as of now. */
+	void set_not(size_t len, pll_split_base_t *res) const;
 
-    [[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
+	[[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
 
 	[[nodiscard]] static constexpr size_t splitBitWidth() {
 		return sizeof(pll_split_base_t) * 8;
@@ -69,8 +72,7 @@ class PllSplit {
 	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
 		return index % splitBitWidth();
 	}
+	size_t inline priv_popcount(size_t len) const;
 
 	pll_split_t _split;
-
 };
-

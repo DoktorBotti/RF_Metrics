@@ -266,6 +266,7 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 		pq.push(std::make_pair(PllSplit(el[0]), 0));
 	}
 	unique_pll_splits.emplace_back(pq.top().first);
+	unique_pll_splits.back().perform_popcount_precalc(PllSplit::split_len);
 	while (!pq.empty()) {
 		// get current state
 		PllSplit curr_split = pq.top().first;
@@ -292,6 +293,7 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 		// no further duplications store the next split in unique_pll_splits, increment
 		// current_split_offset
 		unique_pll_splits.emplace_back(pq.top().first);
+		unique_pll_splits.back().perform_popcount_precalc(PllSplit::split_len);
 		++current_split_offset;
 	}
 	{
@@ -300,7 +302,10 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 		    static_cast<double>(found_duplicates) / static_cast<double>(total_splits);
 		BOOST_LOG_SEV(logger, lg::normal)
 		    << "Done construction of FastSplitList. " << found_duplicates << " duplicates of "
-		    << total_splits << " total elements. Duplicate ratio: " << duplicate_ratio;
+		    << total_splits << " possible PllSplits. Duplicate ratio: " << duplicate_ratio;
+		BOOST_LOG_SEV(logger, lg::normal)
+		    << "Estimated " << reserve_size
+		    << "unique pll splits, actual number: " << unique_pll_splits.size();
 	}
 	// unique_pll_splits will no longer reallocate -> write base-ptr to Static variable
 	FastSplitList::setBasePtr(&unique_pll_splits[0]);
