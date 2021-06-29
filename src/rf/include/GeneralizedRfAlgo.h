@@ -1,5 +1,6 @@
 #ifndef INFORF_GENERALIZEDRFALGO_H
 #define INFORF_GENERALIZEDRFALGO_H
+#include "FastSplitList.h"
 #include "LogDblFact.h"
 #include "Matcher.h"
 #include "RectMatrix.hpp"
@@ -55,8 +56,10 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	std::vector<pll_split_base_t> temporary_split_content;
+	std::vector<PllSplit> unique_pll_splits;
 	Matcher match_solver;
 	void setup_temporary_storage(size_t split_len);
+	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &slow_split_list);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

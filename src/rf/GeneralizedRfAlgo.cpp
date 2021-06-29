@@ -1,6 +1,8 @@
 #include "include/GeneralizedRfAlgo.h"
 #include <boost/math/special_functions/factorials.hpp>
+#include <queue>
 // boost logging
+#include <FastSplitList.h>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
@@ -107,8 +109,9 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		t.alignNodeIndices(*trees.begin());
 		all_splits.emplace_back(t);
 	}
-	setup_temporary_storage(all_splits[0].computeSplitLen());
 	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
+	std::vector<FastSplitList> fast_splits = generateFastList(all_splits);
+	setup_temporary_storage(all_splits[0].computeSplitLen());
 	RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
 	size_t tree_num = 0;
@@ -223,4 +226,83 @@ void GeneralizedRfAlgo::setup_temporary_storage(size_t split_len) {
 	for (size_t i = 0; i < 6; ++i) {
 		temporary_splits[i] = PllSplit(&temporary_split_content[i * split_len]);
 	}
+}
+std::vector<FastSplitList>
+GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_list) {
+	// expect that all elements of slow_split_list[i] are already sorted
+	// -> Perform k-way merge to only store non-duplicate PllSplits
+	PllSplit::split_len = slow_split_list.front().computeSplitLen();
+	BOOST_LOG_SEV(logger, lg::normal)
+	    << "Start reducing PllSplit Size, current split_len: " << PllSplit::split_len;
+
+	// rough estimate on how many PllSplit entries there are
+	const size_t reserve_size = slow_split_list.size() * slow_split_list.front().size() / 4;
+	unique_pll_splits.reserve(reserve_size);
+	std::vector<FastSplitList> returnList(slow_split_list.size(),
+	                                      FastSplitList(slow_split_list.front().size()));
+
+	// data used inside k-way merge
+	std::vector<size_t> currently_inPQ(slow_split_list.size(), 0);
+	size_t current_split_offset = 0;
+	size_t found_duplicates = 0;
+	// PQ which stores a PllSplit (underlying data not touched) and the index from which tree it
+	// originates from
+	typedef std::pair<PllSplit, size_t> pq_type;
+	struct Comparator {
+		bool operator()(const pq_type &left, const pq_type &right) const {
+			for (size_t i = 0; i < PllSplit::split_len; ++i) {
+				if (left.first()[i] < right.first()[i]) {
+					return true;
+				} else if (left.first()[i] > right.first()[i]) {
+					return false;
+				}
+			}
+			return false;
+		}
+	};
+	std::priority_queue<pq_type, std::vector<pq_type>, Comparator> pq;
+	// initialize by inserting first elements of all slow lists
+	for (const auto &el : slow_split_list) {
+		pq.push(std::make_pair(PllSplit(el[0]), 0));
+	}
+	unique_pll_splits.emplace_back(pq.top().first);
+	while (!pq.empty()) {
+		// get current state
+		PllSplit curr_split = pq.top().first;
+		size_t curr_slow_list_idx = pq.top().second;
+
+		auto &active_slow_list = slow_split_list[curr_slow_list_idx];
+		++currently_inPQ[curr_slow_list_idx];
+		returnList[curr_slow_list_idx].push_back(current_split_offset);
+		pq.push(std::make_pair(PllSplit(active_slow_list[currently_inPQ[curr_slow_list_idx]]),
+		                       curr_slow_list_idx));
+		pq.pop();
+		// check if further elements are equal
+		while (curr_split.equals(pq.top().first, PllSplit::split_len)) {
+			++found_duplicates;
+			// duplicate found - use the same offset value
+			size_t equal_in_tree_idx = pq.top().second;
+			++currently_inPQ[equal_in_tree_idx];
+			returnList[equal_in_tree_idx].push_back(current_split_offset);
+			pq.push(std::make_pair(
+			    slow_split_list[equal_in_tree_idx][currently_inPQ[equal_in_tree_idx]],
+			    equal_in_tree_idx));
+			pq.pop();
+		}
+		// no further duplications store the next split in unique_pll_splits, increment
+		// current_split_offset
+		unique_pll_splits.emplace_back(pq.top().first);
+		++current_split_offset;
+	}
+	{
+		size_t total_splits = slow_split_list.size() * slow_split_list.front().size();
+		double duplicate_ratio =
+		    static_cast<double>(found_duplicates) / static_cast<double>(total_splits);
+		BOOST_LOG_SEV(logger, lg::normal)
+		    << "Done construction of FastSplitList. " << found_duplicates << " duplicates of "
+		    << total_splits << " total elements. Duplicate ratio: " << duplicate_ratio;
+	}
+	// unique_pll_splits will no longer reallocate -> write base-ptr to Static variable
+	FastSplitList::setBasePtr(&unique_pll_splits[0]);
+	return returnList;
 }
