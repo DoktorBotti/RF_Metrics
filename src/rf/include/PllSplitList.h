@@ -7,50 +7,26 @@ class PllTree;
 
 class PllSplitList : public SplitList {
   public:
-    explicit PllSplitList(const PllTree &tree);
+	/* Rule of 5 constructors/destructors */
+	virtual ~PllSplitList();
+	explicit PllSplitList(const PllTree &tree);
+	PllSplitList(const PllSplitList &other);
+	PllSplitList(PllSplitList &&other) noexcept;
 
-    /* Rule of 5 constructors/destructors */
-    virtual ~PllSplitList();
+	PllSplitList &operator=(const PllSplitList &other);
+	PllSplitList &operator=(PllSplitList &&other) noexcept;
+	/* access and size operators */
+	const PllSplit &operator[](size_t index) const override;
+	PllSplit &operator[](size_t index) override;
+	[[nodiscard]] size_t size() const override;
 
-    PllSplitList(const PllSplitList &other);
-
-    PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
-    }
-
-    PllSplitList &operator=(const PllSplitList &other) {
-        *this = PllSplitList(other);
-        return *this;
-    }
-
-    PllSplitList &operator=(PllSplitList &&other) noexcept {
-        std::swap(_splits, other._splits);
-        return *this;
-    }
-
-    PllSplit operator[](size_t index) const override {
-        return _splits[index];
-    }
-
-    [[nodiscard]] size_t size() const override {
-        return _splits.size();
-    }
-
-
-    [[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const {
-        return &_splits.at(i);
-    }
-
-    [[nodiscard]] size_t inline getTreeId() const {
-        return _tree_id;
-    }
-    void inline setTreeId(size_t id) {
-        _tree_id = id;
-    }
+	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const;
+	[[nodiscard]] size_t getTreeId() const;
+	void setTreeId(size_t id);
 
   private:
-
-    std::vector<PllSplit> _splits;
-    size_t _tree_id = 0;
+	std::vector<PllSplit> _splits;
+	size_t _tree_id = 0;
 };
 
 #endif // INFORF_PLLSPLITLIST_H
