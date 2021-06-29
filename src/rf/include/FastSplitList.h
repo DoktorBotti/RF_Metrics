@@ -6,12 +6,14 @@
 class FastSplitList : public SplitList {
   public:
 	explicit FastSplitList(size_t num_taxa);
+	virtual ~FastSplitList() = default;
 	PllSplit &operator[](size_t index) override;
 	const PllSplit &operator[](size_t index) const override;
 	[[nodiscard]] size_t size() const override;
 	static void setBasePtr(PllSplit *ptr);
 
-	void push_back(size_t new_split);
+	void setOffsetAt(unsigned long change_offset, size_t newValue);
+
   private:
 	// we store the index to all PllSplits as offsets from a (static) base address
 	std::vector<size_t> split_idx;

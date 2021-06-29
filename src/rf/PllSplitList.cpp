@@ -8,7 +8,7 @@ PllSplitList::PllSplitList(const PllTree &tree) {
 	for (size_t i = 0; i < tree.tree()->tip_count - 3; ++i) {
 		_splits.emplace_back(tmp_splits[i]);
 	}
-
+    delete_ptr = _splits[0]();
 	free(tmp_splits);
 }
 
@@ -22,11 +22,13 @@ PllSplitList::PllSplitList(const PllSplitList &other) {
 	for (size_t i = 0; i < other.computeSplitArraySize(); ++i) {
 		_splits.emplace_back(tmp_splits + (i * other.computeSplitLen()));
 	}
+    delete_ptr = _splits[0]();
+
 }
 
 PllSplitList::~PllSplitList() {
 	if (!_splits.empty()) {
-		free(_splits[0]()); // Probably fine. Always allocate all splits in a single chunk of
+		free(delete_ptr); // Probably fine. Always allocate all splits in a single chunk of
 		                    // memory!!
 	}
 }
@@ -58,4 +60,10 @@ size_t PllSplitList::size() const {
 }
 PllSplitList::PllSplitList(PllSplitList &&other) noexcept
     : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
+}
+auto PllSplitList::begin() -> decltype(std::vector<PllSplit>::iterator()) {
+	return _splits.begin();
+}
+auto PllSplitList::end() -> decltype(std::vector<PllSplit>::iterator()) {
+	return _splits.end();
 }

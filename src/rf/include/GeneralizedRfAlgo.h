@@ -19,7 +19,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	static LogDblFact factorials;
 
   protected:
-	virtual Scalar calc_tree_score(const PllSplitList &A, const PllSplitList &B);
+	virtual Scalar calc_tree_score(const SplitList &A, const SplitList &B);
 	static Scalar p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	static Scalar p_phy(const PllSplit &S, size_t taxa, size_t split_len);
 	/* Calculates the phylogenetic probability of a split with partition sizes a and b. */
@@ -29,7 +29,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static Scalar h_info_content(size_t a, size_t b);
-	SplitScores calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
+	SplitScores calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2);
 
   public:
 	virtual Scalar
@@ -59,7 +59,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	std::vector<PllSplit> unique_pll_splits;
 	Matcher match_solver;
 	void setup_temporary_storage(size_t split_len);
-	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &slow_split_list);
+	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
+	void sort_PllSplitLists(std::vector<PllSplitList> &to_sort) const;
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

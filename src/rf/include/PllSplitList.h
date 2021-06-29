@@ -23,10 +23,13 @@ class PllSplitList : public SplitList {
 	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const;
 	[[nodiscard]] size_t getTreeId() const;
 	void setTreeId(size_t id);
+	auto begin() -> decltype(std::vector<PllSplit>::iterator());
+	auto end() -> decltype(std::vector<PllSplit>::iterator());
 
   private:
 	std::vector<PllSplit> _splits;
 	size_t _tree_id = 0;
+	decltype(_splits.front().operator()()) delete_ptr;
 };
 
 #endif // INFORF_PLLSPLITLIST_H

@@ -44,7 +44,7 @@ static bool nearly_eq_floating(double a, double b);
 
 TEST_CASE("Calculate simple trees", "[dbg]") {
 	// Edit your trees to test here
-	std::string tree1 = "((((F,C),B),A),(E,D));";
+	std::string tree1 = "((((D,C),B),A),(E,F));";
 	std::string tree2 = "(((B,C),(D,A)),(E,F));";
 	std::string tree_path = "/tmp/tmpTrees";
 
@@ -62,6 +62,38 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 	iface.do_magical_high_performance_stuff();
 	std::cout << iface.get_result().pairwise_similarities.print() << std::endl << std::flush;
 	SUCCEED("Done.");
+}
+
+TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
+	std::string trees_str = "((((F,C),B),A),(E,D));\n(((B,C),(D,A)),(E,F));";
+	auto trees = Util::create_all_trees_from_string(trees_str);
+
+	std::vector<PllSplitList> all_splits;
+	all_splits.reserve(trees.size());
+	for (auto &t : trees) {
+		t.alignNodeIndices(*trees.begin());
+		all_splits.emplace_back(t);
+	}
+	PllSplit::split_len = all_splits.back().computeSplitLen();
+	for (auto &t : all_splits) {
+		std::sort(
+		    t.begin(), t.end(), [](const auto &left, const auto &right) { return left < right; });
+	}
+	for (auto split_list : all_splits) {
+		for (size_t i = 0; i < split_list.size() - 1; ++i) {
+			auto &currSplit = split_list[i];
+			auto &nextSplit = split_list[i + 1];
+
+			CHECK(currSplit < nextSplit);
+
+			if (!(currSplit < nextSplit)) {
+				// maybe it was equal?
+				for (size_t j = 0; j < PllSplit::split_len; ++j) {
+					CHECK(currSplit()[j] == nextSplit()[j]);
+				}
+			}
+		}
+	}
 }
 
 TEST_CASE("Compare to other Team", "[other_team]") {
@@ -128,8 +160,8 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 			size_t n_cols = our_res.pairwise_distance_mtx[row].size();
 			REQUIRE(n_cols == res.pairwise_distance_mtx[row].size());
 			for (size_t col = 0; col < n_cols; ++col) {
-				auto diff = our_res.pairwise_distance_mtx[row][col] -
-				                     res.pairwise_distance_mtx[row][col];
+				auto diff =
+				    our_res.pairwise_distance_mtx[row][col] - res.pairwise_distance_mtx[row][col];
 				if (std::abs(diff) > max_diff) {
 					max_diff = diff;
 				}

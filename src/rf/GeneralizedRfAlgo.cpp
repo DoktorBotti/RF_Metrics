@@ -109,9 +109,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		t.alignNodeIndices(*trees.begin());
 		all_splits.emplace_back(t);
 	}
+	PllSplit::split_len = all_splits.back().computeSplitLen();
+
+	sort_PllSplitLists(all_splits);
 	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
-	std::vector<FastSplitList> fast_splits = generateFastList(all_splits);
-	setup_temporary_storage(all_splits[0].computeSplitLen());
+	std::vector<FastSplitList> fast_trees = generateFastList(all_splits);
+	assert(PllSplit::split_len != std::numeric_limits<size_t>::max());
+	setup_temporary_storage(PllSplit::split_len);
 	RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
 	size_t tree_num = 0;
@@ -120,7 +124,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	// iterate through all tree combinations
 	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
 		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
-			Scalar dst = calc_tree_score(all_splits[idx_a], all_splits[idx_b]);
+			Scalar dst = calc_tree_score(fast_trees[idx_a], fast_trees[idx_b]);
 			res.pairwise_similarities.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 			++tree_num;
@@ -140,9 +144,15 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	calc_pairwise_tree_dist(all_splits, res);
 	return res;
 }
+void GeneralizedRfAlgo::sort_PllSplitLists(std::vector<PllSplitList> &to_sort) const {
+	for (auto &t : to_sort) {
+		std::sort(
+		    t.begin(), t.end(), [](const auto &left, const auto &right) { return left < right; });
+	}
+}
 
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A,
-                                                                const PllSplitList &B) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
+                                                                const SplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	Scalar total_score = match_solver.solve(scores);
 	std::stringstream out;
@@ -154,8 +164,8 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitLi
 	return total_score;
 }
 
-GeneralizedRfAlgo::SplitScores
-GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
+GeneralizedRfAlgo::SplitScores GeneralizedRfAlgo::calc_pairwise_split_scores(const SplitList &S1,
+                                                                             const SplitList &S2) {
 	SplitScores scores(S1.size());
 	const auto taxa = S1.size() + 3;
 	factorials.reserve(taxa + taxa);
@@ -236,7 +246,7 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 	    << "Start reducing PllSplit Size, current split_len: " << PllSplit::split_len;
 
 	// rough estimate on how many PllSplit entries there are
-	const size_t reserve_size = slow_split_list.size() * slow_split_list.front().size() / 4;
+	const size_t reserve_size = slow_split_list.size() * slow_split_list.front().size() / 2;
 	unique_pll_splits.reserve(reserve_size);
 	std::vector<FastSplitList> returnList(slow_split_list.size(),
 	                                      FastSplitList(slow_split_list.front().size()));
@@ -262,33 +272,47 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 	};
 	std::priority_queue<pq_type, std::vector<pq_type>, Comparator> pq;
 	// initialize by inserting first elements of all slow lists
-	for (const auto &el : slow_split_list) {
-		pq.push(std::make_pair(PllSplit(el[0]), 0));
+	for (size_t i = 0; i < slow_split_list.size(); ++i) {
+		pq.push(std::make_pair(PllSplit(slow_split_list[i][0]), i));
 	}
 	unique_pll_splits.emplace_back(pq.top().first);
 	unique_pll_splits.back().perform_popcount_precalc(PllSplit::split_len);
+	auto insert_in_pq = [&](size_t active_slow_idx) {
+		// takes the current index
+		auto &active_slow_list = slow_split_list[active_slow_idx];
+		// increment where the active element is
+		size_t list_idx = ++currently_inPQ[active_slow_idx];
+		if (list_idx < active_slow_list.size()) {
+			PllSplit insert_split(active_slow_list[list_idx]());
+			pq.push(std::make_pair(insert_split, active_slow_idx));
+		}
+	};
 	while (!pq.empty()) {
 		// get current state
 		PllSplit curr_split = pq.top().first;
-		size_t curr_slow_list_idx = pq.top().second;
+		{
+			size_t curr_slow_list_idx = pq.top().second;
+			// add current unique split to result
+			assert(currently_inPQ[curr_slow_list_idx] < slow_split_list.back().size());
+			returnList[curr_slow_list_idx].setOffsetAt(currently_inPQ[curr_slow_list_idx],
+			                                           current_split_offset);
+			// add from the same list a replacement element
+			pq.pop();
 
-		auto &active_slow_list = slow_split_list[curr_slow_list_idx];
-		++currently_inPQ[curr_slow_list_idx];
-		returnList[curr_slow_list_idx].push_back(current_split_offset);
-		pq.push(std::make_pair(PllSplit(active_slow_list[currently_inPQ[curr_slow_list_idx]]),
-		                       curr_slow_list_idx));
-		pq.pop();
+			insert_in_pq(curr_slow_list_idx);
+		}
 		// check if further elements are equal
-		while (curr_split.equals(pq.top().first, PllSplit::split_len)) {
+		while (!pq.empty() && curr_split.equals(pq.top().first, PllSplit::split_len)) {
 			++found_duplicates;
 			// duplicate found - use the same offset value
 			size_t equal_in_tree_idx = pq.top().second;
-			++currently_inPQ[equal_in_tree_idx];
-			returnList[equal_in_tree_idx].push_back(current_split_offset);
-			pq.push(std::make_pair(
-			    slow_split_list[equal_in_tree_idx][currently_inPQ[equal_in_tree_idx]],
-			    equal_in_tree_idx));
+			// the found value must have un-inserted elements
+			assert(currently_inPQ[equal_in_tree_idx] < slow_split_list[equal_in_tree_idx].size());
+			returnList[equal_in_tree_idx].setOffsetAt(currently_inPQ[equal_in_tree_idx],
+			                                          current_split_offset);
 			pq.pop();
+			// insertion of replacement for equal_in_tree element
+			insert_in_pq(equal_in_tree_idx);
 		}
 		// no further duplications store the next split in unique_pll_splits, increment
 		// current_split_offset
@@ -300,12 +324,12 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 		size_t total_splits = slow_split_list.size() * slow_split_list.front().size();
 		double duplicate_ratio =
 		    static_cast<double>(found_duplicates) / static_cast<double>(total_splits);
-		BOOST_LOG_SEV(logger, lg::normal)
+		BOOST_LOG_SEV(logger, lg::notification)
 		    << "Done construction of FastSplitList. " << found_duplicates << " duplicates of "
 		    << total_splits << " possible PllSplits. Duplicate ratio: " << duplicate_ratio;
-		BOOST_LOG_SEV(logger, lg::normal)
+		BOOST_LOG_SEV(logger, lg::notification)
 		    << "Estimated " << reserve_size
-		    << "unique pll splits, actual number: " << unique_pll_splits.size();
+		    << " unique pll splits, actual number: " << unique_pll_splits.size();
 	}
 	// unique_pll_splits will no longer reallocate -> write base-ptr to Static variable
 	FastSplitList::setBasePtr(&unique_pll_splits[0]);

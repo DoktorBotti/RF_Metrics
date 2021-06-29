@@ -26,7 +26,7 @@ bool PllSplit::is_disjoint(const PllSplit &other, size_t len) const {
 	return true;
 }
 
-size_t PllSplit::split_len = 1337;
+size_t PllSplit::split_len = std::numeric_limits<size_t>::max();
 
 void PllSplit::set_union(const PllSplit &other, size_t len, pll_split_base_t *res) const {
 	for (size_t i = 0; i < len; ++i) {
@@ -71,4 +71,18 @@ size_t inline PllSplit::priv_popcount(size_t len) const {
 }
 void PllSplit::perform_popcount_precalc(size_t len) const {
 	priv_popcount(len);
+}
+// requires split_len to be something sensible
+bool PllSplit::operator<(const PllSplit &rhs) const {
+	assert(PllSplit::split_len < std::numeric_limits<size_t>::max());
+//    for (size_t j = PllSplit::split_len+1; j > 0; --j) {
+//        auto i = j -1;
+	for(size_t i = 0; i < PllSplit::split_len; ++i){
+        if (operator()()[i] < rhs()[i]) {
+            return true;
+        } else if (operator()()[i] > rhs()[i]) {
+            return false;
+        }
+    }
+    return false;
 }

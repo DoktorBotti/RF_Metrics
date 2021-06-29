@@ -64,6 +64,8 @@ class PllSplit {
 		return sizeof(pll_split_base_t) * 8;
 	}
 
+	bool operator<(PllSplit const& rhs) const;
+
   private:
 	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
 		return index / splitBitWidth();

@@ -4,7 +4,7 @@ PllSplit *FastSplitList::base_ptr = nullptr;
 size_t FastSplitList::size() const {
 	return split_idx.size();
 }
-FastSplitList::FastSplitList(size_t num_taxa) : split_idx(num_taxa - 3) {
+FastSplitList::FastSplitList(size_t num_taxa) : split_idx(num_taxa) {
 }
 PllSplit &FastSplitList::operator[](size_t index) {
 	assert(index < size());
@@ -19,7 +19,7 @@ const PllSplit &FastSplitList::operator[](size_t index) const {
 void FastSplitList::setBasePtr(PllSplit *ptr) {
     base_ptr = ptr;
 }
-void FastSplitList::push_back(size_t new_split) {
-	split_idx.emplace_back(new_split);
+void FastSplitList::setOffsetAt(unsigned long change_offset, size_t newValue) {
+	assert(change_offset < split_idx.size());
+	split_idx[change_offset] = newValue;
 }
-
