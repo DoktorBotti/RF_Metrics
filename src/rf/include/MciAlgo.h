@@ -20,6 +20,10 @@ class MciAlgo : public GeneralizedRfAlgo {
 	                        size_t split_len) override;
 	RfAlgorithmInterface::Scalar
 	calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) override;
+	GeneralizedRfAlgo::SplitScores calc_pairwise_split_scores(const PllSplitList &S1,
+	                                                          const PllSplitList &S2) override;
+	void
+	compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len) override;
 };
 
 #endif // CONCURRENT_GROWTABLE_MCIALGO_H

@@ -28,7 +28,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static Scalar h_info_content(size_t a, size_t b);
-	SplitScores calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
+	virtual SplitScores calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2);
 
   public:
 	virtual Scalar
@@ -49,12 +49,14 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	 * temporary_splits[4] : A1 and B2
 	 * temporary_splits[5] : A2 and B1
 	 */
-	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	virtual void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	// Stores intermediate results such as intersections. For more information see
+	// compute_split_comparison
 	std::vector<PllSplit> temporary_splits;
+	std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
-	std::vector<pll_split_base_t> temporary_split_content;
 	Matcher match_solver;
 	void setup_temporary_storage(size_t split_len);
 };

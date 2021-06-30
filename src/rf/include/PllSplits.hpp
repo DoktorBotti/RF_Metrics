@@ -30,8 +30,14 @@ class PllTree;
  */
 class PllSplit {
   public:
-	explicit PllSplit(pll_split_t s) : _split{s} {
-	}
+    PllSplit(pll_split_t s, size_t split_length) : _split{s} {
+        pre_calc_popcount = popcount(split_length);
+    }
+
+    explicit PllSplit(pll_split_t s) : pre_calc_popcount(0), _split{s} {
+    }
+
+	size_t pre_calc_popcount;
 
 	static size_t split_len;
 
@@ -39,7 +45,7 @@ class PllSplit {
 		return _split;
 	}
 
-	[[nodiscard]] size_t popcount(size_t len) const;
+	[[nodiscard]] size_t popcount(size_t len) const; // TODO: make const after testing
 
 	[[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
@@ -54,10 +60,10 @@ class PllSplit {
 	/* Trivial xor operation. Not optimized as of now. */
 	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
-    /* Trivial not operation. Not optimized as of now. */
-    void set_not(size_t len, pll_split_base_t *res) const;
+	/* Trivial not operation. Not optimized as of now. */
+	void set_not(size_t len, pll_split_base_t *res) const;
 
-    [[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
+	[[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
 
 	[[nodiscard]] static constexpr size_t splitBitWidth() {
 		return sizeof(pll_split_base_t) * 8;
@@ -73,7 +79,6 @@ class PllSplit {
 	}
 
 	pll_split_t _split;
-
 };
 
 class PllSplitList {
@@ -85,7 +90,8 @@ class PllSplitList {
 
 	PllSplitList(const PllSplitList &other);
 
-	PllSplitList(PllSplitList &&other) noexcept : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
+	PllSplitList(PllSplitList &&other) noexcept
+	    : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
 	}
 
 	PllSplitList &operator=(const PllSplitList &other) {
@@ -98,7 +104,11 @@ class PllSplitList {
 		return *this;
 	}
 
-	PllSplit operator[](size_t index) const {
+	PllSplit &operator[](size_t index) {
+		return _splits[index];
+	}
+
+	const PllSplit &operator[](size_t index) const {
 		return _splits[index];
 	}
 
