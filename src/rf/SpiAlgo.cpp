@@ -97,7 +97,8 @@ GeneralizedRfAlgo::Scalar SpiAlgo::calc_split_score(const PllSplit &S1,
 
 	return 0;
 }
-
+SpiAlgo::SpiAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
+}
 
 // AB | DEFC
 // DEF | ABC --> ABC | DEF

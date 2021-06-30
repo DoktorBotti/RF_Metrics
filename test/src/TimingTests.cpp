@@ -11,19 +11,19 @@
 
 static void time_metric(const RfMetricInterface::Metric &metric);
 
-TEST_CASE("SPI timing test", "[SPI][Time]")
+TEST_CASE("SPI timing test", "[SPI][Time][long]")
 {
     auto metr = RfMetricInterface::SPI;
     time_metric(metr);
 }
 
-TEST_CASE("MSI timing test", "[MSI][Time]")
+TEST_CASE("MSI timing test", "[MSI][Time][long]")
 {
     auto metr = RfMetricInterface::MSI;
     time_metric(metr);
 }
 
-TEST_CASE("MCI timing test", "[MCI][Time]")
+TEST_CASE("MCI timing test", "[MCI][Time][long]")
 {
 	auto metr = RfMetricInterface::MCI;
 	time_metric(metr);

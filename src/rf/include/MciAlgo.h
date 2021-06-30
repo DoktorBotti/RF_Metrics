@@ -14,6 +14,11 @@ class MciAlgo : public GeneralizedRfAlgo {
 
   public:
 	// TODO: make private and still testable?
+	explicit MciAlgo(size_t split_len);
+	MciAlgo() = default;
+	MciAlgo(MciAlgo&&) = default;
+	~MciAlgo() override = default;
+
 	Scalar calc_split_score(const PllSplit &S1,
 	                        const PllSplit &S2,
 	                        size_t taxa,

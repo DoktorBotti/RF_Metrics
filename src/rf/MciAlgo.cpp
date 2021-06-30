@@ -1,9 +1,7 @@
-//
-// Created by Robert Schmoltzi on 18.05.21.
-//
-
 #include "MciAlgo.h"
 
+MciAlgo::MciAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
+}
 // TODO: test boolean transformation to reduce operations
 double
 MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
@@ -92,6 +90,10 @@ GeneralizedRfAlgo::SplitScores MciAlgo::calc_pairwise_split_scores(const PllSpli
 }
 
 void MciAlgo::compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len) {
+    // B1 -> &split_buffer[0]
+    S1.set_not(split_len, &temporary_split_content[0]);
+    // B2 -> &split_buffer[split_len]
+    S2.set_not(split_len, &temporary_split_content[split_len]);
 	// A1 and A2 -> &split_buffer[2 * split_len]
 	S1.intersect(S2, split_len, &temporary_split_content[2 * split_len]);
 	// B1 and B2 -> &split_buffer[3 * split_len]

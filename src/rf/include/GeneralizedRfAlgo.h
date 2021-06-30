@@ -11,6 +11,7 @@
 class GeneralizedRfAlgo : public RfAlgorithmInterface {
   public:
 	GeneralizedRfAlgo();
+	explicit GeneralizedRfAlgo(size_t split_len);
 	GeneralizedRfAlgo(GeneralizedRfAlgo &&) = default;
 	~GeneralizedRfAlgo() override = default;
 	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;

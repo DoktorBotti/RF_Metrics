@@ -1,5 +1,7 @@
 #include "MsiAlgo.h"
 
+MsiAlgo::MsiAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
+}
 GeneralizedRfAlgo::Scalar
 MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
 	// TODO: could save one interim result with boolean transformation -> test performance

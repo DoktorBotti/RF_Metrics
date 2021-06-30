@@ -221,9 +221,13 @@ void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> 
 	                                   (static_cast<Scalar>(trees.size()) / 2.));
 }
 void GeneralizedRfAlgo::setup_temporary_storage(size_t split_len) {
-	temporary_split_content.reserve(split_len * 6);
+	temporary_split_content.assign(split_len * 6, 0);
 	temporary_splits.reserve(6);
 	for (size_t i = 0; i < 6; ++i) {
-		temporary_splits[i] = PllSplit(&temporary_split_content[i * split_len]);
+		temporary_splits.emplace_back(&temporary_split_content[i * split_len]);
 	}
+}
+GeneralizedRfAlgo::GeneralizedRfAlgo(size_t split_len) {
+    logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
+	setup_temporary_storage(split_len);
 }

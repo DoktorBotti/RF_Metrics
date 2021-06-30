@@ -9,6 +9,10 @@
 class MsiAlgo : public GeneralizedRfAlgo {
   protected:
   public:
+	explicit MsiAlgo(size_t split_len);
+	MsiAlgo() = default;
+	MsiAlgo(MsiAlgo&&) = default;
+	~MsiAlgo() override = default;
 	Scalar calc_split_score(const PllSplit &S1,
 	                        const PllSplit &S2,
 	                        size_t taxa,
