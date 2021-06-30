@@ -9,9 +9,11 @@ GeneralizedRfAlgo::GeneralizedRfAlgo() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 }
 
+// TODO: optimize h_info_contents and remove split_len from params
+
 RfAlgorithmInterface::Scalar
-GeneralizedRfAlgo::h_info_content(PllSplit &S, size_t taxa, size_t split_len) {
-	size_t a = S.popcount(split_len);
+GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
+	size_t a = S.pre_calc_popcount;
 	size_t b = taxa - a;
 
 	Scalar res = factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) +
@@ -21,8 +23,8 @@ GeneralizedRfAlgo::h_info_content(PllSplit &S, size_t taxa, size_t split_len) {
 	return -res;
 }
 
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(PllSplit &S1,
-                                                               PllSplit &S2,
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(const PllSplit &S1,
+                                                               const PllSplit &S2,
                                                                size_t taxa,
                                                                size_t split_len) {
 	return -p_phy(S1, S2, taxa, split_len);
@@ -32,10 +34,10 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(size_t a, size_t 
 	return -p_phy(a, b);
 }
 
-RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(PllSplit &S,
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S,
                                                              size_t taxa,
                                                              size_t split_len) {
-	auto a = S.popcount(split_len);
+	auto a = S.pre_calc_popcount;
 	auto b = taxa - a;
 
 	return p_phy(a, b);
@@ -51,27 +53,28 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(size_t a, size_t b)
 	       factorials.lg_unrooted_dbl_fact_fast(static_cast<long>(a + b));
 }
 
-RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(PllSplit &S1,
-                                                             PllSplit &S2,
+RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
+                                                             const PllSplit &S2,
                                                              size_t taxa,
                                                              size_t split_len) {
+	// TODO: reuse vector to stop calling malloc/free
 	std::vector<pll_split_base_t> cut(split_len);
 	S1.intersect(S2, split_len, &cut[0]);
 
 	size_t a1, b1, a2;
 
 	if (S2.equals(PllSplit(&cut[0], split_len), split_len)) {
-		a1 = S1.popcount(split_len);
+		a1 = S1.pre_calc_popcount;
 		b1 = taxa - a1;
-		a2 = S2.popcount(split_len);
+		a2 = S2.pre_calc_popcount;
 	} else if (S1.equals(PllSplit(&cut[0], split_len), split_len)) {
-		a1 = S2.popcount(split_len);
+		a1 = S2.pre_calc_popcount;
 		b1 = taxa - a1;
-		a2 = S1.popcount(split_len);
+		a2 = S1.pre_calc_popcount;
 	} else {
-		a1 = S1.popcount(split_len);
+		a1 = S1.pre_calc_popcount;
 		b1 = taxa - a1;
-		auto b2 = S2.popcount(split_len);
+		auto b2 = S2.pre_calc_popcount;
 		a2 = taxa - b2;
 	}
 
@@ -130,10 +133,6 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		}
 	}
 
-	auto count_count_count = all_splits[0][34].popcount_count;
-	auto op_count_count = all_splits[0][34].operation_count;
-	auto not_count_count = all_splits[0][34].not_count;
-
 	// calc mean distance between trees
 	res.mean_distance = total_dst / static_cast<Scalar>(trees.size());
 
@@ -142,8 +141,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	return res;
 }
 
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(PllSplitList &A,
-                                                                PllSplitList &B) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const PllSplitList &A,
+                                                                const PllSplitList &B) {
 	auto scores = calc_pairwise_split_scores(A, B);
 	Scalar total_score = match_solver.solve(scores);
 	std::stringstream out;
@@ -156,7 +155,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(PllSplitList &A,
 }
 
 GeneralizedRfAlgo::SplitScores
-GeneralizedRfAlgo::calc_pairwise_split_scores(PllSplitList &S1, PllSplitList &S2) {
+GeneralizedRfAlgo::calc_pairwise_split_scores(const PllSplitList &S1, const PllSplitList &S2) {
 	SplitScores scores(S1.size());
 	auto taxa = S1.size() + 3;
 	factorials.reserve(taxa + taxa);
@@ -174,8 +173,8 @@ GeneralizedRfAlgo::calc_pairwise_split_scores(PllSplitList &S1, PllSplitList &S2
 	return scores;
 }
 
-void GeneralizedRfAlgo::compute_split_comparison(PllSplit &S1,
-                                                 PllSplit &S2,
+void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
+                                                 const PllSplit &S2,
                                                  size_t split_len) {
 	// B1 -> &split_buffer[0]
 	S1.set_not(split_len, &temporary_split_content[0]);
@@ -192,18 +191,18 @@ void GeneralizedRfAlgo::compute_split_comparison(PllSplit &S1,
 	S2.intersect(temporary_splits[0], split_len, &temporary_split_content[5 * split_len]);
 }
 RfAlgorithmInterface::Scalar
-GeneralizedRfAlgo::calc_tree_info_content(PllSplitList &S, size_t taxa, size_t split_len) {
+GeneralizedRfAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
 	Scalar sum = 0;
 	for (size_t i = 0; i < S.size(); ++i) {
 		sum += h_info_content(S[i], taxa, split_len);
 	}
 	return sum;
 }
-void GeneralizedRfAlgo::calc_pairwise_tree_dist(std::vector<PllSplitList> &trees,
+void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<PllSplitList> &trees,
                                                 RfMetricInterface::Results &res) {
 	std::vector<GeneralizedRfAlgo::Scalar> tree_info(trees.size());
-	auto taxa = trees[0].size() + 3;
-	auto split_len = trees[0].computeSplitLen();
+	const auto taxa = trees[0].size() + 3;
+	const auto split_len = trees[0].computeSplitLen();
 	for (size_t i = 0; i < trees.size(); ++i) {
 		tree_info[i] = calc_tree_info_content(trees[i], taxa, split_len);
 	}

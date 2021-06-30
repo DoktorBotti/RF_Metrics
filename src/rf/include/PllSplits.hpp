@@ -37,10 +37,6 @@ class PllSplit {
     explicit PllSplit(pll_split_t s) : pre_calc_popcount(0), _split{s} {
     }
 
-
-	size_t popcount_count = 0; // Count Count beware!
-	size_t operation_count = 0;
-	size_t not_count = 0; // Don't count on me!
 	size_t pre_calc_popcount;
 
 	static size_t split_len;
@@ -49,25 +45,25 @@ class PllSplit {
 		return _split;
 	}
 
-	[[nodiscard]] size_t popcount(size_t len); // TODO: make const after testing
+	[[nodiscard]] size_t popcount(size_t len) const; // TODO: make const after testing
 
 	[[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
-	[[nodiscard]] bool equals(const PllSplit &other, size_t len);
+	[[nodiscard]] bool equals(const PllSplit &other, size_t len) const;
 
 	/* Trivial and operation. Not optimized as of now. */
-	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void intersect(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
 	/* Trivial or operation. Not optimized as of now. */
-	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void set_union(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
 	/* Trivial xor operation. Not optimized as of now. */
-	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res);
+	void set_minus(const PllSplit &other, size_t len, pll_split_base_t *res) const;
 
 	/* Trivial not operation. Not optimized as of now. */
-	void set_not(size_t len, pll_split_base_t *res);
+	void set_not(size_t len, pll_split_base_t *res) const;
 
-	[[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len);
+	[[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
 
 	[[nodiscard]] static constexpr size_t splitBitWidth() {
 		return sizeof(pll_split_base_t) * 8;

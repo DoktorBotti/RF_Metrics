@@ -202,8 +202,8 @@ static void test_metric(const std::string &base_path_splits,
 		params.input_file_path = trees_path;
 		params.metric = metric;
 		params.normalize_output = false;
-		INFO("Calculating distances from " + res_fname)
-		INFO("Indices a: " + std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b))
+		WARN("Calculating distances from " + res_fname);
+		WARN("Indices a: " + std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b));
 		CHECK(!res_fname.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();
