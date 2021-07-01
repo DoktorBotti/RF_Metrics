@@ -14,9 +14,8 @@ TEST_CASE("Calc standard RF distance", "[RF][long]") {
 	    1, "/rf_metrics/BS/125", "/tmp/foobaz.out", RfMetricInterface::Metric::RF};
 	RfMetricInterface algo(libParams);
 	algo.do_magical_high_performance_stuff();
-	INFO(algo.get_result().num_unique_trees)
-	INFO(algo.get_result().mean_distance)
-	REQUIRE(false);
+	WARN(algo.get_result().num_unique_trees);
+	WARN(algo.get_result().mean_distance);
 }
 
 static io::IOData calc_result(const std::string& in_file);

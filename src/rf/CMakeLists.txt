@@ -1,5 +1,6 @@
 add_library(rf_lib STATIC
         Cacher.cpp
+        FastSplitList.cpp
         GeneralizedRfAlgo.cpp
         LogDblFact.cpp
         LoggingBackend.cpp
@@ -7,16 +8,19 @@ add_library(rf_lib STATIC
         MatcherOrTools.cpp
         MciAlgo.cpp
         MsiAlgo.cpp
-        PllSplits.cpp
+        PllSplit.cpp
+        PllSplitList.cpp
         PllTree.cpp
         RfAlgorithmInterface.cpp
         RfMetricInterface.cpp
         SpiAlgo.cpp
+        SplitList.cpp
         StandardRfAlgo.cpp
         TwoSplitHashmapFunctor.cpp
         TwoSplitHashmapKey.cpp
         helpers/Util.cpp
         helpers/Util.h
+        include/FastSplitList.h
         include/GeneralizedRfAlgo.h
         include/HashmapUtil/Cacher.h
         include/HashmapUtil/OneSplitHashingFunctor.hpp
@@ -29,12 +33,13 @@ add_library(rf_lib STATIC
         include/MatcherOrTools.h
         include/MciAlgo.h
         include/MsiAlgo.h
-        include/PllSplits.hpp
+        include/PllSplitList.h
         include/PllTree.hpp
         include/RectMatrix.hpp
         include/RfAlgorithmInterface.h
         include/RfMetricInterface.h
         include/SpiAlgo.h
+        include/SplitList.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp
         )

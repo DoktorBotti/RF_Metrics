@@ -12,16 +12,20 @@ MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	const auto b1 = taxa - a1;
 	const auto b2 = taxa - a2;
 
-	auto split_buffer = GeneralizedRfAlgo::compute_split_comparison(S1, S2, split_len);
+	compute_split_comparison(S1, S2, split_len);
 
-	const auto a1_a2 = PllSplit(&split_buffer[2 * split_len]).popcount(split_len); // a_and_b
-	const auto a1_b2 = PllSplit(&split_buffer[4 * split_len]).popcount(split_len); // a_and_B
-	const auto a2_b1 = PllSplit(&split_buffer[5 * split_len]).popcount(split_len); // A_and_b
+	const auto a1_a2 = temporary_splits[2].popcount(split_len); // a_and_b
+	const auto a1_b2 = temporary_splits[4].popcount(split_len); // a_and_B
+	const auto a2_b1 = temporary_splits[5].popcount(split_len); // A_and_b
+
+	//	const auto a1_a2 = PllSplit(&split_buffer[2 * split_len]).popcount(split_len); // a_and_b
+	//	const auto a1_b2 = PllSplit(&split_buffer[4 * split_len]).popcount(split_len); // a_and_B
+	//	const auto a2_b1 = PllSplit(&split_buffer[5 * split_len]).popcount(split_len); // A_and_b
 	// Account for the bits counted at the end because of both inversions!
 	// TODO: test whether bitmask is faster
 	const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
 	const auto b1_b2 =
-	    PllSplit(&split_buffer[3 * split_len]).popcount(split_len) - bits_too_many; // A_and_B
+	    temporary_splits[3].popcount(split_len) - bits_too_many; // A_and_B
 	assert(b1_b2 == taxa - (a1_a2 + a1_b2 + a2_b1));
 
 	assert(a1 == a1_a2 + a1_b2); // na

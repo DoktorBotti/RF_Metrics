@@ -1,7 +1,6 @@
 #include "../src/rf/helpers/Util.h"
 #include "RfMetricInterface.h"
 #include "catch2/catch.hpp"
-#include <boost/log/sources/record_ostream.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -44,8 +43,8 @@ static bool nearly_eq_floating(double a, double b);
 
 TEST_CASE("Calculate simple trees", "[dbg]") {
 	// Edit your trees to test here
-	std::string tree1 = "((((F,C),B),A),(E,D));";
-	std::string tree2 = "(((B,C),(D,A)),(E,F));";
+	std::string tree1 = "(((A,B),C),((E,F),G));";
+	std::string tree2 = "(((A,B),C),((F,G),E));";
 	std::string tree_path = "/tmp/tmpTrees";
 
 	// write them to a temporary file
@@ -62,6 +61,35 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 	iface.do_magical_high_performance_stuff();
 	std::cout << iface.get_result().pairwise_similarities.print() << std::endl << std::flush;
 	SUCCEED("Done.");
+}
+
+TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
+	std::string trees_str = "((((F,C),B),A),(E,D));\n(((B,C),(D,A)),(E,F));";
+	auto trees = Util::create_all_trees_from_file("/rf_metrics/BS/125");
+
+	std::vector<PllSplitList> all_splits;
+	all_splits.reserve(trees.size());
+	for (auto &t : trees) {
+		t.alignNodeIndices(*trees.begin());
+		all_splits.emplace_back(t);
+	}
+	PllSplit::split_len = all_splits.back().computeSplitLen();
+	for (auto &t : all_splits) {
+		for (size_t i = 0; i < t.size() - 1; ++i) {
+			// refs
+			{
+				auto &currSplit = t[i];
+				auto &nextSplit = t[i + 1];
+				CHECK(currSplit < nextSplit);
+			}
+			// copies
+			{
+				auto currSplit = t[i];
+				auto nextSplit = t[i + 1];
+				CHECK(currSplit < nextSplit);
+			}
+		}
+	}
 }
 
 TEST_CASE("Compare to other Team", "[other_team]") {
@@ -128,8 +156,8 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 			size_t n_cols = our_res.pairwise_distance_mtx[row].size();
 			REQUIRE(n_cols == res.pairwise_distance_mtx[row].size());
 			for (size_t col = 0; col < n_cols; ++col) {
-				auto diff = our_res.pairwise_distance_mtx[row][col] -
-				                     res.pairwise_distance_mtx[row][col];
+				auto diff =
+				    our_res.pairwise_distance_mtx[row][col] - res.pairwise_distance_mtx[row][col];
 				if (std::abs(diff) > max_diff) {
 					max_diff = diff;
 				}

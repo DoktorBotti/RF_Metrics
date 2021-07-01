@@ -1,7 +1,7 @@
 #ifndef RF_METRICS_TWOSPLITHASHMAPKEY_H
 #define RF_METRICS_TWOSPLITHASHMAPKEY_H
 
-#include <PllSplits.hpp>
+#include <PllSplit.hpp>
 class TwoSplitHashmapKey {
   public:
 	// constructors
@@ -12,8 +12,9 @@ class TwoSplitHashmapKey {
 	~TwoSplitHashmapKey() = default;
 
 	// actual splits, can be public since they are const anyway
-	PllSplit const split_a;
-    PllSplit const split_b;
+	PllSplit split_a;
+	PllSplit split_b;
+	size_t pre_hash = 0;
 
   public:
 	// either a must match a or a must match b

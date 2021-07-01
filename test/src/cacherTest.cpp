@@ -1,6 +1,6 @@
-#include "rf/include/Cacher/Cacher.h"
 #include "../../src/rf/helpers/Util.h"
 #include "PllTree.hpp"
+#include <HashmapUtil/Cacher.h>
 #include <catch2/catch.hpp>
 #include <string.h>
 
@@ -14,23 +14,23 @@ TEST_CASE("Key equality", "[HashmapUtil]") {
 	PllSplit d(split_list[3]);
 	// completely equal or unequal
 	{
-		CacherKey k;
-		auto key_a = CacherKey(&a, &b);
-		auto key_b = CacherKey(&c, &d);
+		TwoSplitHashmapKey k;
+		auto key_a = TwoSplitHashmapKey(&a, &b);
+		auto key_b = TwoSplitHashmapKey(&c, &d);
 		CHECK(key_a != key_b);
 		CHECK(key_a == key_a);
 
-		auto key_perm_a = CacherKey(&b, &a);
+		auto key_perm_a = TwoSplitHashmapKey(&b, &a);
 		CHECK(key_b != key_perm_a);
 		CHECK(key_a == key_perm_a);
 	}
     // one differs
     {
-        auto key_a = CacherKey(&a, &b);
-        auto key_b = CacherKey(&a, &d);
+        auto key_a = TwoSplitHashmapKey(&a, &b);
+        auto key_b = TwoSplitHashmapKey(&a, &d);
         CHECK(key_a != key_b);
         CHECK(key_a == key_a);
-        auto key_perm_a = new CacherKey(&b, &a);
+        auto key_perm_a = new TwoSplitHashmapKey(&b, &a);
         CHECK(key_b != *key_perm_a);
 		delete key_perm_a;
     }
@@ -45,7 +45,7 @@ TEST_CASE("Cache some values", "[HashmapUtil]"){
     PllSplit b(split_list[1]);
     PllSplit c(split_list[2]);
     PllSplit d(split_list[3]);
-	auto key = CacherKey(&a,&b);
+	auto key = TwoSplitHashmapKey(&a,&b);
 	double outVal = 0.;
 	cache.lookupTrees(key, outVal);
 }
