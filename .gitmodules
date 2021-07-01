@@ -10,3 +10,5 @@
 [submodule "src/commandline/IO"]
 	path = src/commandline/IO
 	url = https://github.com/DoktorBotti/RF_Metrics_IO.git
+[submodule "growt"]
+	url = https://github.com/DoktorBotti/growt.git

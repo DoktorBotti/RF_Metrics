@@ -53,16 +53,6 @@ target_include_directories(growt_main
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/growt/
         ${TBB_INCLUDE_DIRS}
         )
-target_link_libraries(growt_main ${TBB_LIBRARIES})
-target_compile_definitions(growt_main PRIVATE
-        -D UAGROW # hier habe ich alle Optionen durchprobiert
-        -D ${GROWT_HASHFCT} # habe ich nirgends gesetzt, ist XXH3
-        -D ${GROWT_ALLOCATOR} # auch nirgends gesetzt, ist ALIGNED
-        )
-
-
-message(WARNING ${TBB_LIBRARIES}\n ${GROWT_HASHFCT}\n ${GROWT_ALLOCATOR} \n${TBB_INCLUDE_DIRS} )
-
 
 add_subdirectory(test)
 #adds automatic softwipe execution
