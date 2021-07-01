@@ -7,8 +7,8 @@
 // TODO: test boolean transformation to reduce operations
 double
 MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
-	const auto a1 = S1.popcount(split_len);
-	const auto a2 = S2.popcount(split_len);
+	const auto a1 = S1.precalc_popcount;
+	const auto a2 = S2.precalc_popcount;
 	const auto b1 = taxa - a1;
 	const auto b2 = taxa - a2;
 
@@ -24,8 +24,7 @@ MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	// Account for the bits counted at the end because of both inversions!
 	// TODO: test whether bitmask is faster
 	const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
-	const auto b1_b2 =
-	    temporary_splits[3].popcount(split_len) - bits_too_many; // A_and_B
+	const auto b1_b2 = temporary_splits[3].popcount(split_len) - bits_too_many; // A_and_B
 	assert(b1_b2 == taxa - (a1_a2 + a1_b2 + a2_b1));
 
 	assert(a1 == a1_a2 + a1_b2); // na
@@ -72,4 +71,13 @@ MciAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split
 		sum += entropy;
 	}
 	return sum;
+}
+RfAlgorithmInterface::Scalar
+MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
+	return (to_prob(S1.precalc_popcount, taxa, S1.precalc_popcount, S1.precalc_popcount) +
+                 to_prob(taxa - S1.precalc_popcount,
+                         taxa,
+                         taxa - S1.precalc_popcount,
+                         taxa - S1.precalc_popcount)) /
+                static_cast<Scalar>(taxa);
 }

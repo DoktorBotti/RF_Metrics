@@ -43,7 +43,7 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S,
 	return p_phy(a, b);
 }
 
-RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::p_phy(const size_t a, const size_t b) {
 	// no trivial splits allowed here (outer log would return infty, because no information present)
 	assert(a >= 2);
 	assert(b >= 2);
@@ -164,11 +164,15 @@ GeneralizedRfAlgo::SplitScores GeneralizedRfAlgo::calc_pairwise_split_scores(con
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
-			Scalar val;
-			if (!pairwise_score_cacher.lookupTrees(S1[row], S2[col], val)) {
-				val = calc_split_score(S1[row], S2[col], taxa, split_len);
-				pairwise_score_cacher.putTrees(S1[row], S2[col], val);
-			}
+            Scalar val;
+			// when using fast Split list, the pointers to PllSplit define equality
+			if(&S1[row] == &S2[col]){
+				assert(S1[row] == S2[col]);
+				val = calc_split_score(S1[row], taxa, split_len);
+			}else{
+                val = calc_split_score(S1[row], S2[col], taxa, split_len);
+            }
+
 			if (scores.max_score < val) {
 				scores.max_score = val;
 			}

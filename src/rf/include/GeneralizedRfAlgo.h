@@ -35,6 +35,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
   public:
 	virtual Scalar
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
+	// method to use if both pll-splits are equal. Often more simple solution possible
+    virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) = 0;
 
   protected:
 	virtual Scalar calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len);
@@ -54,7 +56,6 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
 	std::vector<PllSplit> temporary_splits;
 
-    Cacher pairwise_score_cacher;
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	std::vector<pll_split_base_t> temporary_split_content;
