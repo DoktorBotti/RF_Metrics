@@ -54,7 +54,7 @@ void PllSplit::set_not(size_t len, pll_split_base_t *res) const {
 		res[i] = ~_split[i];
 	}
 }
-size_t inline PllSplit::priv_popcount(size_t len) const {
+size_t PllSplit::priv_popcount(size_t len) const {
 	size_t popcount = 0;
 	for (size_t i = 0; i < len; ++i) {
 		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt

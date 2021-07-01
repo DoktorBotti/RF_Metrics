@@ -70,7 +70,7 @@ GeneralizedRfAlgo::Scalar SpiAlgo::calc_split_score(const PllSplit &S1,
 		}
 	}
 	if (!flag)
-		return one_overlap(S1.pre_calc_popcount, S2.pre_calc_popcount, n_tips);
+		return one_overlap(S1.precalc_popcount, S2.precalc_popcount, n_tips);
 
 	for (size_t i = 0; i != split_len; ++i) {
 		if ((S1()[i] & ~S2()[i])) {
@@ -79,7 +79,7 @@ GeneralizedRfAlgo::Scalar SpiAlgo::calc_split_score(const PllSplit &S1,
 		}
 	}
 	if (flag)
-		return one_overlap(S1.pre_calc_popcount, S2.pre_calc_popcount, n_tips);
+		return one_overlap(S1.precalc_popcount, S2.precalc_popcount, n_tips);
 
 	const size_t bits_too_many = GeneralizedRfAlgo::bits_too_many(n_tips);
 	for (size_t i = 0; i != split_len; ++i) {
@@ -93,7 +93,7 @@ GeneralizedRfAlgo::Scalar SpiAlgo::calc_split_score(const PllSplit &S1,
 		}
 	}
 	if (!flag)
-		return one_overlap_notb(S1.pre_calc_popcount, S2.pre_calc_popcount, n_tips);
+		return one_overlap_notb(S1.precalc_popcount, S2.precalc_popcount, n_tips);
 
 	return 0;
 }

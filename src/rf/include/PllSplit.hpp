@@ -30,6 +30,9 @@ class PllSplit {
   public:
 	explicit PllSplit(pll_split_t s) : _split{s} {
 	}
+    PllSplit(pll_split_t s, size_t split_length) : _split{s} {
+        precalc_popcount = priv_popcount(split_length);
+    }
 	PllSplit() : _split(nullptr){};
 	bool operator==(const PllSplit &rhs) const;
 	bool operator!=(const PllSplit& rhs)const;
@@ -77,7 +80,7 @@ class PllSplit {
 	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
 		return index % splitBitWidth();
 	}
-	size_t inline priv_popcount(size_t len) const;
+	size_t priv_popcount(size_t len) const;
 
 	pll_split_t _split;
 };

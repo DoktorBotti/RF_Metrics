@@ -15,7 +15,7 @@ GeneralizedRfAlgo::GeneralizedRfAlgo() {
 
 RfAlgorithmInterface::Scalar
 GeneralizedRfAlgo::h_info_content(const PllSplit &S, size_t taxa, size_t split_len) {
-	size_t a = S.pre_calc_popcount;
+	size_t a = S.precalc_popcount;
 	size_t b = taxa - a;
 
 	Scalar res = factorials.lg_rooted_dbl_fact_fast(static_cast<long>(a)) +
@@ -39,7 +39,7 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::h_info_content(size_t a, size_t 
 RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S,
                                                              size_t taxa,
                                                              size_t split_len) {
-	auto a = S.pre_calc_popcount;
+	auto a = S.precalc_popcount;
 	auto b = taxa - a;
 
 	return p_phy(a, b);
@@ -66,17 +66,17 @@ RfAlgorithmInterface::Scalar inline GeneralizedRfAlgo::p_phy(const PllSplit &S1,
 	size_t a1, b1, a2;
 
 	if (S2.equals(PllSplit(&cut[0], split_len), split_len)) {
-		a1 = S1.pre_calc_popcount;
+		a1 = S1.precalc_popcount;
 		b1 = taxa - a1;
-		a2 = S2.pre_calc_popcount;
+		a2 = S2.precalc_popcount;
 	} else if (S1.equals(PllSplit(&cut[0], split_len), split_len)) {
-		a1 = S2.pre_calc_popcount;
+		a1 = S2.precalc_popcount;
 		b1 = taxa - a1;
-		a2 = S1.pre_calc_popcount;
+		a2 = S1.precalc_popcount;
 	} else {
-		a1 = S1.pre_calc_popcount;
+		a1 = S1.precalc_popcount;
 		b1 = taxa - a1;
-		auto b2 = S2.pre_calc_popcount;
+		auto b2 = S2.precalc_popcount;
 		a2 = taxa - b2;
 	}
 
