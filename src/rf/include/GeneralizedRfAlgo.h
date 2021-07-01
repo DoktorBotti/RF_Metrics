@@ -60,7 +60,6 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	Matcher match_solver;
 	void setup_temporary_storage(size_t split_len);
 	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
-	void sort_PllSplitLists(std::vector<PllSplitList> &to_sort) const;
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

@@ -30,12 +30,15 @@ class PllSplit {
   public:
 	explicit PllSplit(pll_split_t s) : _split{s} {
 	}
-
+	PllSplit() : _split(nullptr){};
+	bool operator==(const PllSplit &rhs) const;
+	bool operator!=(const PllSplit& rhs)const;
 	static size_t split_len;
 
 	pll_split_t operator()() const {
 		return _split;
 	}
+	~PllSplit() = default;
 	mutable size_t precalc_popcount = 0;
 
 	void perform_popcount_precalc(size_t len) const;
@@ -65,7 +68,7 @@ class PllSplit {
 	}
 
 	bool operator<(PllSplit const& rhs) const;
-
+    bool operator>(PllSplit const& rhs) const;
   private:
 	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
 		return index / splitBitWidth();

@@ -61,9 +61,9 @@ size_t PllSplitList::size() const {
 PllSplitList::PllSplitList(PllSplitList &&other) noexcept
     : _splits(std::exchange(other._splits, {})), _tree_id(other._tree_id) {
 }
-auto PllSplitList::begin() -> decltype(std::vector<PllSplit>::iterator()) {
+PllSplitList::iterator PllSplitList::begin() {
 	return _splits.begin();
 }
-auto PllSplitList::end() -> decltype(std::vector<PllSplit>::iterator()) {
+PllSplitList::iterator PllSplitList::end() {
 	return _splits.end();
 }

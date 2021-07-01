@@ -23,8 +23,11 @@ class PllSplitList : public SplitList {
 	[[nodiscard]] PllSplit const *getPtrToNthElem(size_t i) const;
 	[[nodiscard]] size_t getTreeId() const;
 	void setTreeId(size_t id);
-	auto begin() -> decltype(std::vector<PllSplit>::iterator());
-	auto end() -> decltype(std::vector<PllSplit>::iterator());
+	using iterator = std::vector<PllSplit>::iterator;
+	using const_iterator = std::vector<PllSplit>::const_iterator;
+
+	iterator begin();
+	iterator end();
 
   private:
 	std::vector<PllSplit> _splits;

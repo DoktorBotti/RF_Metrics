@@ -55,34 +55,59 @@ void PllSplit::set_not(size_t len, pll_split_base_t *res) const {
 	}
 }
 size_t inline PllSplit::priv_popcount(size_t len) const {
-    size_t popcount = 0;
-    for (size_t i = 0; i < len; ++i) {
-        // Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
-        //		if constexpr (sizeof(pll_split_base_t) == 4) {
-        popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
-        //		} else if constexpr (sizeof(pll_split_base_t) == 8) {
-        //			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
-        //		} else {
-        //			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
-        //		}
-    }
+	size_t popcount = 0;
+	for (size_t i = 0; i < len; ++i) {
+		// Optimize later for use of asm( popcnt) use compiler flag -mpopcnt
+		//		if constexpr (sizeof(pll_split_base_t) == 4) {
+		popcount += static_cast<size_t>(__builtin_popcount(_split[i]));
+		//		} else if constexpr (sizeof(pll_split_base_t) == 8) {
+		//			popcount += static_cast<size_t>(__builtin_popcountll(_split[i]));
+		//		} else {
+		//			throw std::invalid_argument("Size of pll_split_base_t must be 4 or 8");
+		//		}
+	}
 	precalc_popcount = popcount;
-	return  popcount;
+	return popcount;
 }
 void PllSplit::perform_popcount_precalc(size_t len) const {
 	priv_popcount(len);
 }
 // requires split_len to be something sensible
 bool PllSplit::operator<(const PllSplit &rhs) const {
+	if (!operator()() || !rhs()) {
+		return false;
+	}
 	assert(PllSplit::split_len < std::numeric_limits<size_t>::max());
-//    for (size_t j = PllSplit::split_len+1; j > 0; --j) {
-//        auto i = j -1;
-	for(size_t i = 0; i < PllSplit::split_len; ++i){
-        if (operator()()[i] < rhs()[i]) {
-            return true;
-        } else if (operator()()[i] > rhs()[i]) {
-            return false;
-        }
-    }
-    return false;
+	for (size_t i = 0; i < PllSplit::split_len; ++i) {
+		if (operator()()[i] != rhs()[i]) {
+			return operator()()[i] < rhs()[i];
+		}
+	}
+	return operator()() < rhs();
+}
+bool PllSplit::operator==(const PllSplit &rhs) const {
+	if (!operator()() || !rhs()) {
+		return false;
+	}
+	for (size_t i = 0; i < PllSplit::split_len; ++i) {
+		if (operator()()[i] != rhs()[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+bool PllSplit::operator!=(const PllSplit &rhs) const {
+	return !(*this == rhs);
+}
+bool PllSplit::operator>(const PllSplit &rhs) const {
+	if (!operator()() || !rhs()) {
+		return false;
+	}
+	assert(PllSplit::split_len < std::numeric_limits<size_t>::max());
+	for (size_t i = 0; i < PllSplit::split_len; ++i) {
+		if (operator()()[i] != rhs()[i]) {
+			return operator()()[i] > rhs()[i];
+		}
+	}
+	return operator()() > rhs();
 }

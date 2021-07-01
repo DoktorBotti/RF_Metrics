@@ -1,7 +1,6 @@
 #include "../src/rf/helpers/Util.h"
 #include "RfMetricInterface.h"
 #include "catch2/catch.hpp"
-#include <boost/log/sources/record_ostream.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -44,8 +43,8 @@ static bool nearly_eq_floating(double a, double b);
 
 TEST_CASE("Calculate simple trees", "[dbg]") {
 	// Edit your trees to test here
-	std::string tree1 = "((((D,C),B),A),(E,F));";
-	std::string tree2 = "(((B,C),(D,A)),(E,F));";
+	std::string tree1 = "(((A,B),C),((E,F),G));";
+	std::string tree2 = "(((A,B),C),((F,G),E));";
 	std::string tree_path = "/tmp/tmpTrees";
 
 	// write them to a temporary file
@@ -66,7 +65,7 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 
 TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
 	std::string trees_str = "((((F,C),B),A),(E,D));\n(((B,C),(D,A)),(E,F));";
-	auto trees = Util::create_all_trees_from_string(trees_str);
+	auto trees = Util::create_all_trees_from_file("/rf_metrics/BS/125");
 
 	std::vector<PllSplitList> all_splits;
 	all_splits.reserve(trees.size());
@@ -76,21 +75,18 @@ TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
 	}
 	PllSplit::split_len = all_splits.back().computeSplitLen();
 	for (auto &t : all_splits) {
-		std::sort(
-		    t.begin(), t.end(), [](const auto &left, const auto &right) { return left < right; });
-	}
-	for (auto split_list : all_splits) {
-		for (size_t i = 0; i < split_list.size() - 1; ++i) {
-			auto &currSplit = split_list[i];
-			auto &nextSplit = split_list[i + 1];
-
-			CHECK(currSplit < nextSplit);
-
-			if (!(currSplit < nextSplit)) {
-				// maybe it was equal?
-				for (size_t j = 0; j < PllSplit::split_len; ++j) {
-					CHECK(currSplit()[j] == nextSplit()[j]);
-				}
+		for (size_t i = 0; i < t.size() - 1; ++i) {
+			// refs
+			{
+				auto &currSplit = t[i];
+				auto &nextSplit = t[i + 1];
+				CHECK(currSplit < nextSplit);
+			}
+			// copies
+			{
+				auto currSplit = t[i];
+				auto nextSplit = t[i + 1];
+				CHECK(currSplit < nextSplit);
 			}
 		}
 	}
