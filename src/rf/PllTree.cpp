@@ -1,5 +1,5 @@
 #include "PllTree.hpp"
-#include "PllSplits.hpp"
+#include "PllSplit.hpp"
 #include "libpll/pll.h"
 #include <stdexcept>
 

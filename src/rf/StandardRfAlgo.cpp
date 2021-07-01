@@ -97,7 +97,7 @@ size_t StandardRfAlgo::calc_rf_and_unique_trees(const size_t tree_size,
 
 SymmetricMatrix<size_t> StandardRfAlgo::pairwise_occurences(
     const std::vector<PllTree> &trees,
-    const std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> &map) {
+    const std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor> &map) {
 	SymmetricMatrix<size_t> pairwise_dst(trees.size());
 	// Increments each matrix entry for each split which is in both trees.
 	for (const auto &el : map) {
@@ -118,17 +118,17 @@ SymmetricMatrix<size_t> StandardRfAlgo::pairwise_occurences(
 	return pairwise_dst;
 }
 
-std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor>
+std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor>
 StandardRfAlgo::insert_all_splits(const std::vector<PllSplitList> &split_lists) {
 	const size_t num_inner_splits = split_lists[0].size();
 	const size_t num_bitvec_entries = split_lists.size() + 1;
 
 	// Adds all splits into a hashmap. The value is a bitvector whose 1's represent all trees which
 	// contain this split.
-	std::unordered_map<HashmapKey, boost::dynamic_bitset<>, HashingFunctor> map;
+	std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor> map;
 	for (const auto &list_el : split_lists) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
-			HashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not
+			OneSplitHashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not
 			// const *)
 			auto iter = map.find(key);
 			if (iter != map.end()) {

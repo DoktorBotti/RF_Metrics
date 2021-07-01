@@ -23,6 +23,8 @@ def writeToFile(file_names, ours_times, reference_times):
             file.write(str(ours_out) + '\n')
             file.write("\tReference: ")
             file.write(str(ref_out) + '\n')
+
+        file.write('\n' + print_ex_times(ours_times, reference_times))
 def print_single_instance(ours, ref):
     return f"( {sum(ours)/len(ours) * 1e-9 } vs. {sum(ref)/len(ref)*1e-9} )"
 
@@ -61,7 +63,7 @@ try:
         for m_idx, metric in enumerate(metrics):
             # Reference impl
             reference_args = ["Rscript", "--vanilla",reference_script , metric , path]
-            print(f"processing {metric} in {test_names[num]}, {num} of {len(test_paths)}. Running Reference:")
+            print(f"processing {metric} in {test_names[num]}, {num+1} of {len(test_paths)}. Running Reference:")
             ref_start = time.time_ns()
             proc = subprocess.call(reference_args, stdout=FNULL)
             ref_end = time.time_ns()

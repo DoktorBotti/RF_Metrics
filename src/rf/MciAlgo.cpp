@@ -5,8 +5,8 @@ MciAlgo::MciAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
 // TODO: test boolean transformation to reduce operations
 double
 MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
-	const auto a1 = S1.pre_calc_popcount;
-	const auto a2 = S2.pre_calc_popcount;
+	const auto a1 = S1.precalc_popcount;
+	const auto a2 = S2.precalc_popcount;
 	const auto b1 = taxa - a1;
 	const auto b2 = taxa - a2;
 
@@ -46,8 +46,8 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 	    numerator_inout_log + numerator_inout_log == numerator_in_log) {
 		return static_cast<Scalar>(numerator_inout_log);
 	}
-	size_t numerator = numerator_inout_log * numerator_in_log;
-	size_t denominator = denom_a * denom_b;
+	const size_t numerator = numerator_inout_log * numerator_in_log;
+	const size_t denominator = denom_a * denom_b;
 
 	// log first should result in a higher precision
 	return static_cast<Scalar>(numerator_inout_log) *
@@ -103,4 +103,13 @@ void MciAlgo::compute_split_comparison(const PllSplit &S1, const PllSplit &S2, s
 	S1.intersect(temporary_splits[1], split_len, &temporary_split_content[4 * split_len]);
 	// A2 and B1 -> &split_buffer[5 * split_len]
 	S2.intersect(temporary_splits[0], split_len, &temporary_split_content[5 * split_len]);
+}
+RfAlgorithmInterface::Scalar
+MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
+	return (to_prob(S1.precalc_popcount, taxa, S1.precalc_popcount, S1.precalc_popcount) +
+                 to_prob(taxa - S1.precalc_popcount,
+                         taxa,
+                         taxa - S1.precalc_popcount,
+                         taxa - S1.precalc_popcount)) /
+                static_cast<Scalar>(taxa);
 }

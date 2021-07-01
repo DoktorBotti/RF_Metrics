@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(inforf LANGUAGES CXX)
+project(rf_metrics LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -44,6 +44,16 @@ set(COMPILER_WARNING_FLAGS $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:App
 add_subdirectory(src/commandline)
 add_subdirectory(src/rf)
 add_subdirectory(utils)
+
+find_package(TBB REQUIRED COMPONENTS tbb tbbmalloc)
+add_executable(growt_main src/sample_main.cpp)
+target_include_directories(growt_main
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/growt/misc/submodules/xxhash
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs/growt/
+        ${TBB_INCLUDE_DIRS}
+        )
+
 add_subdirectory(test)
 #adds automatic softwipe execution
 add_subdirectory(misc)
