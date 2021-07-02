@@ -3,11 +3,12 @@
 #include <queue>
 // boost logging
 #include <FastSplitList.h>
+#include <SpiAlgo.h>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
 LogDblFact GeneralizedRfAlgo::factorials = LogDblFact();
-GeneralizedRfAlgo::GeneralizedRfAlgo() {
+GeneralizedRfAlgo::GeneralizedRfAlgo() : precalc_intersections(0) {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 }
 
@@ -118,7 +119,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	std::vector<FastSplitList> fast_trees = generateFastList(all_splits);
 	assert(PllSplit::split_len != std::numeric_limits<size_t>::max());
 	setup_temporary_storage(PllSplit::split_len);
-	RfMetricInterface::Results res(trees.size());
+	if (auto* isSPI = dynamic_cast<SpiAlgo*>(this)){
+		// no need for precalculations when using SPI
+	}else{
+        precalc_intersections = precalcIntersections(fast_trees.front().size()+3);
+
+    }
+    RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
 	size_t tree_num = 0;
 	size_t num_tree_calcs = all_splits.size() * (all_splits.size() + 1) / 2;
@@ -144,6 +151,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 
 	// calculate distances
 	calc_pairwise_tree_dist(fast_trees, res);
+
+	factorials.printLog();
 	return res;
 }
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
@@ -163,7 +172,7 @@ GeneralizedRfAlgo::SplitScores GeneralizedRfAlgo::calc_pairwise_split_scores(con
                                                                              const SplitList &S2) {
 	SplitScores scores(S1.size());
 	const auto taxa = S1.size() + 3;
-	factorials.reserve(taxa + taxa);
+	factorials.reserve(taxa + taxa+4);
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
@@ -240,7 +249,7 @@ void GeneralizedRfAlgo::setup_temporary_storage(size_t split_len) {
 		temporary_splits.emplace_back(&temporary_split_content[i * split_len]);
 	}
 }
-GeneralizedRfAlgo::GeneralizedRfAlgo(size_t split_len) {
+GeneralizedRfAlgo::GeneralizedRfAlgo(size_t split_len) : precalc_intersections(0) {
     logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 	setup_temporary_storage(split_len);
 }
@@ -327,4 +336,28 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 	// unique_pll_splits will no longer reallocate -> write base-ptr to Static variable
 	FastSplitList::setBasePtr(&unique_pll_splits[0]);
 	return returnList;
+}
+
+SymmetricMatrix<SplitIntersections> GeneralizedRfAlgo::precalcIntersections(size_t taxa) {
+	assert(!unique_pll_splits.empty());
+	const size_t split_len = PllSplit::split_len;
+	size_t split_num = unique_pll_splits.size();
+    const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
+    SymmetricMatrix<SplitIntersections> resMtx(split_num);
+	for(size_t row = 0; row < split_num; ++row){
+		auto & rSplit = unique_pll_splits[row];
+		// let the split know, which index it is. -> should happen once per PllSplit
+		rSplit.setIntersectionIdx(row);
+		for(size_t col = 0; col < row; ++col){
+			auto & cSplit = unique_pll_splits[col];
+			compute_split_comparison(rSplit,cSplit, split_len);
+			SplitIntersections isecs;
+			isecs.a1_a2 = temporary_splits[2].popcount(split_len);
+			isecs.a1_b2 = temporary_splits[4].popcount(split_len);
+			isecs.b1_a2 = temporary_splits[5].popcount(split_len);
+			isecs.b1_b2 = temporary_splits[3].popcount(split_len) - bits_too_many;
+			resMtx.set_at(row, col, isecs);
+		}
+	}
+	return resMtx;
 }

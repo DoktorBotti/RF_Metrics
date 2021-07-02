@@ -66,16 +66,15 @@ class PllSplit {
 
 	[[nodiscard]] bool is_disjoint(const PllSplit &other, size_t len) const;
 
-	[[nodiscard]] static constexpr size_t splitBitWidth() {
-		return sizeof(pll_split_base_t) * 8;
-	}
+	[[nodiscard]] static constexpr size_t splitBitWidth();
+
+	void setIntersectionIdx(size_t idx);
+	size_t getIntersectionIdx() const;
 
 	bool operator<(PllSplit const& rhs) const;
     bool operator>(PllSplit const& rhs) const;
   private:
-	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
-		return index / splitBitWidth();
-	}
+	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index);
 
 	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
 		return index % splitBitWidth();
@@ -83,4 +82,5 @@ class PllSplit {
 	size_t priv_popcount(size_t len) const;
 
 	pll_split_t _split;
+	size_t intersection_matrix_index = 0;
 };

@@ -39,6 +39,7 @@ add_library(rf_lib STATIC
         include/RfAlgorithmInterface.h
         include/RfMetricInterface.h
         include/SpiAlgo.h
+        include/SplitIntersections.h
         include/SplitList.h
         include/StandardRfAlgo.h
         include/SymmetricMatrix.hpp

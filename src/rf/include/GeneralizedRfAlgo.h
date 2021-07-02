@@ -5,6 +5,7 @@
 #include "MatcherOrTools.h"
 #include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
+#include "SplitIntersections.h"
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -36,7 +37,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	virtual Scalar
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
 	// method to use if both pll-splits are equal. Often more simple solution possible
-    virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) = 0;
+	virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) = 0;
 
   protected:
 	virtual Scalar calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_len);
@@ -53,18 +54,20 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	 * temporary_splits[4] : A1 and B2
 	 * temporary_splits[5] : A2 and B1
 	 */
-	virtual void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
 	// Stores intermediate results such as intersections. For more information see
 	// compute_split_comparison
 	std::vector<PllSplit> temporary_splits;
-	std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
+	SymmetricMatrix<SplitIntersections> precalc_intersections;
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	std::vector<PllSplit> unique_pll_splits;
 	MatcherOrTools match_solver;
+	std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
 	void setup_temporary_storage(size_t split_len);
 	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
+	SymmetricMatrix<SplitIntersections> precalcIntersections(size_t taxa);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

@@ -10,16 +10,15 @@ MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	const auto b1 = taxa - a1;
 	const auto b2 = taxa - a2;
 
-	compute_split_comparison(S1, S2, split_len);
+	size_t s1_idx = S1.getIntersectionIdx();
+	size_t s2_idx = S2.getIntersectionIdx();
+	auto &isec = precalc_intersections.checked_at(s1_idx, s2_idx);
 
-	const auto a1_a2 = temporary_splits[2].popcount(split_len); // A1_and_A2
-	const auto a1_b2 = temporary_splits[4].popcount(split_len); // A1_and_B2
-	const auto a2_b1 = temporary_splits[5].popcount(split_len); // B1_and_A2
+	const auto a1_a2 = isec.a1_a2;                                  // A1_and_A2
+	const auto a1_b2 = (s1_idx < s2_idx) ? isec.b1_a2 : isec.a1_b2; // A1_and_B2
+	const auto a2_b1 = (s1_idx < s2_idx) ? isec.a1_b2 : isec.b1_a2; // B1_and_A2
+	const auto b1_b2 = isec.b1_b2; // B1_and_B2
 
-	// Account for the bits counted at the end because of both inversions!
-	// TODO: test whether bitmask is faster
-	const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
-	const auto b1_b2 = temporary_splits[3].popcount(split_len) - bits_too_many; // B1_and_B2
 	assert(b1_b2 == taxa - (a1_a2 + a1_b2 + a2_b1));
 
 	assert(a1 == a1_a2 + a1_b2); // na
@@ -69,27 +68,12 @@ MciAlgo::calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_le
 	return sum;
 }
 
-void MciAlgo::compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len) {
-    // B1 -> &split_buffer[0]
-    S1.set_not(split_len, &temporary_split_content[0]);
-    // B2 -> &split_buffer[split_len]
-    S2.set_not(split_len, &temporary_split_content[split_len]);
-	// A1 and A2 -> &split_buffer[2 * split_len]
-	S1.intersect(S2, split_len, &temporary_split_content[2 * split_len]);
-	// B1 and B2 -> &split_buffer[3 * split_len]
-	temporary_splits[0].intersect(
-	    temporary_splits[1], split_len, &temporary_split_content[3 * split_len]);
-	// A1 and B2 -> &split_buffer[4 * split_len]
-	S1.intersect(temporary_splits[1], split_len, &temporary_split_content[4 * split_len]);
-	// A2 and B1 -> &split_buffer[5 * split_len]
-	S2.intersect(temporary_splits[0], split_len, &temporary_split_content[5 * split_len]);
-}
 RfAlgorithmInterface::Scalar
 MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
 	return (to_prob(S1.precalc_popcount, taxa, S1.precalc_popcount, S1.precalc_popcount) +
-                 to_prob(taxa - S1.precalc_popcount,
-                         taxa,
-                         taxa - S1.precalc_popcount,
-                         taxa - S1.precalc_popcount)) /
-                static_cast<Scalar>(taxa);
+	        to_prob(taxa - S1.precalc_popcount,
+	                taxa,
+	                taxa - S1.precalc_popcount,
+	                taxa - S1.precalc_popcount)) /
+	       static_cast<Scalar>(taxa);
 }
