@@ -55,11 +55,11 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 }
 
 RfAlgorithmInterface::Scalar
-MciAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split_len) {
+MciAlgo::calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_len) {
 	GeneralizedRfAlgo::Scalar sum = 0;
 	for (size_t i = 0; i < S.size(); ++i) {
 		// TODO: Perf: log2(a) - log2(x);
-		const auto a = static_cast<Scalar>(S[i].popcount(split_len));
+		const auto a = static_cast<Scalar>(S[i].precalc_popcount);
 		const auto b = static_cast<Scalar>(taxa) - static_cast<Scalar>(a);
 		const auto taxa_f = static_cast<Scalar>(taxa);
 		const auto entropy =
@@ -67,26 +67,6 @@ MciAlgo::calc_tree_info_content(const PllSplitList &S, size_t taxa, size_t split
 		sum += entropy;
 	}
 	return sum;
-}
-GeneralizedRfAlgo::SplitScores MciAlgo::calc_pairwise_split_scores(const PllSplitList &S1,
-                                                                   const PllSplitList &S2) {
-	SplitScores scores(S1.size());
-	auto taxa = S1.size() + 3;
-	factorials.reserve(taxa + taxa);
-	auto split_len = S1.computeSplitLen();
-	for (size_t row = 0; row < S1.size(); ++row) {
-		S1[row].set_not(split_len, &temporary_split_content[0]);
-		for (size_t col = 0; col < S1.size(); ++col) {
-			S2[col].set_not(split_len, &temporary_split_content[split_len]);
-			auto val = calc_split_score(S1[row], S2[col], taxa, split_len);
-			if (scores.max_score < val) {
-				scores.max_score = val;
-			}
-			scores.scores.set(row, col, val);
-		}
-	}
-
-	return scores;
 }
 
 void MciAlgo::compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len) {
