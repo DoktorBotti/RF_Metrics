@@ -5,7 +5,7 @@
 #include <string.h>
 
 TEST_CASE("Key equality", "[HashmapUtil]") {
-	std::string tree_str = "((((F,C),B),A),(E,D));";
+	std::string tree_str = "((((F,C),B),A),(E,(D,G)));";
 	auto tree = Util::create_all_trees_from_string(tree_str)[0];
 	auto split_list = PllSplitList(tree);
 	PllSplit a(split_list[0]);
@@ -14,6 +14,7 @@ TEST_CASE("Key equality", "[HashmapUtil]") {
 	PllSplit d(split_list[3]);
 	// completely equal or unequal
 	{
+		PllSplit::split_len = 1;
 		TwoSplitHashmapKey k;
 		auto key_a = TwoSplitHashmapKey(&a, &b);
 		auto key_b = TwoSplitHashmapKey(&c, &d);
@@ -41,6 +42,7 @@ TEST_CASE("Cache some values", "[HashmapUtil]"){
     std::string tree_str = "((((F,C),B),A),(E,D));";
     auto tree = Util::create_all_trees_from_string(tree_str)[0];
     auto split_list = PllSplitList(tree);
+	PllSplit::split_len = 1;
     PllSplit a(split_list[0]);
     PllSplit b(split_list[1]);
     PllSplit c(split_list[2]);

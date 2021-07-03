@@ -10,11 +10,8 @@ test_names = [file for file in os.listdir(test_files_dir)]
 test_paths = [test_files_dir + a for a in test_names]
 
 # configure which testset to execute
-upper_taxa_bound = 2000
-tree_counts  = [2,4,10,50,100,1000] # all measurements will be performed with these counts
-calc_metrics = [True, True, True] # if MCI, MSI, SPI should be computed respectively
-exclude_test_files = []
-
+upper_taxa_bound = 1400
+tree_counts  = [2,10,100] # all measurements will be performed with these counts
 # test matrix dimensions [treeNum][taxa/testfile][metric]
 
 def writeToFile(file_names, ours_times, reference_times):
@@ -66,7 +63,8 @@ try:
             if(int(test_names[num])>=upper_taxa_bound):
                 continue
         except ValueError:
-                print("Value error while reading taxa count. Processing file anyway.")
+                print("Value error while reading taxa count. Skipping")
+                continue
         # create temporary file which holds correct number of trees
         for trees_idx, num_trees in enumerate(tree_counts):
             with open(path, "r") as all_trees:

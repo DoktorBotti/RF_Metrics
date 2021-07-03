@@ -58,7 +58,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	// Stores intermediate results such as intersections. For more information see
 	// compute_split_comparison
 	std::vector<PllSplit> temporary_splits;
-	SymmetricMatrix<SplitIntersections> precalc_intersections;
+	SymmetricMatrix<Scalar> pairwise_split_scores;
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
@@ -67,7 +67,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
 	void setup_temporary_storage(size_t split_len);
 	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
-	SymmetricMatrix<SplitIntersections> precalcIntersections(size_t taxa);
+	SymmetricMatrix<Scalar> calcPairwiseSplitScores(size_t taxa);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

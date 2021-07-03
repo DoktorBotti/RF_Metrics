@@ -21,6 +21,7 @@ static inline void checkSymmetry(GeneralizedRfAlgo &algo,
                                  const size_t num_taxa,
                                  const size_t split_len);
 TEST_CASE("Find un-symmetric compatible() method", "[Sym]") {
+	REQUIRE(false); // with precalculations this test is not easy to replicate
 	std::string trees_str = "";
 	size_t num_taxa =  GENERATE(14,18,21,80,125);
 	if (false) {

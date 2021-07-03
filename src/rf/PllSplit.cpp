@@ -111,15 +111,9 @@ bool PllSplit::operator>(const PllSplit &rhs) const {
 	}
 	return operator()() > rhs();
 }
-constexpr size_t PllSplit::splitBitWidth() {
-	return sizeof(pll_split_base_t) * 8;
-}
-constexpr size_t PllSplit::computeMajorIndex(size_t index) {
-	return index / splitBitWidth();
-}
 void PllSplit::setIntersectionIdx(size_t idx) {
 	intersection_matrix_index = idx;
 }
-size_t PllSplit::getIntersectionIdx() const {
+size_t PllSplit::getScoreIndex() const {
 	return intersection_matrix_index;
 }

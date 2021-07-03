@@ -32,7 +32,6 @@ class PllSplitList : public SplitList {
   private:
 	std::vector<PllSplit> _splits;
 	size_t _tree_id = 0;
-	decltype(_splits.front().operator()()) delete_ptr;
 };
 
 #endif // INFORF_PLLSPLITLIST_H

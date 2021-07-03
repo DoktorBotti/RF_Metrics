@@ -17,7 +17,7 @@ TwoSplitHashmapKey::TwoSplitHashmapKey(const PllSplit *copy_split_a, const PllSp
         split_a = PllSplit(copy_split_b->operator()());
         split_b = PllSplit(copy_split_a->operator()());
 	}
-	for(size_t i = 0; PllSplit::split_len; ++i){
+	for(size_t i = 0; i < PllSplit::split_len; ++i){
 		pre_hash ^= split_a()[i] ^ split_b()[i];
 	}
 }
