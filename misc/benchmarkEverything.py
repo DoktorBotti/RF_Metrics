@@ -16,7 +16,7 @@ tree_counts  = [2,10,100] # all measurements will be performed with these counts
 
 def writeToFile(file_names, ours_times, reference_times):
     # write results to file
-    with open('Unopt_preview_refVSus.txt', "w") as file:
+    with open('Opt_preview_refVSus.txt', "w") as file:
         file.write(f"Evaluated the following samples: {file_names}\n")
         file.write(f"Evaluated with the following tree numbers per file: {tree_counts}\n")
         for t_idx, trees in enumerate(tree_counts):
@@ -98,9 +98,10 @@ try:
             #push when all metrics are calculated
             ours_times[trees_idx, num] = ours_metric_arr
             ref_times[trees_idx, num] = ref_metric_arr
-            file_names.append(test_names[num])
-
             print(print_ex_times(ours_times, ref_times))
+
+    file_names.append(test_names[num])
+
 except KeyboardInterrupt:
     print("exiting")
     writeToFile(file_names, ours_times, ref_times)
