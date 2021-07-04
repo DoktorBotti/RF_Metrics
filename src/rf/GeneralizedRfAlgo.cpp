@@ -6,6 +6,7 @@
 #include <SpiAlgo.h>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/record_ostream.hpp>
+#include <future>
 
 LogDblFact GeneralizedRfAlgo::factorials = LogDblFact();
 GeneralizedRfAlgo::GeneralizedRfAlgo() : pairwise_split_scores(0) {
@@ -121,7 +122,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	setup_temporary_storage(PllSplit::split_len);
 	pairwise_split_scores = calcPairwiseSplitScores(fast_trees.front().size() + 3);
 
-    RfMetricInterface::Results res(trees.size());
+	SymmetricMatrix<std::future<Scalar>> async_res(trees.size());
+	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
+		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
+			async_res.set_at_move(idx_a, idx_b, calc_tree_score(fast_trees[idx_a], fast_trees[idx_b]));
+		}
+	}
+	RfMetricInterface::Results res(trees.size());
 	Scalar total_dst = 0;
 	size_t tree_num = 0;
 	size_t num_tree_calcs = all_splits.size() * (all_splits.size() + 1) / 2;
@@ -129,7 +136,7 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	// iterate through all tree combinations
 	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
 		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
-			Scalar dst = calc_tree_score(fast_trees[idx_a], fast_trees[idx_b]);
+			Scalar dst = async_res.at(idx_a, idx_b).get();
 			res.pairwise_similarities.set_at(idx_a, idx_b, dst);
 			total_dst += dst;
 			++tree_num;
@@ -151,24 +158,24 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	factorials.printLog();
 	return res;
 }
-RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
+std::future<RfAlgorithmInterface::Scalar> GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
                                                                 const SplitList &B) {
-//	auto scores = calc_pairwise_split_scores(A, B);
+	//	auto scores = calc_pairwise_split_scores(A, B);
 	SplitScores scores(A.size());
 	Scalar max_val = 0;
-	for(size_t row = 0; row < A.size(); ++row){
+	for (size_t row = 0; row < A.size(); ++row) {
 		size_t row_idx = A[row].getScoreIndex();
-		for(size_t col = 0; col < A.size(); ++col){
+		for (size_t col = 0; col < A.size(); ++col) {
 			size_t col_idx = B[col].getScoreIndex();
 			auto val = pairwise_split_scores.checked_at(row_idx, col_idx);
 			scores.scores.set(row, col, val);
-			if (val > max_val){
+			if (val > max_val) {
 				max_val = val;
 			}
 		}
 	}
 	scores.max_score = max_val;
-	Scalar total_score = match_solver.solve(scores);
+	auto total_score = match_solver.solve(scores);
 	//	std::stringstream out;
 	//	for (size_t i = 0; i < mapping.size(); ++i) {
 	//	for (size_t i = 0; i < mapping.size(); ++i) {
@@ -182,18 +189,18 @@ GeneralizedRfAlgo::SplitScores GeneralizedRfAlgo::calc_pairwise_split_scores(con
                                                                              const SplitList &S2) {
 	SplitScores scores(S1.size());
 	const auto taxa = S1.size() + 3;
-	factorials.reserve(taxa + taxa+4);
+	factorials.reserve(taxa + taxa + 4);
 	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
-            Scalar val;
+			Scalar val;
 			// when using fast Split list, the pointers to PllSplit define equality
-			if(&S1[row] == &S2[col]){
+			if (&S1[row] == &S2[col]) {
 				assert(S1[row] == S2[col]);
 				val = calc_split_score(S1[row], taxa, split_len);
-			}else{
-                val = calc_split_score(S1[row], S2[col], taxa, split_len);
-            }
+			} else {
+				val = calc_split_score(S1[row], S2[col], taxa, split_len);
+			}
 
 			if (scores.max_score < val) {
 				scores.max_score = val;
@@ -260,7 +267,7 @@ void GeneralizedRfAlgo::setup_temporary_storage(size_t split_len) {
 	}
 }
 GeneralizedRfAlgo::GeneralizedRfAlgo(size_t split_len) : pairwise_split_scores(0) {
-    logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
+	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
 	setup_temporary_storage(split_len);
 }
 std::vector<FastSplitList>
@@ -272,8 +279,8 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 	    << "Start reducing PllSplit Size, current split_len: " << PllSplit::split_len;
 
 	// rough estimate on how many PllSplit entries there are
-	//const auto reserve_size = static_cast<size_t>(slow_split_list.size() * slow_split_list.front().size() / 1.5);
-	//unique_pll_splits.reserve(reserve_size);
+	// const auto reserve_size = static_cast<size_t>(slow_split_list.size() *
+	// slow_split_list.front().size() / 1.5); unique_pll_splits.reserve(reserve_size);
 	std::vector<FastSplitList> returnList(slow_split_list.size(),
 	                                      FastSplitList(slow_split_list.front().size()));
 
@@ -330,8 +337,8 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 			// insertion of replacement for equal_in_tree element
 			insert_in_pq(equal_in_tree_idx);
 		}
-        ++current_split_offset;
-    }
+		++current_split_offset;
+	}
 	{
 		size_t total_splits = slow_split_list.size() * slow_split_list.front().size();
 		double duplicate_ratio =
@@ -340,7 +347,8 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 		    << "Done construction of FastSplitList. " << found_duplicates << " duplicates of "
 		    << total_splits << " possible PllSplits. Duplicate ratio: " << duplicate_ratio;
 		BOOST_LOG_SEV(logger, lg::notification)
-		    << "Did not estimate number of unique pll splits, actual number: " << unique_pll_splits.size();
+		    << "Did not estimate number of unique pll splits, actual number: "
+		    << unique_pll_splits.size();
 	}
 	// unique_pll_splits will no longer reallocate -> write base-ptr to Static variable
 	FastSplitList::setBasePtr(&unique_pll_splits[0]);
@@ -349,20 +357,20 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 
 SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitScores(size_t taxa) {
 	assert(!unique_pll_splits.empty());
-    factorials.reserve(taxa + taxa+4);
+	factorials.reserve(taxa + taxa + 4);
 
-    const size_t split_len = PllSplit::split_len;
+	const size_t split_len = PllSplit::split_len;
 	size_t split_num = unique_pll_splits.size();
-    SymmetricMatrix<Scalar> resMtx(split_num);
-	for(size_t row = 0; row < split_num; ++row){
-		auto & rSplit = unique_pll_splits[row];
+	SymmetricMatrix<Scalar> resMtx(split_num);
+	for (size_t row = 0; row < split_num; ++row) {
+		auto &rSplit = unique_pll_splits[row];
 		// let the split know, which index it is. -> should happen once per PllSplit
 		rSplit.setIntersectionIdx(row);
-		for(size_t col = 0; col < row; ++col){
-			auto & cSplit = unique_pll_splits[col];
+		for (size_t col = 0; col < row; ++col) {
+			auto &cSplit = unique_pll_splits[col];
 			resMtx.set_at(row, col, calc_split_score(rSplit, cSplit, taxa, split_len));
 		}
-		resMtx.set_at(row,row, calc_split_score(rSplit, taxa, split_len));
+		resMtx.set_at(row, row, calc_split_score(rSplit, taxa, split_len));
 	}
 	return resMtx;
 }

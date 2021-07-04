@@ -15,6 +15,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catc
 # search for gmp library
 find_package(GMP REQUIRED)
 
+# multithreading for std::async
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # find and configure boost in system
 SET(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.76.0 COMPONENTS log REQUIRED)

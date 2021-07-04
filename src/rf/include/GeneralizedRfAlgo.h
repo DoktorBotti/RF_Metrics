@@ -9,6 +9,7 @@
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
+#include <future>
 
 class GeneralizedRfAlgo : public RfAlgorithmInterface {
   public:
@@ -21,7 +22,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	static LogDblFact factorials;
 
   protected:
-	virtual Scalar calc_tree_score(const SplitList &A, const SplitList &B);
+	std::future<Scalar> calc_tree_score(const SplitList &A, const SplitList &B);
 	static Scalar p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	static Scalar p_phy(const PllSplit &S, size_t taxa, size_t split_len);
 	/* Calculates the phylogenetic probability of a split with partition sizes a and b. */

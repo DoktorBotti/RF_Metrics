@@ -13,11 +13,14 @@ class SymmetricMatrix {
 	explicit SymmetricMatrix(size_t num_elems);
 	/* Sets the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	void set_at(size_t row, size_t column, T val);
+	void set_at_move(size_t row, size_t column, T&& val);
 	/* Sets the value at row, column. Checked, behaves like a symmetric matrix. */
 	void checked_set_at(size_t row, size_t column, T val);
 	/* Retrieves the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	const T &at(size_t row, size_t column) const;
-	/* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
+    T &at(size_t row, size_t column);
+
+    /* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
 	const T &checked_at(size_t row, size_t column) const;
 	[[nodiscard]] size_t size() const;
 	std::vector<std::vector<T>> to_vector() const;
@@ -52,7 +55,12 @@ const T &SymmetricMatrix<T>::at(size_t row, size_t column) const {
 	size_t row_idx = row * (row + 1) / 2;
 	return matrix[row_idx + column];
 }
-
+template <typename T>
+T &SymmetricMatrix<T>::at(size_t row, size_t column) {
+    assert(row >= column);
+    size_t row_idx = row * (row + 1) / 2;
+    return matrix[row_idx + column];
+}
 template <typename T>
 size_t SymmetricMatrix<T>::size() const {
 	return dim;
@@ -107,6 +115,12 @@ SymmetricMatrix<T> SymmetricMatrix<T>::operator-(const SymmetricMatrix<T> &other
 		out[i] = this->matrix[i] - other.matrix[i];
 	}
 	return out;
+}
+template <typename T>
+void SymmetricMatrix<T>::set_at_move(size_t row, size_t column, T&& val) {
+    assert(row >= column);
+    size_t row_idx = row * (row + 1) / 2;
+    std::swap(matrix[row_idx + column], val);
 }
 
 #endif // INFORF_SYMMETRICMATRIX_H

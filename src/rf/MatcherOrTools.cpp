@@ -3,75 +3,25 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <climits>
 
-
-MatcherOrTools::Scalar MatcherOrTools::solve(const GeneralizedRfAlgo::SplitScores &scores
+std::future<MatcherOrTools::Scalar>
+MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
                                /*,std::vector<size_t> *best_matching_out*/) {
-	// performance accuracy trade-off
-	// auto lap_factor = static_cast<double>(1 << 25);
-
-	auto lap_factor = static_cast<double>(LLONG_MAX) /
-	                  static_cast<double>(10000 * scores.scores.size()) /
-	                  (scores.max_score > 1. ? scores.max_score : 1.);
-
 	// initialize on first usage
 	if (!is_ready) {
 		init(scores.scores.size());
 		is_ready = true;
 	}
-	// find maximal pairwise score, will be needed since the solver minimizes cost
-	using namespace operations_research;
-	// Construct the LinearSumAssignment.
-	BOOST_LOG_SEV(logger, lg::normal) << "Creating assignment";
-	int num_left_nodes = static_cast<int>(scores.scores.size());
-	LinearSumAssignment<Graph> a(graph, num_left_nodes);
-	parameterize_assignment(scores, a, lap_factor);
+//
+//	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
+//	BOOST_LOG_SEV(logger, lg::normal)
+//	    << "Total score result by OrTools directly: " << optimum_cost
+//	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
-	// Compute the optimum assignment.
-	BOOST_LOG_SEV(logger, lg::normal) << "Calculating assignment";
-	if (!a.FinalizeSetup()) {
-		throw std::logic_error("The Linear Assignment Calculator cannot guarantee a valid result");
-	}
-	bool success = a.ComputeAssignment();
-	assert(success);
-	if (success) {
-		BOOST_LOG_SEV(logger, lg::normal) << "Finished assignment successfully.";
-	} else {
-		BOOST_LOG_SEV(logger, lg::error) << "Finished assignment with errors.";
-	}
-	// Retrieve the cost of the optimum assignment.
-	MatcherOrTools::Scalar optimum_cost = static_cast<double>(-a.GetCost()) / lap_factor;
-	MatcherOrTools::Scalar summed_cost = 0;
-	// Retrieve the node-node correspondence of the optimum assignment and the
-	// cost of each node pairing.
-	for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
-		const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.scores.size();
-		assert(right_idx >= 0 && right_idx < scores.scores.size());
-		//			best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
-		MatcherOrTools::Scalar arc_score =
-		    scores.scores.at(static_cast<size_t>(left_node), right_idx);
-		//		{
-		//			// DEBUG verify that chosen arc index is left_id * size + right_id - size
-		//			auto arc_mate_id = a.GetAssignmentArc(left_node);
-		//			// Softwipe..
-		//			int arc_should_id =
-		//			    static_cast<int>(static_cast<size_t>(left_node) * scores.size() + right_idx); 			assert(arc_mate_id == arc_should_id);
-		//			// DEBUG if arc indices were as they should be
-		//			auto arc_score_diff =
-		//			    std::abs(arc_score + static_cast<Matcher::Scalar>(a.GetAssignmentCost(left_node)) /
-		//			                             static_cast<Matcher::Scalar>(large_num));
-		//			assert(arc_score_diff < 1e-5);
-		//		}
-		summed_cost += arc_score;
-	}
-	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
-	BOOST_LOG_SEV(logger, lg::normal)
-	    << "Total score result by OrTools directly: " << optimum_cost
-	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
-
-	return optimum_cost;
+	return std::async([](auto scores, const auto& graph_instance, const auto& perm){ return parallel_calc(scores, graph_instance, perm);}, scores, graph, arc_permutation);
 }
 operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
 MatcherOrTools::parameterize_assignment(
+    const MatcherOrTools::Graph& graph,
     const RfAlgorithmInterface::SplitScores &scores,
     operations_research::LinearSumAssignment<MatcherOrTools::Graph> &a,
     const double lap_factor) { // tiny lambda helpers
@@ -87,7 +37,7 @@ MatcherOrTools::parameterize_assignment(
 
 			const long arc_cost = getScore(from, to);
             const auto arc_idx = from * dim + to;
-            assign_permuted_cost(arc_idx, arc_cost, a);
+			assign_permuted_cost(arc_idx, arc_cost, a, std::vector<int>());
             // Debug:
 			assert(graph.Tail(arc_idx) == static_cast<int>(from));
 			assert(graph.Head(arc_idx) == static_cast<int>(to + dim));
@@ -98,11 +48,13 @@ MatcherOrTools::parameterize_assignment(
 MatcherOrTools::MatcherOrTools() {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("Matcher"));
 }
-void MatcherOrTools::assign_permuted_cost(size_t unpermuted_index,
-                                   long cost,
-                                   operations_research::LinearSumAssignment<Graph> &assignment) {
+void MatcherOrTools::assign_permuted_cost(
+    size_t unpermuted_index,
+    long cost,
+    operations_research::LinearSumAssignment<Graph> &assignment,
+    const std::vector<int> arc_permutations) {
 	int idx = static_cast<int>(unpermuted_index);
-	int perm_id = arc_permutation.empty() ? idx : arc_permutation[static_cast<size_t>(idx)];
+	int perm_id = arc_permutations.empty() ? idx : arc_permutations[static_cast<size_t>(idx)];
 	assignment.SetArcCost(perm_id, cost);
 }
 void MatcherOrTools::init(size_t num_matches) {
@@ -134,4 +86,41 @@ MatcherOrTools::getGraphCopy(const RectMatrix<MatcherOrTools::Scalar> &scores) {
 		is_ready = true;
 	}
 	return graph;
+}
+double MatcherOrTools::parallel_calc(RfAlgorithmInterface::SplitScores &scores,
+                                     const MatcherOrTools::Graph &graph,
+                                     const std::vector<int> &arc_permutations) {
+    // performance accuracy trade-off
+    auto lap_factor = static_cast<double>(LLONG_MAX) /
+                      static_cast<double>(10000 * scores.scores.size()) /
+                      (scores.max_score > 1. ? scores.max_score : 1.);
+
+// find maximal pairwise score, will be needed since the solver minimizes cost
+    using namespace operations_research;
+    // Construct the LinearSumAssignment.
+    int num_left_nodes = static_cast<int>(scores.scores.size());
+    LinearSumAssignment<Graph> a(graph, num_left_nodes);
+    parameterize_assignment(graph, scores, a, lap_factor);
+
+    // Compute the optimum assignment.
+    if (!a.FinalizeSetup()) {
+        throw std::logic_error("The Linear Assignment Calculator cannot guarantee a valid result");
+    }
+    bool success = a.ComputeAssignment();
+    assert(success);
+
+    // Retrieve the cost of the optimum assignment.
+    MatcherOrTools::Scalar optimum_cost = static_cast<double>(-a.GetCost()) / lap_factor;
+    MatcherOrTools::Scalar summed_cost = 0;
+    // Retrieve the node-node correspondence of the optimum assignment and the
+    // cost of each node pairing.
+    for (int left_node = 0; left_node < num_left_nodes; ++left_node) {
+        const size_t right_idx = static_cast<size_t>(a.GetMate(left_node)) - scores.scores.size();
+        assert(right_idx >= 0 && right_idx < scores.scores.size());
+        //			best_matching_out->operator[](static_cast<size_t>(left_node)) = right_idx;
+        MatcherOrTools::Scalar arc_score =
+            scores.scores.at(static_cast<size_t>(left_node), right_idx);
+        summed_cost += arc_score;
+    }
+    return summed_cost;
 }

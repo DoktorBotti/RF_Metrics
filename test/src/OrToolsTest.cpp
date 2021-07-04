@@ -24,7 +24,8 @@ TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	//		}
 	//	}
 	MatcherOrTools matcher;
-	double res = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(dst_mtx)));
+    RfAlgorithmInterface::SplitScores scores(std::move(dst_mtx));
+	double res = matcher.solve(scores).get();
 	REQUIRE(res > 0);
 	std::stringstream out;
 
@@ -39,7 +40,8 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	MatcherOrTools matcher;
-	double res = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(dst_mtx)));
+    RfAlgorithmInterface::SplitScores scores (std::move(dst_mtx));
+	double res = matcher.solve(scores).get();
 	INFO(res)
 	REQUIRE(std::abs(res - 1.) >= 1e-5); // TODO: whaaa?
 	// create multiple random mappings
@@ -111,7 +113,8 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		// calculate own solution by matching from pairwise split score matrix
 		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
 		MatcherOrTools matcher;
-		auto our_solution = matcher.solve(RfAlgorithmInterface::SplitScores(std::move(split_scores)));
+        RfAlgorithmInterface::SplitScores scores(std::move(split_scores));
+		auto our_solution = matcher.solve(scores).get();
 		double difference = std::abs(our_solution - solution);
 		bool correct = difference <= 1e-3;
 		CHECK(correct);

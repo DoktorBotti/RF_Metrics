@@ -55,6 +55,7 @@ target_include_directories(rf_lib
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         ${CMAKE_BINARY_DIR}/misc/include
         SYSTEM PRIVATE # includes with (hopefully) no warnings and exported includes for other targets
+        Threads::Threads
         #ortools_include_dir
         #$<BUILD_INTERFACE:${ortools}>
 

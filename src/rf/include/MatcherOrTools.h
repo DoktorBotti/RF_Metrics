@@ -15,7 +15,7 @@ class MatcherOrTools : public Matcher {
 	explicit MatcherOrTools();
 
 	// double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
-	Scalar solve(const RfAlgorithmInterface::SplitScores &scores) override;
+	std::future<MatcherOrTools::Scalar> solve(RfAlgorithmInterface::SplitScores &scores) override;
 
 	Graph getGraphCopy(const RectMatrix<Scalar> &scores);
 
@@ -29,17 +29,22 @@ class MatcherOrTools : public Matcher {
 	bool is_ready = false;
 	void init(size_t num_splits);
 	// helper functions
-	void assign_permuted_cost(size_t unpermuted_index,
+	static void assign_permuted_cost(size_t unpermuted_index,
 	                          long cost,
-	                          operations_research::LinearSumAssignment<Graph> &graph);
+	                          operations_research::LinearSumAssignment<Graph> &assignment,
+	                          const std::vector<int> arc_permutations);
 
 	//	operations_research::LinearSumAssignment<Matcher::Graph> &
 	//	parameterize_assignment(const RectMatrix<Scalar> &scores,
 	//	                        operations_research::LinearSumAssignment<Matcher::Graph> &a);
-	operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
-	parameterize_assignment(const RfAlgorithmInterface::SplitScores &scores,
+	static operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
+	parameterize_assignment(const MatcherOrTools::Graph &graph,
+	                        const RfAlgorithmInterface::SplitScores &scores,
 	                        operations_research::LinearSumAssignment<MatcherOrTools::Graph> &a,
 	                        double lap_factor);
+	static double parallel_calc(RfAlgorithmInterface::SplitScores &scores,
+	                            const MatcherOrTools::Graph &graph,
+	                            const std::vector<int> &arc_permutations);
 };
 
 #endif // ORTOOLS_MATCHER_H
