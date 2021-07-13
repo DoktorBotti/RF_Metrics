@@ -2,7 +2,8 @@
 
 MsiAlgo::MsiAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
 }
-GeneralizedRfAlgo::Scalar
+
+RfAlgorithmInterface::Scalar
 MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
 	// TODO: could save one interim result with boolean transformation -> test performance
 	// TODO: are there ways to predict which calculation returns the greater value?
@@ -28,7 +29,6 @@ MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	}
 	return std::max(h_info_content(a1_a2, b1_b2), h_info_content(a1_b2, a2_b1));
 }
-RfAlgorithmInterface::Scalar
-MsiAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar MsiAlgo::calc_split_score(const PllSplit &S1, size_t taxa) {
 	return h_info_content(S1.precalc_popcount, taxa - S1.precalc_popcount);
 }

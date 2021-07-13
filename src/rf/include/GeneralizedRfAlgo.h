@@ -5,7 +5,6 @@
 #include "MatcherOrTools.h"
 #include "RectMatrix.hpp"
 #include "RfAlgorithmInterface.h"
-#include "SplitIntersections.h"
 #include <boost/dynamic_bitset.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -24,24 +23,24 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
   protected:
 	std::future<Scalar> calc_tree_score(const SplitList &A, const SplitList &B);
 	static Scalar p_phy(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
-	static Scalar p_phy(const PllSplit &S, size_t taxa, size_t split_len);
+	static Scalar p_phy(const PllSplit &S, size_t taxa);
 	/* Calculates the phylogenetic probability of a split with partition sizes a and b. */
 	static Scalar p_phy(size_t a, size_t b);
-	static Scalar h_info_content(const PllSplit &S, size_t taxa, size_t split_len);
+	static Scalar h_info_content(const PllSplit &S, size_t taxa);
 	static Scalar
 	h_info_content(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	static Scalar h_info_content(size_t a, size_t b);
-	SplitScores calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2);
+	[[maybe_unused]] SplitScores calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2);
 
   public:
 	virtual Scalar
 	calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
 	// method to use if both pll-splits are equal. Often more simple solution possible
-	virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) = 0;
+	virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa) = 0;
 
   protected:
-	virtual Scalar calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_len);
+	virtual RfAlgorithmInterface::Scalar calc_tree_info_content(const SplitList &S, size_t taxa);
 	void calc_pairwise_tree_dist(const std::vector<FastSplitList> &trees,
 	                             RfMetricInterface::Results &res);
 	static size_t bits_too_many(size_t taxa);

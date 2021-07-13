@@ -63,12 +63,14 @@ RfMetricInterface::Results &RfMetricInterface::get_result() {
 	assert(has_calculated);
 	return *result_ptr;
 }
+
+// Clang tidy wants to make this const. This isn't possible because of the Logger
 bool RfMetricInterface::write_result_to_file() {
 	assert(has_calculated);
 	std::ofstream out_stream(parameters.output_file_path);
 	if (out_stream.is_open()) {
 		io::IOData output = get_result_as_IOData();
-		nlohmann::json j;
+		nlohmann::json j = 0;
 		io::to_json(j, output);
 		std::string pretty_format = j.dump(2);
 
@@ -80,7 +82,7 @@ bool RfMetricInterface::write_result_to_file() {
 	return false;
 }
 io::IOData RfMetricInterface::get_result_as_IOData() const {
-	assert(has_calculated);
+	assert(has_calculated); // WTF Clang Tidy
 	io::IOData output;
 	output.pairwise_distance_mtx = result_ptr->pairwise_similarities.to_vector();
 	output.mean_rf_dst = result_ptr->mean_distance;

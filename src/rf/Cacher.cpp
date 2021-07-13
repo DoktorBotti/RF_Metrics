@@ -13,7 +13,7 @@ bool Cacher::lookupTrees(const PllSplit &spl_a, const PllSplit &spl_b, Cacher::v
 }
 void Cacher::putTrees(const PllSplit &spl_a, const PllSplit &spl_b, value_type val) {
     auto key = TwoSplitHashmapKey(&spl_a,&spl_b);
-    auto handle = hash_map.insert(std::make_pair(key, val));
+    /*auto handle = */hash_map.insert(std::make_pair(key, val));
 }
 Cacher::Cacher() : hash_map(initial_size) {
 }

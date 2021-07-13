@@ -44,7 +44,7 @@ static bool nearly_eq_floating(double a, double b);
 TEST_CASE("Calculate simple trees", "[dbg]") {
 	// Edit your trees to test here
 	std::string tree1 = "(((A,B),C),((E,F),G));";
-	std::string tree2 = "(((A,B),C),((F,G),E));";
+	std::string tree2 = "(((A,B),C),((F,G),E));"; // Two statements according to KWStyle?!
 	std::string tree_path = "/tmp/tmpTrees";
 
 	// write them to a temporary file

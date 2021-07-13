@@ -54,8 +54,7 @@ RfAlgorithmInterface::Scalar MciAlgo::to_prob(size_t numerator_inout_log,
 	       (factorials.lg(numerator) - factorials.lg(denominator));
 }
 
-RfAlgorithmInterface::Scalar
-MciAlgo::calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar MciAlgo::calc_tree_info_content(const SplitList &S, size_t taxa) {
 	GeneralizedRfAlgo::Scalar sum = 0;
 	for (size_t i = 0; i < S.size(); ++i) {
 		// TODO: Perf: log2(a) - log2(x);
@@ -69,8 +68,7 @@ MciAlgo::calc_tree_info_content(const SplitList &S, size_t taxa, size_t split_le
 	return sum;
 }
 
-RfAlgorithmInterface::Scalar
-MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
+RfAlgorithmInterface::Scalar MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa) {
 	return (to_prob(S1.precalc_popcount, taxa, S1.precalc_popcount, S1.precalc_popcount) +
 	        to_prob(taxa - S1.precalc_popcount,
 	                taxa,

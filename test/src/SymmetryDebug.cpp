@@ -106,9 +106,9 @@ static void checkSymmetry(GeneralizedRfAlgo &algo,
 	double score_a = algo.calc_split_score(split_a, split_b, num_taxa, split_len);
 	double score_b = algo.calc_split_score(split_b, split_a, num_taxa, split_len);
 	if (std::abs(score_a - score_b) > 1e-8) {
-		pllmod_utree_split_show(split_a(), num_taxa);
+		pllmod_utree_split_show(split_a(), static_cast<unsigned int>(num_taxa));
 		putchar('\n');
-		pllmod_utree_split_show(split_b(), num_taxa);
+		pllmod_utree_split_show(split_b(), static_cast<unsigned int>(num_taxa));
 		putchar('\n');
 		putchar('\n');
 	}

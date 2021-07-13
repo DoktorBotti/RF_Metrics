@@ -32,7 +32,7 @@ class MatcherOrTools : public Matcher {
 	static void assign_permuted_cost(size_t unpermuted_index,
 	                          long cost,
 	                          operations_research::LinearSumAssignment<Graph> &assignment,
-	                          const std::vector<int> arc_permutations);
+	                          const std::vector<int> &arc_permutations);
 
 	//	operations_research::LinearSumAssignment<Matcher::Graph> &
 	//	parameterize_assignment(const RectMatrix<Scalar> &scores,
@@ -43,8 +43,7 @@ class MatcherOrTools : public Matcher {
 	                        operations_research::LinearSumAssignment<MatcherOrTools::Graph> &a,
 	                        double lap_factor);
 	static double parallel_calc(RfAlgorithmInterface::SplitScores &scores,
-	                            const MatcherOrTools::Graph &graph,
-	                            const std::vector<int> &arc_permutations);
+	                            const MatcherOrTools::Graph &graph);
 };
 
 #endif // ORTOOLS_MATCHER_H

@@ -1,7 +1,7 @@
 #include "include/HashmapUtil/TwoSplitHashmapKey.h"
 bool TwoSplitHashmapKey::operator==(const TwoSplitHashmapKey &rhs) const {
 	// assumes, that we use FastSplits!
-	return split_a()  == rhs.split_b() && split_b() == rhs.split_a();
+	return split_a() == rhs.split_b() && split_b() == rhs.split_a();
 }
 bool TwoSplitHashmapKey::operator!=(const TwoSplitHashmapKey &rhs) const {
 	return !(rhs == *this);

@@ -37,7 +37,7 @@ TEST_CASE("Key equality", "[HashmapUtil]") {
     }
 }
 
-TEST_CASE("Cache some values", "[HashmapUtil]"){
+TEST_CASE("Cache some values", "[HashmapUtil]") { // Two statements according to KWStyle?!
 	Cacher cache;
     std::string tree_str = "((((F,C),B),A),(E,D));";
     auto tree = Util::create_all_trees_from_string(tree_str)[0];
@@ -45,8 +45,8 @@ TEST_CASE("Cache some values", "[HashmapUtil]"){
 	PllSplit::split_len = 1;
     PllSplit a(split_list[0]);
     PllSplit b(split_list[1]);
-    PllSplit c(split_list[2]);
-    PllSplit d(split_list[3]);
+    //PllSplit c(split_list[2]);
+    //PllSplit d(split_list[3]);
 	auto key = TwoSplitHashmapKey(&a,&b);
 	double outVal = 0.;
 	cache.lookupTrees(key, outVal);

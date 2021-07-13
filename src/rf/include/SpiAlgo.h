@@ -8,8 +8,6 @@
 #include "GeneralizedRfAlgo.h"
 class SpiAlgo : public GeneralizedRfAlgo {
   public:
-	/* Calculates whether the two splits are compatible. */
-	static bool compatible(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len);
 	double calc_split_score(const PllSplit &S1,
 	                        const PllSplit &S2,
 	                        size_t taxa,
@@ -19,7 +17,7 @@ class SpiAlgo : public GeneralizedRfAlgo {
 	~SpiAlgo() override = default;
 
 	explicit SpiAlgo(size_t split_len);
-	double calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) override;
+    RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1, size_t taxa) override;
 
   private:
 	static Scalar one_overlap(size_t a, size_t b, size_t n);

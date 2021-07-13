@@ -99,9 +99,9 @@ GeneralizedRfAlgo::Scalar SpiAlgo::calc_split_score(const PllSplit &S1,
 }
 SpiAlgo::SpiAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
 }
-RfAlgorithmInterface::Scalar
-SpiAlgo::calc_split_score(const PllSplit &S1, size_t taxa, size_t split_len) {
-	return -p_phy(S1.precalc_popcount, taxa - S1.precalc_popcount);
+
+RfAlgorithmInterface::Scalar SpiAlgo::calc_split_score(const PllSplit &S1, size_t taxa) {
+	return h_info_content(S1, taxa);
 }
 
 // AB | DEFC
