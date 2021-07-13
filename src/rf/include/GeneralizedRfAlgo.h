@@ -65,14 +65,20 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 	std::vector<PllSplit> unique_pll_splits;
 	MatcherOrTools match_solver;
-	const size_t max_parallel_threads = 800;
+	const size_t max_parallel_threads = 600;
 	size_t stat_calculated_trees = 0;
 	std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
 	void setup_temporary_storage(size_t split_len);
 	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
 	SymmetricMatrix<Scalar> calcPairwiseSplitScores(size_t taxa);
-	inline std::pair<size_t, size_t> startAsyncTask(std::pair<size_t,size_t> start_indices, SymmetricMatrix<std::future<Scalar>>& futures, size_t num_tasks, const std::vector<FastSplitList>& trees);
-	void awaitAsyncTask(RfMetricInterface::Results& results, SymmetricMatrix<std::future<Scalar>>& futures, std::pair<size_t,size_t> start_indices, size_t num_tasks);
+	inline std::pair<size_t, size_t> startAsyncTask(std::pair<size_t, size_t> start_indices,
+	                                                std::vector<std::future<Scalar>> &futures,
+	                                                size_t num_tasks,
+	                                                const std::vector<FastSplitList> &trees);
+	void awaitAsyncTask(RfMetricInterface::Results &results,
+	                    std::vector<std::future<Scalar>> &futures,
+	                    std::pair<size_t, size_t> start_indices,
+	                    size_t num_tasks);
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

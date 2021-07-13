@@ -124,12 +124,12 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 
 	BOOST_LOG_SEV(logger, lg::notification)
 	    << "Calculated pairwise scores; Calculating pairwise tree scores.";
-	SymmetricMatrix<std::future<Scalar>> async_res(trees.size());
 	RfMetricInterface::Results res(trees.size());
 	std::pair<size_t, size_t> start_idx = std::make_pair(0, 0);
 	std::pair<size_t, size_t> end_idx =
 	    std::make_pair(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max());
 	while (start_idx != end_idx) {
+		std::vector<std::future<Scalar>> async_res(max_parallel_threads);
 		auto new_start_idx = startAsyncTask(start_idx, async_res, max_parallel_threads, fast_trees);
 		awaitAsyncTask(res, async_res, start_idx, max_parallel_threads);
 		start_idx = new_start_idx;
@@ -368,17 +368,17 @@ SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitS
 }
 std::pair<size_t, size_t>
 GeneralizedRfAlgo::startAsyncTask(std::pair<size_t, size_t> start_indices,
-                                  SymmetricMatrix<std::future<Scalar>> &futures,
+                                  std::vector<std::future<Scalar>> &futures,
                                   size_t num_tasks,
                                   const std::vector<FastSplitList> &trees) {
 	constexpr size_t max = std::numeric_limits<size_t>::max();
 	size_t tasks = 0;
-	for (size_t idx_a = start_indices.first; idx_a < futures.size(); ++idx_a) {
+	for (size_t idx_a = start_indices.first; idx_a < trees.size(); ++idx_a) {
 		for (size_t idx_b = start_indices.second; idx_b <= idx_a; ++idx_b) {
-			futures.set_at_move(idx_a, idx_b, calc_tree_score(trees[idx_a], trees[idx_b]));
+			futures[tasks] = calc_tree_score(trees[idx_a], trees[idx_b]);
 			if (++tasks >= num_tasks) {
 				// stop starting new threads
-				if (idx_b == idx_a && idx_a == futures.size()) {
+				if (idx_b == idx_a && idx_a == trees.size()) {
 					// we already calculated everything
 					return std::make_pair(max, max);
 				}
@@ -396,15 +396,17 @@ GeneralizedRfAlgo::startAsyncTask(std::pair<size_t, size_t> start_indices,
 	return std::make_pair(max, max);
 }
 void GeneralizedRfAlgo::awaitAsyncTask(RfMetricInterface::Results &results,
-                                       SymmetricMatrix<std::future<Scalar>> &futures,
+                                       std::vector<std::future<Scalar>> &futures,
                                        std::pair<size_t, size_t> start_indices,
                                        size_t num_tasks) {
 	size_t tasks = 0;
-	for (size_t idx_a = start_indices.first; idx_a < futures.size(); ++idx_a) {
+	for (size_t idx_a = start_indices.first; idx_a < results.pairwise_similarities.size();
+	     ++idx_a) {
 		for (size_t idx_b = start_indices.second; idx_b <= idx_a; ++idx_b) {
-			auto tree_res = futures.at(idx_a, idx_b).get();
+			auto tree_res = futures[tasks].get();
 			results.pairwise_similarities.set_at(idx_a, idx_b, tree_res);
 			++stat_calculated_trees;
+			++tasks;
 			if (stat_calculated_trees % 50 == 0) {
 				size_t num_tree_calcs = futures.size() * (futures.size() + 1) / 2;
 				// print update
@@ -412,7 +414,8 @@ void GeneralizedRfAlgo::awaitAsyncTask(RfMetricInterface::Results &results,
 				    << "Processed " << stat_calculated_trees << " of " << num_tree_calcs
 				    << " total tree calculations";
 			}
-			if (++tasks >= num_tasks || (idx_b == idx_a && idx_a == futures.size())) {
+			if (tasks >= num_tasks ||
+			    (idx_b == idx_a && idx_a == results.pairwise_similarities.size())) {
 				return;
 			}
 		}
