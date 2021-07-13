@@ -1,22 +1,23 @@
 import os, subprocess, time
 import numpy as np
 # normal configuration variables
-test_files_dir = '/rf_metrics/BS/'
+test_files_dir = '/home/tbwsl/rf_stuff/practical_data/BS/'
 project_dir = os.path.pardir
 our_exe = project_dir + "/bin/commandline_rf"
+result_file_path = project_dir + '/misc/'
 metrics = ["MCI", "MSI", "SPI"]
 test_names = [file for file in os.listdir(test_files_dir)]
 test_paths = [test_files_dir + a for a in test_names]
 
 # configure which testset to execute
-upper_taxa_bound = 1400
-tree_counts  = [2,10,100] # all measurements will be performed with these counts
+upper_taxa_bound = 1000000
+tree_counts  = [2,10,100,1000] # all measurements will be performed with these counts
 # test matrix dimensions [treeNum][taxa/testfile][metric]
 
 def writeToFile(file_names, ours_times):
     # write results to file
-    with open('timings_ours.txt', "w") as file:
-        file.write(f"Evaluated the following samples: {file_names}\n")
+    with open(result_file_path + 'timings_ours.txt', "w") as file:
+        file.write(f'Evaluated the following samples: {file_names}\n')
         file.write(f"Evaluated with the following tree numbers per file: {tree_counts}\n")
         for t_idx, trees in enumerate(tree_counts):
             file.write(f"Calculated with {trees} trees:\n")
@@ -31,7 +32,7 @@ def writeToFile(file_names, ours_times):
         file.write('\n' + print_ex_times(ours_times))
     # write raw matrix with timestamp
     timestamp = str(int(time.time()))
-    np.save('ours_timingMatrix'+timestamp+'.npy', ours_times)
+    np.save(result_file_path +'ours_timingMatrix'+timestamp+'.npy', ours_times)
 def print_single_instance(ours):
     return f"( {np.average(ours) * 1e-9 } )"
 
@@ -72,12 +73,16 @@ try:
                 ours_args = [our_exe, '--metric', metric, '-o', '/tmp/ourRes.txt', '-i', "/tmp/tmp.trees"]
                 print(status_string+ "Running ours:")
                 our_start = time.time_ns()
-                proc = subprocess.run(ours_args, shell=False, stdout=FNULL)
+                proc = subprocess.run(ours_args, shell=False, stdout=FNULL).returncode
                 our_end = time.time_ns()
                 print(f"Took {(our_end - our_start) * 1e-9} seconds")
-
                 # writing to array upon successful calculation
-                ours_metric_arr[m_idx] = our_end - our_start
+                if proc != 0:
+                    print("error occured!")
+                    ours_metric_arr[m_idx] = -1.
+                else:
+                    ours_metric_arr[m_idx] = our_end - our_start
+
             #push when all metrics are calculated
             ours_times[trees_idx, num] = ours_metric_arr
             print(print_ex_times(ours_times))

@@ -66,7 +66,6 @@ target_link_libraries(rf_lib PUBLIC
         Boost::log
         rf_io_lib
         ortools
-        GMP::gmpxx
         )
 
 # only generate loads of warnings for our lib - does not propagate to dependencies
