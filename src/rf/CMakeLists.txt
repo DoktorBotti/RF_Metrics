@@ -63,7 +63,7 @@ target_include_directories(rf_lib
         )
 target_link_libraries(rf_lib PUBLIC
         pll_lib
-        growt_lib
+        #growt_lib
         Boost::log
         rf_io_lib
         ortools

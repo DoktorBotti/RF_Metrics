@@ -33,8 +33,8 @@ ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/gitVersionHeader.h.in  ${CMAKE_CURRENT_BINARY_DIR}/include/gitVersionHeader.h @ONLY)
 
-add_executable(min_example ${CMAKE_CURRENT_SOURCE_DIR}/sample_main.cpp)
-target_link_libraries(min_example growt_lib)
-target_link_libraries(min_example ${TBB_LIBRARIES})
+#add_executable(min_example ${CMAKE_CURRENT_SOURCE_DIR}/sample_main.cpp)
+#target_link_libraries(min_example growt_lib)
+#target_link_libraries(min_example ${TBB_LIBRARIES})
 
-message(WARNING ${TBB_LIBRARIES}\n ${GROWT_HASHFCT}\n ${GROWT_ALLOCATOR} \n${TBB_INCLUDE_DIRS} )
+#message(WARNING ${TBB_LIBRARIES}\n ${GROWT_HASHFCT}\n ${GROWT_ALLOCATOR} \n${TBB_INCLUDE_DIRS} )

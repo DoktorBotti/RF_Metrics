@@ -22,12 +22,12 @@ target_include_directories(pll_lib INTERFACE
         )
 
 # defining target lib for growt
-add_library(growt_lib INTERFACE)
-target_include_directories(growt_lib
-        INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt>
-            #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt/allocator>
-        )
+#add_library(growt_lib INTERFACE)
+#target_include_directories(growt_lib
+#        INTERFACE
+#            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt>
+#            #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/growt/allocator>
+#        )
 
 add_subdirectory(catch2)
-add_subdirectory(growt)
+#add_subdirectory(growt)
