@@ -122,7 +122,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	setup_temporary_storage(PllSplit::split_len);
 	pairwise_split_scores = calcPairwiseSplitScores(fast_trees.front().size() + 3);
 
-	SymmetricMatrix<std::future<Scalar>> async_res(trees.size());
+    BOOST_LOG_SEV(logger, lg::notification) << "Calculated pairwise scores; Calculating pairwise tree scores.";
+    SymmetricMatrix<std::future<Scalar>> async_res(trees.size());
 	for (size_t idx_a = 0; idx_a < all_splits.size(); ++idx_a) {
 		for (size_t idx_b = 0; idx_b <= idx_a; ++idx_b) {
 			async_res.set_at_move(idx_a, idx_b, calc_tree_score(fast_trees[idx_a], fast_trees[idx_b]));

@@ -65,7 +65,6 @@ const static std::vector<Flag> flags = {
      }}};
 
 int main(int argc, char **argv) {
-	try {
 		if (argc == 1) {
 			std::cout << "Please use the format: " << argv[0]
 			          << " --metric [ RF | MCI | MSI | SPI ]"
@@ -73,7 +72,6 @@ int main(int argc, char **argv) {
 			          << " -o [output-file-path]" << std::endl;
 			return 0;
 		}
-
 		bool flag_found = false;
 		int arg_pos = 1;
 		RfMetricInterface::Params params;
@@ -103,9 +101,6 @@ int main(int argc, char **argv) {
 		res.do_magical_high_performance_stuff();
 		bool success = res.write_result_to_file();
 		assert(success);
+	    return 0;
 
-	} catch (const std::exception &err) {
-		std::cerr << "Exception : " << err.what() << std::endl;
-		throw;
-	}
 }
