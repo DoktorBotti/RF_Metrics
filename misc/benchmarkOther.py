@@ -3,8 +3,8 @@ import numpy as np
 # normal configuration variables
 test_files_dir = '/home/tbwsl/rf_stuff/practical_data/BS/'
 project_dir = os.path.pardir
-our_exe = project_dir + "/bin/commandline_rf"
-result_file_path = project_dir + '/benchmark_ours/'
+our_exe = '/home/tbwsl/rf_stuff/other_team/practical-2021/bin/rfdist'
+result_file_path = project_dir + '/benchmark_others/'
 metrics = ["MCI", "MSI", "SPI"]
 timeout_in_secs = 60 * 12 # 12 minutes
 test_names = [file for file in os.listdir(test_files_dir)]
@@ -18,7 +18,7 @@ tree_counts  = [2,10,100, 300] # all measurements will be performed with these c
 def writeToFile(file_names, ours_times):
     # write results to file
     timestamp = str(int(time.time()))
-    with open(result_file_path + 'overview_ours_'+ timestamp+ '.txt', "w") as file:
+    with open(result_file_path + 'overview_others_'+ timestamp+ '.txt', "w") as file:
         file.write(f'Evaluated the following samples: {file_names}\n')
         file.write(f"Evaluated with the following tree numbers per file: {tree_counts}\n")
         for t_idx, trees in enumerate(tree_counts):
@@ -33,7 +33,7 @@ def writeToFile(file_names, ours_times):
 
         file.write('\n' + print_ex_times(ours_times))
     # write raw matrix with timestamp
-    np.save(result_file_path +'ours_timingMatrix'+timestamp+'.npy', ours_times)
+    np.save(result_file_path +'others_timingMatrix'+timestamp+'.npy', ours_times)
 def print_single_instance(ours):
     return f"( {np.average(ours) * 1e-9 } )"
 
@@ -72,8 +72,8 @@ try:
             for m_idx, metric in enumerate(metrics):
                 status_string = f"processing {metric} in {test_names[num]}, {num+1} of {len(test_paths)}, with {num_trees} trees. "
                 # run our script
-                ours_args = [our_exe, '--metric', metric, '-o', '/tmp/ourRes.txt', '-i', "/tmp/tmp.trees"]
-                print(status_string+ "Running ours:")
+                ours_args = [our_exe, '-m', metric, '-o', '/tmp', '-i', "/tmp/tmp.trees"]
+                print(status_string+ f"Running: {''.join(ours_args)}")
                 runtime = 0
                 try:
                     our_start = time.time_ns()
