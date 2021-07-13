@@ -33,7 +33,7 @@ class PllSplit {
 	PllSplit(pll_split_t s, size_t split_length) : _split{s} {
 		precalc_popcount = priv_popcount(split_length);
 	}
-	PllSplit() : _split(nullptr){};
+	PllSplit() : _split(nullptr){}
 	bool operator==(const PllSplit &rhs) const;
 	bool operator!=(const PllSplit &rhs) const;
 	static size_t split_len;
@@ -68,7 +68,7 @@ class PllSplit {
 
 	[[nodiscard]] static constexpr size_t splitBitWidth() {
 		return sizeof(pll_split_base_t) * 8;
-	};
+	}
 
 	void setIntersectionIdx(size_t idx);
 	size_t getScoreIndex() const;
@@ -79,7 +79,7 @@ class PllSplit {
   private:
 	[[nodiscard]] static constexpr size_t computeMajorIndex(size_t index) {
 		return index / splitBitWidth();
-	};
+	}
 
 	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
 		return index % splitBitWidth();

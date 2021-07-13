@@ -18,8 +18,8 @@ MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
 	//	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
 	return std::async(
-	    [](auto scores, const auto &graph_instance) {
-		    return parallel_calc(scores, graph_instance);
+	    [](auto scores_v, const auto &graph_instance) {
+		    return parallel_calc(scores_v, graph_instance);
 	    },
 	    scores,
 	    graph);
