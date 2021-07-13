@@ -12,9 +12,6 @@ add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/libs/catch2/contrib "${CMAKE_SOURCE_DIR}/cmake")
 
-# search for gmp library
-find_package(GMP REQUIRED)
-
 # multithreading for std::async
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

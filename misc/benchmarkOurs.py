@@ -1,10 +1,10 @@
 import os, subprocess, time
 import numpy as np
 # normal configuration variables
-test_files_dir = '/rf_metrics/BS/'
+test_files_dir = '/home/tbwsl/rf_stuff/practical_data/BS/'
 project_dir = os.path.pardir
 our_exe = project_dir + "/bin/commandline_rf"
-result_file_path = '/rf_metrics/'
+result_file_path = project_dir + '/misc/'
 metrics = ["MCI", "MSI", "SPI"]
 test_names = [file for file in os.listdir(test_files_dir)]
 test_paths = [test_files_dir + a for a in test_names]
