@@ -9,6 +9,6 @@ class Matcher {
 	// double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
 	virtual std::future<Scalar>
 	solve(RfAlgorithmInterface::SplitScores &scores) = 0;
-	~Matcher();
+	virtual ~Matcher();
 };
 #endif // MATCHER_H

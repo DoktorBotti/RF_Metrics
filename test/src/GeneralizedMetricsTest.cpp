@@ -200,9 +200,9 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 	}
 	// make summary over all executions
 	WARN("Summary of all comparisons:\n MSI mean: "
-	     << mean_msi / num_msi << " worst: " << max_msi << "\n MCI mean: " << mean_mci / num_mci
-	     << " worst: " << max_mci << "\n SPI mean: " << mean_spi / num_spi
-	     << " worst: " << max_spi);
+	     << mean_msi / static_cast<double>(num_msi) << " worst: " << max_msi
+	     << "\n MCI mean: " << mean_mci / static_cast<double>(num_mci) << " worst: " << max_mci
+	     << "\n SPI mean: " << mean_spi / static_cast<double>(num_spi) << " worst: " << max_spi);
 }
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,

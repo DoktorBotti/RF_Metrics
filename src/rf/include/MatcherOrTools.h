@@ -13,7 +13,7 @@ class MatcherOrTools : public Matcher {
 	typedef util::StaticGraph<> Graph;
 
 	explicit MatcherOrTools();
-
+	~MatcherOrTools() override = default;
 	// double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
 	std::future<MatcherOrTools::Scalar> solve(RfAlgorithmInterface::SplitScores &scores) override;
 

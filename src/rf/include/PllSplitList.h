@@ -8,7 +8,7 @@ class PllTree;
 class PllSplitList : public SplitList {
   public:
 	/* Rule of 5 constructors/destructors */
-	virtual ~PllSplitList();
+	~PllSplitList() override;
 	explicit PllSplitList(const PllTree &tree);
 	PllSplitList(const PllSplitList &other);
 	PllSplitList(PllSplitList &&other) noexcept;

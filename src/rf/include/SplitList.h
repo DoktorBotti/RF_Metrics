@@ -11,6 +11,7 @@ class SplitList{
      * single split
      */
     [[nodiscard]] size_t computeSplitLen() const;
+	virtual ~SplitList();
 
   protected:
     /* Computes the number of bits per split base */

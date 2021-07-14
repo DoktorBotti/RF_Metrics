@@ -23,7 +23,7 @@ static inline void checkSymmetry(GeneralizedRfAlgo &algo,
 TEST_CASE("Find un-symmetric compatible() method", "[Sym]") {
 	REQUIRE(false); // with precalculations this test is not easy to replicate
 	std::string trees_str = "";
-	size_t num_taxa =  GENERATE(14,18,21,80,125);
+	size_t num_taxa =  GENERATE(14ul,18ul,21ul,80ul,125ul);
 	if (false) {
 		// config
 		// create random trees, many

@@ -15,3 +15,4 @@ constexpr size_t SplitList::computeSplitBaseSize() {
 size_t SplitList::computeSplitArraySize() const {
     return computeSplitLen() * size();
 }
+SplitList::~SplitList() = default;

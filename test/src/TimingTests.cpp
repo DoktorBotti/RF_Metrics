@@ -39,7 +39,7 @@ static void time_metric(const RfMetricInterface::Metric &metric) {
 		params.input_file_path = base_path + ts;
 		params.metric = metric;
 		params.normalize_output = false;
-		INFO("Calculating distances from " + ts);
+		INFO("Calculating distances from " + ts)
 		CHECK(!ts.empty());
 		RfMetricInterface iface(params);
 		iface.do_magical_high_performance_stuff();

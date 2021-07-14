@@ -43,8 +43,8 @@ MatcherOrTools::parameterize_assignment(
 			const auto arc_idx = from * dim + to;
 			assign_permuted_cost(arc_idx, arc_cost, a, std::vector<int>());
 			// Debug:
-			assert(graph.Tail(arc_idx) == static_cast<int>(from));
-			assert(graph.Head(arc_idx) == static_cast<int>(to + dim));
+			assert(graph.Tail(static_cast<int>(arc_idx)) == static_cast<int>(from));
+			assert(graph.Head(static_cast<int>(arc_idx)) == static_cast<int>(to + dim));
 		}
 	}
 	return a;

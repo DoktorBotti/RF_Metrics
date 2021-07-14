@@ -6,7 +6,7 @@
 class FastSplitList : public SplitList {
   public:
 	explicit FastSplitList(size_t num_taxa);
-	virtual ~FastSplitList() = default;
+	~FastSplitList() override = default;
 	PllSplit &operator[](size_t index) override;
 	const PllSplit &operator[](size_t index) const override;
 	[[nodiscard]] size_t size() const override;
