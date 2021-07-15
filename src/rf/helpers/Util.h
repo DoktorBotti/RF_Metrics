@@ -33,6 +33,8 @@ class Util {
 
 	static std::string read_file(const std::string &file_name);
 
+	static std::string get_git_commit();
+
   private:
 	static std::vector<PllTree> get_tree_from_string_list(std::vector<std::string> &tree_str);
 };

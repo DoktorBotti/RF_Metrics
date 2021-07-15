@@ -1,5 +1,6 @@
 #include "PllSplit.hpp"
 #include "PllTree.hpp"
+#include <GeneralizedRfAlgo.h>
 
 /*  Calculates the Hamming weight of the split. */
 size_t PllSplit::popcount(size_t len) const {
@@ -69,8 +70,8 @@ size_t PllSplit::priv_popcount(size_t len) const {
 	precalc_popcount = popcount;
 	return popcount;
 }
-void PllSplit::perform_popcount_precalc(size_t len) const {
-	priv_popcount(len);
+void PllSplit::perform_popcount_precalc(size_t split_len) const {
+	priv_popcount(split_len);
 }
 // requires split_len to be something sensible
 bool PllSplit::operator<(const PllSplit &rhs) const {
@@ -116,4 +117,18 @@ void PllSplit::setIntersectionIdx(size_t idx) {
 }
 size_t PllSplit::getScoreIndex() const {
 	return intersection_matrix_index;
+}
+double PllSplit::getHInfoContent() const {
+	assert(precalc_h_info_content > 0.);
+	return precalc_h_info_content;
+}
+size_t PllSplit::getPrecalcPopcnt() const {
+	assert(precalc_popcount > 0);
+	return precalc_popcount;
+}
+void PllSplit::setHInfoContent(double val) const {
+	// this should only happen once -> zero before
+	assert(precalc_h_info_content <= 0);
+
+	precalc_h_info_content = val;
 }

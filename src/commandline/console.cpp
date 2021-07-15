@@ -1,11 +1,11 @@
-//
-// Created by Robert Schmoltzi on 22.04.21.
-//
-
+#include "LoggingBackend.h"
 #include "RfMetricInterface.h"
+#include <array>
+#include <boost/log/attributes/constant.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_logger.hpp>
 #include <functional>
 #include <iostream>
-#include <array>
 
 struct Flag {
 	std::string name;
@@ -17,8 +17,8 @@ struct Flag {
 	     int parameter_count_in,
 	     std::string description_in,
 	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> func_in)
-	    : name(move(name_in)), parameter_count(parameter_count_in), description(move(description_in)),
-	      func(move(func_in)) {
+	    : name(move(name_in)), parameter_count(parameter_count_in),
+	      description(move(description_in)), func(move(func_in)) {
 	}
 
 	Flag(std::string name_in,
@@ -65,42 +65,51 @@ const static std::vector<Flag> flags = {
      }}};
 
 int main(int argc, char **argv) {
-		if (argc == 1) {
-			std::cout << "Please use the format: " << argv[0]
-			          << " --metric [ RF | MCI | MSI | SPI ]"
-			          << " -i [input-file-path]"
-			          << " -o [output-file-path]" << std::endl;
-			return 0;
-		}
-		bool flag_found = false;
-		int arg_pos = 1;
-		RfMetricInterface::Params params;
-		while (arg_pos < argc) {
-			flag_found = false;
-			for (auto &c : flags) {
-				if (!flag_found && c.name == argv[arg_pos]) {
-					if (arg_pos + 1 + c.parameter_count > argc)
-						throw std::runtime_error("Not enough parameters to command " + c.name);
-
-					std::vector<std::string> args(argv + arg_pos + 1,
-					                              argv + arg_pos + 1 + c.parameter_count);
-					++arg_pos;
-					arg_pos += c.parameter_count;
-
-					c.func(params, move(args));
-
-					flag_found = true;
+	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
+	if (argc == 1) {
+		BOOST_LOG_SEV(logger, lg::warning) << "did not specify any parameters arguments";
+		std::cout << "Please use the format: " << argv[0] << " --metric [ RF | MCI | MSI | SPI ]"
+		          << " -i [input-file-path]"
+		          << " -o [output-file-path]" << std::endl;
+		return 0;
+	}
+	bool flag_found = false;
+	int arg_pos = 1;
+	RfMetricInterface::Params params;
+	while (arg_pos < argc) {
+		flag_found = false;
+		for (auto &c : flags) {
+			if (!flag_found && c.name == argv[arg_pos]) {
+				if (arg_pos + 1 + c.parameter_count > argc) {
+					const std::string errMsg = "Not enough parameters to command " + c.name;
+					BOOST_LOG_SEV(logger, lg::error) << errMsg;
+					throw std::runtime_error(errMsg);
 				}
-			}
-			if (!flag_found) {
-				throw std::runtime_error(std::string("Unknown flag ") + argv[arg_pos]);
+
+				std::vector<std::string> args(argv + arg_pos + 1,
+				                              argv + arg_pos + 1 + c.parameter_count);
+				++arg_pos;
+				arg_pos += c.parameter_count;
+
+				c.func(params, move(args));
+
+				flag_found = true;
 			}
 		}
+		if (!flag_found) {
+			const auto errMsg = std::string("Unknown flag ") + argv[arg_pos];
+			BOOST_LOG_SEV(logger, lg::error) << errMsg;
+			throw std::runtime_error(errMsg);
+		}
+	}
 
-		auto res = RfMetricInterface(params);
-		res.do_magical_high_performance_stuff();
-		bool success = res.write_result_to_file();
-		assert(success);
-	    return 0;
-
+	auto res = RfMetricInterface(params);
+	res.do_magical_high_performance_stuff();
+	bool success = res.write_result_to_file();
+	if (!success) {
+		BOOST_LOG_SEV(logger, lg::error) << "could not write to output file.";
+		return 1;
+	}
+	assert(success);
+	return 0;
 }

@@ -23,8 +23,11 @@ class MciAlgo : public GeneralizedRfAlgo {
 	                        const PllSplit &S2,
 	                        size_t taxa,
 	                        size_t split_len) override;
-	RfAlgorithmInterface::Scalar calc_tree_info_content(const SplitList &S, size_t taxa) override;
+	RfAlgorithmInterface::Scalar calc_tree_info_content(const SplitList &S) override;
     RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1, size_t taxa) override;
+
+  protected:
+	Scalar h_info_content(size_t a, size_t b) override;
 };
 
 #endif // CONCURRENT_GROWTABLE_MCIALGO_H

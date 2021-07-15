@@ -30,9 +30,6 @@ class PllSplit {
   public:
 	explicit PllSplit(pll_split_t s) : _split{s} {
 	}
-	PllSplit(pll_split_t s, size_t split_length) : _split{s} {
-		precalc_popcount = priv_popcount(split_length);
-	}
 	PllSplit() : _split(nullptr){}
 	bool operator==(const PllSplit &rhs) const;
 	bool operator!=(const PllSplit &rhs) const;
@@ -42,11 +39,11 @@ class PllSplit {
 		return _split;
 	}
 	~PllSplit() = default;
-	mutable size_t precalc_popcount = 0;
 
-	void perform_popcount_precalc(size_t len) const;
+	void perform_popcount_precalc(size_t split_len) const;
 
 	[[nodiscard]] size_t popcount(size_t len) const;
+	[[nodiscard]] size_t getPrecalcPopcnt() const;
 
 	[[nodiscard]] uint32_t bit_extract(size_t bit_index) const;
 
@@ -72,6 +69,8 @@ class PllSplit {
 
 	void setIntersectionIdx(size_t idx);
 	size_t getScoreIndex() const;
+	double getHInfoContent() const;
+	void setHInfoContent(double val) const;
 
 	bool operator<(PllSplit const &rhs) const;
 	bool operator>(PllSplit const &rhs) const;
@@ -87,5 +86,9 @@ class PllSplit {
 	size_t priv_popcount(size_t len) const;
 
 	pll_split_t _split;
+
+	// precalculations and optimization variables
 	size_t intersection_matrix_index = 0;
+    mutable size_t precalc_popcount = 0;
+    mutable double precalc_h_info_content = 0;
 };

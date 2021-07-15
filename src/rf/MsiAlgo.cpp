@@ -30,5 +30,5 @@ MsiAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, s
 	return std::max(h_info_content(a1_a2, b1_b2), h_info_content(a1_b2, a2_b1));
 }
 RfAlgorithmInterface::Scalar MsiAlgo::calc_split_score(const PllSplit &S1, size_t taxa) {
-	return h_info_content(S1.precalc_popcount, taxa - S1.precalc_popcount);
+	return S1.getHInfoContent();
 }

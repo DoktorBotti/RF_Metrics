@@ -46,8 +46,8 @@ TEST_CASE("Print first Split", "[useless]") {
 
 TEST_CASE("Check CPU output", "[useless]") {
 	const std::string command = "lscpu";
-	INFO(Util::get_output_of_bash_command(command))
-	REQUIRE(false);
+	WARN(Util::get_output_of_bash_command(command));
+	WARN(Util::get_git_commit());
 }
 
 TEST_CASE("Checked methods SymmetricMatrix", "[SymMtx]") {

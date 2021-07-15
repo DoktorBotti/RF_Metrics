@@ -1,8 +1,7 @@
-
 #include <RfAlgorithmInterface.h>
 
-RfAlgorithmInterface::~RfAlgorithmInterface() {
-}
+RfAlgorithmInterface::~RfAlgorithmInterface() = default;
+
 RfAlgorithmInterface::SplitScores::SplitScores(size_t num_trees) : scores(num_trees) {
 }
 RfAlgorithmInterface::SplitScores::SplitScores(RectMatrix<Scalar> &&matrix) : scores(matrix) {
