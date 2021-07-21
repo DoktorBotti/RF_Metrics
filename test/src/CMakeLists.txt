@@ -1,18 +1,17 @@
 
 add_executable(catch2_tests
-        main.cpp
-        first_tests.cpp
-        PllSplitsTest.cpp
-        RFTest.cpp
-        testIO.cpp
+        ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
+        GeneralizedMetricsTest.cpp
         MciTest.cpp
         OrToolsTest.cpp
-        ${CMAKE_SOURCE_DIR}/src/rf/helpers/Util.h
         OrToolsTest.cpp
-        GeneralizedMetricsTest.cpp
+        PllSplitsTest.cpp
+        RFTest.cpp
         SymmetryDebug.cpp
         TimingTests.cpp
-        cacherTest.cpp
+        first_tests.cpp
+        main.cpp
+        testIO.cpp
         )
 
 target_link_libraries(catch2_tests PUBLIC

@@ -24,9 +24,8 @@ class RfMetricInterface {
 		std::string input_file_path;
 		std::string output_file_path;
 		Metric metric = Metric::RF;
-		bool normalize_output = false;
 	};
-	explicit RfMetricInterface(Params params);
+	explicit RfMetricInterface(const Params& params);
 	struct Results {
 		explicit Results(size_t num_trees);
 		Results(const Results& ) = default;

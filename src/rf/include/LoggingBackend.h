@@ -7,7 +7,6 @@
 #include <string>
 
 namespace lg {
-
 enum SeverityLevel { normal, notification, warning, error, critical };
 
 class LoggingBackend {
@@ -20,6 +19,6 @@ class LoggingBackend {
     const std::string timing_logging_path = "/tmp/rfdst_timing.log";
 };
 
-std::ostream &operator<<(std::ostream &strm, SeverityLevel level);
+//std::ostream &operator<<(std::ostream &strm, SeverityLevel level);
 } // namespace lg
 #endif // INFORF_LOGGINGBACKEND_H

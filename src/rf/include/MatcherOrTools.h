@@ -30,16 +30,15 @@ class MatcherOrTools : public Matcher {
 	void init(size_t num_splits);
 	// helper functions
 	static void assign_permuted_cost(size_t unpermuted_index,
-	                          long cost,
-	                          operations_research::LinearSumAssignment<Graph> &assignment,
-	                          const std::vector<int> &arc_permutations);
+	                                 long cost,
+	                                 operations_research::LinearSumAssignment<Graph> &assignment,
+	                                 const std::vector<int> &arc_permutations);
 
 	//	operations_research::LinearSumAssignment<Matcher::Graph> &
 	//	parameterize_assignment(const RectMatrix<Scalar> &scores,
 	//	                        operations_research::LinearSumAssignment<Matcher::Graph> &a);
 	static operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
-	parameterize_assignment(const MatcherOrTools::Graph &graph,
-	                        const RfAlgorithmInterface::SplitScores &scores,
+	parameterize_assignment(const RfAlgorithmInterface::SplitScores &scores,
 	                        operations_research::LinearSumAssignment<MatcherOrTools::Graph> &a,
 	                        double lap_factor);
 	static double parallel_calc(RfAlgorithmInterface::SplitScores &scores,

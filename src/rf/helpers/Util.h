@@ -37,6 +37,7 @@ class Util {
 
   private:
 	static std::vector<PllTree> get_tree_from_string_list(std::vector<std::string> &tree_str);
+	static std::vector<std::vector<double>> parseMat(const std::string &file_path, char rows, char cols);
 };
 
 #endif // CONCURRENT_GROWTABLE_UTIL_H

@@ -54,8 +54,8 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 void RfMetricInterface::disable_logging() {
 	lg::LoggingBackend::disable_logging();
 }
-RfMetricInterface::RfMetricInterface(RfMetricInterface::Params params)
-    : parameters(std::move(params)) {
+RfMetricInterface::RfMetricInterface(const RfMetricInterface::Params& params)
+    : parameters(params) {
 	// optionally provide a tag
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("INTERFACE"));
 }

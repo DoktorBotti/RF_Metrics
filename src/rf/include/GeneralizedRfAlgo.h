@@ -23,7 +23,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
     // calculates the metric score between two splits
 	// TODO: make protected
     virtual Scalar
-    calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) = 0;
+    calc_split_score(const PllSplit &S1, const PllSplit &S2) = 0;
 
   protected:
 	std::future<Scalar> calc_tree_score(const SplitList &A, const SplitList &B);
@@ -31,7 +31,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	virtual Scalar h_info_content(size_t a, size_t b);
 	[[maybe_unused]] SplitScores calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2);
 	// method to use if both pll-splits are equal. Often more simple solution possible
-	virtual Scalar calc_split_score(const PllSplit &S1, size_t taxa) = 0;
+	virtual Scalar calc_split_score(const PllSplit &S1) = 0;
 
 	virtual RfAlgorithmInterface::Scalar calc_tree_info_content(const SplitList &S);
 	void calc_pairwise_tree_dist(const std::vector<FastSplitList> &trees,
@@ -47,11 +47,12 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	 * temporary_splits[4] : A1 and B2
 	 * temporary_splits[5] : A2 and B1
 	 */
-	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2, size_t split_len);
+	void compute_split_comparison(const PllSplit &S1, const PllSplit &S2);
 	// Stores intermediate results such as intersections. For more information see
 	// compute_split_comparison
 	std::vector<PllSplit> temporary_splits;
 	SymmetricMatrix<Scalar> pairwise_split_scores;
+	size_t taxa = 0;
 
   private:
     MatcherOrTools match_solver;
@@ -67,7 +68,7 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	// private functions to precompute splits and scores
 	void setup_temporary_storage(size_t split_len);
 	std::vector<FastSplitList> generateFastList(const std::vector<PllSplitList> &active_slow_list);
-	SymmetricMatrix<Scalar> calcPairwiseSplitScores(size_t taxa);
+	SymmetricMatrix<Scalar> calcPairwiseSplitScores();
 
 	// parallelization functions which compute max_parallel_threads many pairwise tree scores in parallel
 	inline std::pair<size_t, size_t> startAsyncTask(std::pair<size_t, size_t> start_indices,

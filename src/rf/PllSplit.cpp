@@ -70,21 +70,38 @@ size_t PllSplit::priv_popcount(size_t len) const {
 	precalc_popcount = popcount;
 	return popcount;
 }
-void PllSplit::perform_popcount_precalc(size_t split_len) const {
-	priv_popcount(split_len);
+void PllSplit::perform_popcount_precalc(size_t sp_len) const {
+	priv_popcount(sp_len);
 }
-// requires split_len to be something sensible
-bool PllSplit::operator<(const PllSplit &rhs) const {
+bool PllSplit::comparePrequesites(const PllSplit &rhs) const {
 	if (!operator()() || !rhs()) {
 		return false;
 	}
 	assert(PllSplit::split_len < std::numeric_limits<size_t>::max());
+	return true;
+}
+// requires split_len to be something sensible
+bool PllSplit::operator<(const PllSplit &rhs) const {
+	if (!comparePrequesites(rhs)) {
+		return false;
+	}
 	for (size_t i = 0; i < PllSplit::split_len; ++i) {
 		if (operator()()[i] != rhs()[i]) {
 			return operator()()[i] < rhs()[i];
 		}
 	}
 	return operator()() < rhs();
+}
+bool PllSplit::operator>(const PllSplit &rhs) const {
+    if (!comparePrequesites(rhs)) {
+        return false;
+    }
+	for (size_t i = 0; i < PllSplit::split_len; ++i) {
+		if (operator()()[i] != rhs()[i]) {
+			return operator()()[i] > rhs()[i];
+		}
+	}
+	return operator()() > rhs();
 }
 bool PllSplit::operator==(const PllSplit &rhs) const {
 	if (!operator()() || !rhs()) {
@@ -100,18 +117,7 @@ bool PllSplit::operator==(const PllSplit &rhs) const {
 bool PllSplit::operator!=(const PllSplit &rhs) const {
 	return !(*this == rhs);
 }
-bool PllSplit::operator>(const PllSplit &rhs) const {
-	if (!operator()() || !rhs()) {
-		return false;
-	}
-	assert(PllSplit::split_len < std::numeric_limits<size_t>::max());
-	for (size_t i = 0; i < PllSplit::split_len; ++i) {
-		if (operator()()[i] != rhs()[i]) {
-			return operator()()[i] > rhs()[i];
-		}
-	}
-	return operator()() > rhs();
-}
+
 void PllSplit::setIntersectionIdx(size_t idx) {
 	intersection_matrix_index = idx;
 }

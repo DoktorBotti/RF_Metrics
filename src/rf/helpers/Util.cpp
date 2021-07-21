@@ -87,23 +87,11 @@ RectMatrix<double> Util::create_random_mtx(const size_t dim) {
 	}
 	return res;
 }
+
 RectMatrix<double>
 Util::parse_mtx_from_r(const std::string &file_path, char delim_row, char delim_col) {
-	std::string file_content = read_file(file_path);
-	auto lines = Util::split(file_content, delim_row);
-	std::vector<std::vector<std::string>> mat;
-	mat.reserve(lines.size());
-	for (const auto &el : lines) {
-		mat.push_back(Util::split(el, delim_col));
-	}
+	std::vector<std::vector<double>> dbl_mat = parseMat(file_path, delim_row, delim_col);
 
-	std::vector<std::vector<double>> dbl_mat;
-	for (const auto &el : mat) {
-		dbl_mat.emplace_back();
-		std::for_each(el.begin(), el.end(), [&dbl_mat](auto elem) {
-			dbl_mat.back().push_back(std::stod(elem));
-		});
-	}
 	// copy out matrix
 	size_t dim = dbl_mat.size();
 	RectMatrix<double> res(dim);
@@ -114,14 +102,14 @@ Util::parse_mtx_from_r(const std::string &file_path, char delim_row, char delim_
 	}
 	return res;
 }
-SymmetricMatrix<double>
-Util::parse_sym_mtx_from_r(const std::string &file_path, char delim_row, char delim_col) {
+std::vector<std::vector<double>>
+Util::parseMat(const std::string &file_path, char rows, char cols) {
 	std::string file_content = read_file(file_path);
-	auto lines = Util::split(file_content, delim_row);
+	auto lines = split(file_content, rows);
 	std::vector<std::vector<std::string>> mat;
 	mat.reserve(lines.size());
 	for (const auto &el : lines) {
-		mat.push_back(Util::split(el, delim_col));
+		mat.push_back(split(el, cols));
 	}
 
 	std::vector<std::vector<double>> dbl_mat;
@@ -131,7 +119,14 @@ Util::parse_sym_mtx_from_r(const std::string &file_path, char delim_row, char de
 			dbl_mat.back().push_back(std::stod(elem));
 		});
 	}
-	// copy out matrix
+	return dbl_mat;
+}
+
+SymmetricMatrix<double>
+Util::parse_sym_mtx_from_r(const std::string &file_path, char delim_row, char delim_col) {
+    std::vector<std::vector<double>> dbl_mat = parseMat(file_path, delim_row, delim_col);
+
+    // copy out matrix
 	size_t dim = dbl_mat.size();
 	SymmetricMatrix<double> res(dim);
 	for (size_t i = 0; i < dim; ++i) {

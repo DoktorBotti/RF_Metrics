@@ -38,6 +38,9 @@ class PllSplit {
 	pll_split_t operator()() const {
 		return _split;
 	}
+	PllSplit(const PllSplit&) = default;
+	PllSplit(PllSplit&&) = default;
+	PllSplit& operator=(const PllSplit&)= default;
 	~PllSplit() = default;
 
 	void perform_popcount_precalc(size_t split_len) const;
@@ -83,7 +86,9 @@ class PllSplit {
 	[[nodiscard]] static constexpr size_t computeMinorIndex(size_t index) {
 		return index % splitBitWidth();
 	}
-	size_t priv_popcount(size_t len) const;
+    bool inline comparePrequesites(const PllSplit& rhs) const;
+
+        size_t priv_popcount(size_t len) const;
 
 	pll_split_t _split;
 

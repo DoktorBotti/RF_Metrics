@@ -24,15 +24,14 @@ TEST_CASE("perform matching of specific dst matrix", "[OR_TOOLS]") {
 	//		}
 	//	}
 	MatcherOrTools matcher;
-    RfAlgorithmInterface::SplitScores scores(std::move(dst_mtx));
+	RfAlgorithmInterface::SplitScores scores(std::move(dst_mtx));
 	double res = matcher.solve(scores).get();
 	REQUIRE(res > 0);
-	std::stringstream out;
-
-//	for (size_t i = 0; i < res_matching.size(); ++i) {
-//		out << res_matching[i] << ", ";
-//	}
-//	std::cout << out.str() << std::endl << "summed score: " << res;
+	// std::stringstream out;
+	//	for (size_t i = 0; i < res_matching.size(); ++i) {
+	//		out << res_matching[i] << ", ";
+	//	}
+	//	std::cout << out.str() << std::endl << "summed score: " << res;
 }
 TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	const size_t dim_size = 9;
@@ -40,7 +39,7 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 	          << "! = " << boost::math::double_factorial<double>(dim_size) << "\n";
 	RectMatrix<double> dst_mtx = Util::create_random_mtx(dim_size);
 	MatcherOrTools matcher;
-    RfAlgorithmInterface::SplitScores scores (std::move(dst_mtx));
+	RfAlgorithmInterface::SplitScores scores(std::move(dst_mtx));
 	double res = matcher.solve(scores).get();
 	INFO(res)
 	REQUIRE(std::abs(res - 1.) >= 1e-5); // TODO: whaaa?
@@ -68,26 +67,15 @@ TEST_CASE("matching between sample", "[OR_TOOLS]") {
 }
 std::size_t number_of_files_in_directory(std::filesystem::path path);
 double get_pairwise_tree_score(std::filesystem::path path);
-TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
+static std::string getRefPath(const RfMetricInterface::Metric &metric);
+TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]")
+{
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;
 
 	std::string base_path = "../test/samples/";
 	RfMetricInterface::Metric metric =
 	    GENERATE(RfMetricInterface::SPI, RfMetricInterface::MSI, RfMetricInterface::MCI);
-	std::string reference_path = "/rf_metrics/";
-	switch (metric) {
-		case RfMetricInterface::SPI:
-			reference_path += "SPI_10/";
-			break;
-		case RfMetricInterface::MSI:
-			reference_path += "MSI_10/";
-			break;
-		case RfMetricInterface::MCI:
-			reference_path += "MCI_10/";
-			break;
-		case RfMetricInterface::RF:
-			throw std::invalid_argument("softwipe...");
-	}
+	std::string reference_path = getRefPath(metric);
 	BOOST_LOG_SEV(logger, lg::normal) << "Checking inside metric path " << reference_path;
 	// init randomness for later
 	std::random_device rnd;
@@ -113,14 +101,30 @@ TEST_CASE("validate matching on reference pairwise scores", "[OR_TOOLS][REF]") {
 		// calculate own solution by matching from pairwise split score matrix
 		auto split_scores = Util::parse_mtx_from_r(score_file_iter->path().string(), '\n', ' ');
 		MatcherOrTools matcher;
-        RfAlgorithmInterface::SplitScores scores(std::move(split_scores));
+		RfAlgorithmInterface::SplitScores scores(std::move(split_scores));
 		auto our_solution = matcher.solve(scores).get();
 		double difference = std::abs(our_solution - solution);
 		bool correct = difference <= 1e-3;
 		CHECK(correct);
-        BOOST_LOG_SEV(logger, lg::normal)
-            << (correct? "correct." : "FAIL");
+		BOOST_LOG_SEV(logger, lg::normal) << (correct ? "correct." : "FAIL");
 	}
+}
+static std::string getRefPath(const RfMetricInterface::Metric &metric) {
+	std::string reference_path = "/rf_metrics/";
+	switch (metric) {
+		case RfMetricInterface::SPI:
+			reference_path += "SPI_10/";
+			break;
+		case RfMetricInterface::MSI:
+			reference_path += "MSI_10/";
+			break;
+		case RfMetricInterface::MCI:
+			reference_path += "MCI_10/";
+			break;
+		case RfMetricInterface::RF:
+			throw std::invalid_argument("softwipe...");
+	}
+	return reference_path;
 }
 
 TEST_CASE("matcher arc creation", "[OR_TOOLS]") {
@@ -163,33 +167,33 @@ double get_pairwise_tree_score(std::filesystem::path path) {
 }
 
 static void BasicExample() {
-    using namespace operations_research;
-    // Create the linear solver with the GLOP backend.
-    std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("GLOP"));
+	using namespace operations_research;
+	// Create the linear solver with the GLOP backend.
+	std::unique_ptr<MPSolver> solver(MPSolver::CreateSolver("GLOP"));
 
-    // Create the variables x and y.
-    MPVariable *const x = solver->MakeNumVar(0.0, 1, "x");
-    MPVariable *const y = solver->MakeNumVar(0.0, 2, "y");
+	// Create the variables x and y.
+	MPVariable *const x = solver->MakeNumVar(0.0, 1, "x");
+	MPVariable *const y = solver->MakeNumVar(0.0, 2, "y");
 
-    std::cout << "Number of variables = " << solver->NumVariables() << std::endl;
+	std::cout << "Number of variables = " << solver->NumVariables() << std::endl;
 
-    // Create a linear constraint, 0 <= x + y <= 2.
-    MPConstraint *const ct = solver->MakeRowConstraint(0.0, 2.0, "ct");
-    ct->SetCoefficient(x, 1);
-    ct->SetCoefficient(y, 1);
+	// Create a linear constraint, 0 <= x + y <= 2.
+	MPConstraint *const ct = solver->MakeRowConstraint(0.0, 2.0, "ct");
+	ct->SetCoefficient(x, 1);
+	ct->SetCoefficient(y, 1);
 
-    std::cout << "Number of constraints = " << solver->NumConstraints() << std::endl;
+	std::cout << "Number of constraints = " << solver->NumConstraints() << std::endl;
 
-    // Create the objective function, 3 * x + y.
-    MPObjective *const objective = solver->MutableObjective();
-    objective->SetCoefficient(x, 3);
-    objective->SetCoefficient(y, 1);
-    objective->SetMaximization();
+	// Create the objective function, 3 * x + y.
+	MPObjective *const objective = solver->MutableObjective();
+	objective->SetCoefficient(x, 3);
+	objective->SetCoefficient(y, 1);
+	objective->SetMaximization();
 
-    solver->Solve();
+	solver->Solve();
 
-    std::cout << "Solution:" << std::endl;
-    std::cout << "Objective value = " << objective->Value() << std::endl;
-    std::cout << "x = " << x->solution_value() << std::endl;
-    std::cout << "y = " << y->solution_value() << std::endl;
+	std::cout << "Solution:" << std::endl;
+	std::cout << "Objective value = " << objective->Value() << std::endl;
+	std::cout << "x = " << x->solution_value() << std::endl;
+	std::cout << "y = " << y->solution_value() << std::endl;
 }

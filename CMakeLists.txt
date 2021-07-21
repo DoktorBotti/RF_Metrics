@@ -23,7 +23,9 @@ find_package(Boost 1.76.0 COMPONENTS log REQUIRED)
 # find or-tools (google, linear programming library)
 # if the below find_package fails, you are probably not building in docker and need to manually point to your or-tools binary.
 # e.g.: cmake -DORTOOLS_ROOT:STRING="/my/path/to/the/unzipped/file" ..
-if(NOT DEFINED ORTOOLS_ROOT)
+if(DEFINED ENV{ORTOOLS_ROOT})
+    SET(ORTOOLS_ROOT $ENV{ORTOOLS_ROOT})
+elseif(NOT DEFINED ORTOOLS_ROOT)
     SET(ORTOOLS_ROOT /home/user/or-tools_Ubuntu-20.04-64bit_v9.0.9048)
 endif()
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ORTOOLS_ROOT})
@@ -46,6 +48,6 @@ add_subdirectory(src/commandline)
 add_subdirectory(src/rf)
 add_subdirectory(utils)
 
-add_subdirectory(test)
+add_subdirectory(test/src)
 #adds automatic softwipe execution
 add_subdirectory(misc)

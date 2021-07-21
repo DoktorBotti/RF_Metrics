@@ -53,7 +53,6 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 
 	// init algo interface
 	RfMetricInterface::Params params;
-	params.normalize_output = false;
 	params.metric = RfMetricInterface::SPI;
 	params.input_file_path = tree_path;
 
@@ -64,7 +63,7 @@ TEST_CASE("Calculate simple trees", "[dbg]") {
 }
 
 TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
-	std::string trees_str = "((((F,C),B),A),(E,D));\n(((B,C),(D,A)),(E,F));";
+	// std::string trees_str = "((((F,C),B),A),(E,D));\n(((B,C),(D,A)),(E,F));";
 	auto trees = Util::create_all_trees_from_file("/rf_metrics/BS/125");
 
 	std::vector<PllSplitList> all_splits;
@@ -91,11 +90,7 @@ TEST_CASE("Verify sorted splits in PllSplitLists", "[dbg]") {
 		}
 	}
 }
-
-TEST_CASE("Compare to other Team", "[other_team]") {
-	std::string base_path_res = "../test/samples/luise_reference/";
-	std::string base_path = "../test/samples/data/heads/BS/";
-
+struct Stats {
 	RfMetricInterface::Scalar mean_mci = 0.;
 	RfMetricInterface::Scalar mean_msi = 0.;
 	RfMetricInterface::Scalar mean_spi = 0.;
@@ -105,7 +100,15 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 	size_t num_msi = 0;
 	size_t num_mci = 0;
 	size_t num_spi = 0;
+};
 
+static RfMetricInterface::Metric parseMetric(const std::vector<std::string> &splitted_name);
+static Stats &
+updateStats(Stats &stats, const RfMetricInterface::Metric &metr, double max_diff, double mean_diff);
+TEST_CASE("Compare to other Team", "[other_team]") {
+	std::string base_path_res = "../test/samples/luise_reference/";
+	std::string base_path = "../test/samples/data/heads/BS/";
+	Stats stats;
 	for (const auto &entry : std::filesystem::directory_iterator(base_path_res)) {
 		// skip irrelevant files
 		if (entry.path().filename() == "." || entry.path().filename() == "..") {
@@ -115,20 +118,7 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 		// parse which parameters to pass
 		std::string res_fname = entry.path().filename();
 		auto splitted_name = Util::split(res_fname, '_');
-		auto metr = RfMetricInterface::MCI;
-		{
-			if (splitted_name[0] == "MCI") {
-				metr = RfMetricInterface::MCI;
-			} else if (splitted_name[0] == "MSI") {
-				metr = RfMetricInterface::MSI;
-			} else if (splitted_name[0] == "SPI") {
-				metr = RfMetricInterface::SPI;
-			} else {
-				INFO("Failed to parse metric from other teams reference")
-				INFO(splitted_name[0])
-				REQUIRE(false);
-			}
-		}
+		auto metr = parseMetric(splitted_name);
 		std::string test_name = Util::split(splitted_name[1], '.')[0];
 
 		// load other team IOData
@@ -168,41 +158,64 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 		mean_diff /= static_cast<double>(el_counter);
 		WARN("[" << splitted_name[0] << "] Mean Difference: " << mean_diff << "\n["
 		         << splitted_name[0] << " Max Difference: " << max_diff);
-		switch (metr) {
-			case RfMetricInterface::MCI: {
-				if (std::abs(max_diff) > std::abs(max_mci)) {
-					max_mci = max_diff;
-				}
-				mean_mci += mean_diff;
-				++num_mci;
-				break;
-			}
-			case RfMetricInterface::RF: {
-				throw std::invalid_argument("Not compairing normal RF distance.");
-			}
-			case RfMetricInterface::MSI: {
-				if (std::abs(max_diff) > std::abs(max_msi)) {
-					max_msi = max_diff;
-				}
-				mean_msi += mean_diff;
-				++num_msi;
-				break;
-			}
-			case RfMetricInterface::SPI: {
-				if (std::abs(max_diff) > std::abs(max_spi)) {
-					max_spi = max_diff;
-				}
-				mean_spi += mean_diff;
-				++num_spi;
-				break;
-			}
-		}
+		stats = updateStats(stats, metr, max_diff, mean_diff);
 	}
 	// make summary over all executions
 	WARN("Summary of all comparisons:\n MSI mean: "
-	     << mean_msi / static_cast<double>(num_msi) << " worst: " << max_msi
-	     << "\n MCI mean: " << mean_mci / static_cast<double>(num_mci) << " worst: " << max_mci
-	     << "\n SPI mean: " << mean_spi / static_cast<double>(num_spi) << " worst: " << max_spi);
+	     << stats.mean_msi / static_cast<double>(stats.num_msi) << " worst: " << stats.max_msi
+	     << "\n MCI mean: " << stats.mean_mci / static_cast<double>(stats.num_mci) << " worst: "
+	     << stats.max_mci << "\n SPI mean: " << stats.mean_spi / static_cast<double>(stats.num_spi)
+	     << " worst: " << stats.max_spi);
+}
+static Stats &updateStats(Stats &stats,
+                          const RfMetricInterface::Metric &metr,
+                          double max_diff,
+                          double mean_diff) {
+	switch (metr) {
+		case RfMetricInterface::MCI: {
+			if (std::abs(max_diff) > std::abs(stats.max_mci)) {
+				stats.max_mci = max_diff;
+			}
+			stats.mean_mci += mean_diff;
+			++stats.num_mci;
+			break;
+		}
+		case RfMetricInterface::RF: {
+			throw std::invalid_argument("Not compairing normal RF distance.");
+		}
+		case RfMetricInterface::MSI: {
+			if (std::abs(max_diff) > std::abs(stats.max_msi)) {
+				stats.max_msi = max_diff;
+			}
+			stats.mean_msi += mean_diff;
+			++stats.num_msi;
+			break;
+		}
+		case RfMetricInterface::SPI: {
+			if (std::abs(max_diff) > std::abs(stats.max_spi)) {
+				stats.max_spi = max_diff;
+			}
+			stats.mean_spi += mean_diff;
+			++stats.num_spi;
+			break;
+		}
+	}
+	return stats;
+}
+static RfMetricInterface::Metric parseMetric(const std::vector<std::string> &splitted_name) {
+	RfMetricInterface::Metric metr = RfMetricInterface::MSI;
+	if (splitted_name[0] == "MCI") {
+		metr = RfMetricInterface::MCI;
+	} else if (splitted_name[0] == "MSI") {
+		metr = RfMetricInterface::MSI;
+	} else if (splitted_name[0] == "SPI") {
+		metr = RfMetricInterface::SPI;
+	} else {
+		INFO("Failed to parse metric from other teams reference")
+		INFO(splitted_name[0])
+		REQUIRE(false);
+	}
+	return metr;
 }
 static void test_metric(const std::string &base_path_splits,
                         const std::string &base_path_res,
@@ -229,7 +242,6 @@ static void test_metric(const std::string &base_path_splits,
 		RfMetricInterface::Params params;
 		params.input_file_path = trees_path;
 		params.metric = metric;
-		params.normalize_output = false;
 		WARN("Calculating distances from " + res_fname);
 		WARN("Indices a: " + std::to_string(tree_idx_a) + "    b: " + std::to_string(tree_idx_b));
 		CHECK(!res_fname.empty());

@@ -10,7 +10,8 @@ if(NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*")
         ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND
         #${CMAKE_COMMAND} -E touch ./genFile
-        /bin/bash -c "softwipe -CM ${CMAKE_SOURCE_DIR} -e executeFile -x ${CMAKE_SOURCE_DIR}/libs,${CMAKE_SOURCE_DIR}/utils,${CMAKE_CURRENT_SOURCE_DIR},${CMAKE_SOURCE_DIR}/src/commandline/IO/json,${PROJECT_BINARY_DIR} -a ASSERT,CHECK,REQUIRE"
+        # pass Ortools variable via environment variable
+        /bin/bash -c "ORTOOLS_ROOT=${ORTOOLS_ROOT} softwipe -CM ${CMAKE_SOURCE_DIR} -e executeFile -x ${CMAKE_SOURCE_DIR}/libs,${CMAKE_SOURCE_DIR}/utils,${CMAKE_CURRENT_SOURCE_DIR},${CMAKE_SOURCE_DIR}/src/commandline/IO/json,${PROJECT_BINARY_DIR} -a ASSERT,CHECK,REQUIRE"
 )
 
 endif()

@@ -9,15 +9,13 @@
 class SpiAlgo : public GeneralizedRfAlgo {
   public:
 	double calc_split_score(const PllSplit &S1,
-	                        const PllSplit &S2,
-	                        size_t taxa,
-	                        size_t split_len) override;
+	                        const PllSplit &S2) override;
 	SpiAlgo() = default;
 	SpiAlgo(SpiAlgo &&) = default;
 	~SpiAlgo() override = default;
 
 	explicit SpiAlgo(size_t split_len);
-    RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1, size_t taxa) override;
+    RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1) override;
 
   private:
 	static Scalar one_overlap(size_t a, size_t b, size_t n);

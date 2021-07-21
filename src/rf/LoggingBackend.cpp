@@ -83,14 +83,14 @@ LoggingBackend::LoggingBackend() {
 void LoggingBackend::disable_logging() {
 	boost::log::core::get()->set_logging_enabled(false);
 }
-std::ostream &operator<<(std::ostream &strm, SeverityLevel level) {
-	static const char *strings[] = {"normal", "notification", "warning", "error", "critical"};
-
-	if (static_cast<std::size_t>(level) < sizeof(strings) / sizeof(*strings))
-		strm << strings[level];
-	else
-		strm << static_cast<int>(level);
-
-	return strm;
-}
+//std::ostream &operator<<(std::ostream &strm, SeverityLevel level) {
+//	static const char *strings[] = {"normal", "notification", "warning", "error", "critical"};
+//
+//	if (static_cast<std::size_t>(level) < sizeof(strings) / sizeof(*strings))
+//		strm << strings[level];
+//	else
+//		strm << static_cast<int>(level);
+//
+//	return strm;
+//}
 } // namespace lg

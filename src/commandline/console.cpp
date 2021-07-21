@@ -13,16 +13,16 @@ struct Flag {
 	std::string description;
 	std::function<void(RfMetricInterface::Params &params, std::vector<std::string>)> func;
 
-	Flag(std::string name_in,
+	Flag(std::string &&name_in,
 	     int parameter_count_in,
-	     std::string description_in,
-	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> func_in)
+	     std::string &&description_in,
+	     std::function<void(RfMetricInterface::Params &, std::vector<std::string>)> &&func_in)
 	    : name(move(name_in)), parameter_count(parameter_count_in),
 	      description(move(description_in)), func(move(func_in)) {
 	}
 
-	Flag(std::string name_in,
-	     std::string description_in,
+	Flag(std::string &&name_in,
+	     std::string &&description_in,
 	     const std::function<void(RfMetricInterface::Params &)> &func_in)
 	    : name(move(name_in)), parameter_count(0), description(move(description_in)),
 	      func([=](RfMetricInterface::Params &params, const std::vector<std::string> &) {
@@ -31,6 +31,8 @@ struct Flag {
 	}
 };
 
+RfMetricInterface::Params parseParams(
+    int argc, char *const *argv, boost::log::sources::severity_logger<lg::SeverityLevel> &logger);
 const static std::vector<Flag> flags = {
     {"--metric",
      1,
@@ -73,11 +75,24 @@ int main(int argc, char **argv) {
 		          << " -o [output-file-path]" << std::endl;
 		return 0;
 	}
-	bool flag_found = false;
+	RfMetricInterface::Params params = parseParams(argc, argv, logger);
+
+	auto res = RfMetricInterface(params);
+	res.do_magical_high_performance_stuff();
+	bool success = res.write_result_to_file();
+	if (!success) {
+		BOOST_LOG_SEV(logger, lg::error) << "could not write to output file.";
+		return 1;
+	}
+	assert(success);
+	return 0;
+}
+RfMetricInterface::Params parseParams(
+    int argc, char *const *argv, boost::log::sources::severity_logger<lg::SeverityLevel> &logger) {
 	int arg_pos = 1;
 	RfMetricInterface::Params params;
 	while (arg_pos < argc) {
-		flag_found = false;
+		bool flag_found = false;
 		for (auto &c : flags) {
 			if (!flag_found && c.name == argv[arg_pos]) {
 				if (arg_pos + 1 + c.parameter_count > argc) {
@@ -102,14 +117,5 @@ int main(int argc, char **argv) {
 			throw std::runtime_error(errMsg);
 		}
 	}
-
-	auto res = RfMetricInterface(params);
-	res.do_magical_high_performance_stuff();
-	bool success = res.write_result_to_file();
-	if (!success) {
-		BOOST_LOG_SEV(logger, lg::error) << "could not write to output file.";
-		return 1;
-	}
-	assert(success);
-	return 0;
+	return params;
 }

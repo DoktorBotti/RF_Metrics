@@ -16,15 +16,12 @@ class MciAlgo : public GeneralizedRfAlgo {
 	// TODO: make private and still testable?
 	explicit MciAlgo(size_t split_len);
 	MciAlgo() = default;
-	MciAlgo(MciAlgo&&) = default;
+	MciAlgo(MciAlgo &&) = default;
 	~MciAlgo() override = default;
 
-    RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1,
-	                        const PllSplit &S2,
-	                        size_t taxa,
-	                        size_t split_len) override;
+	RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1, const PllSplit &S2) override;
 	RfAlgorithmInterface::Scalar calc_tree_info_content(const SplitList &S) override;
-    RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1, size_t taxa) override;
+	RfAlgorithmInterface::Scalar calc_split_score(const PllSplit &S1) override;
 
   protected:
 	Scalar h_info_content(size_t a, size_t b) override;

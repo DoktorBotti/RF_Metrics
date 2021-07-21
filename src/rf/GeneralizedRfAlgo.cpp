@@ -41,12 +41,13 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		all_splits.emplace_back(t);
 	}
 	PllSplit::split_len = all_splits.back().computeSplitLen();
+    taxa = all_splits.back().size() + 3;
 
 	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
 	std::vector<FastSplitList> fast_trees = generateFastList(all_splits);
 	assert(PllSplit::split_len != std::numeric_limits<size_t>::max());
 	setup_temporary_storage(PllSplit::split_len);
-	pairwise_split_scores = calcPairwiseSplitScores(fast_trees.front().size() + 3);
+	pairwise_split_scores = calcPairwiseSplitScores();
 
 	BOOST_LOG_SEV(logger, lg::notification)
 	    << "Calculated pairwise scores; Calculating pairwise tree scores.";
@@ -100,18 +101,16 @@ std::future<RfAlgorithmInterface::Scalar> GeneralizedRfAlgo::calc_tree_score(con
 [[maybe_unused]] GeneralizedRfAlgo::SplitScores
 GeneralizedRfAlgo::calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2) {
 	SplitScores scores(S1.size());
-	const auto taxa = S1.size() + 3;
 	factorials.reserve(taxa + taxa + 4);
-	const auto split_len = S1.computeSplitLen();
 	for (size_t row = 0; row < S1.size(); ++row) {
 		for (size_t col = 0; col < S1.size(); ++col) {
 			Scalar val;
 			// when using fast Split list, the pointers to PllSplit define equality
 			if (&S1[row] == &S2[col]) {
 				assert(S1[row] == S2[col]);
-				val = calc_split_score(S1[row], taxa);
+				val = calc_split_score(S1[row]);
 			} else {
-				val = calc_split_score(S1[row], S2[col], taxa, split_len);
+				val = calc_split_score(S1[row], S2[col]);
 			}
 
 			if (scores.max_score < val) {
@@ -125,21 +124,20 @@ GeneralizedRfAlgo::calc_pairwise_split_scores(const SplitList &S1, const SplitLi
 }
 
 void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
-                                                 const PllSplit &S2,
-                                                 size_t split_len) {
+                                                 const PllSplit &S2) {
 	// B1 -> &split_buffer[0]
-	S1.set_not(split_len, &temporary_split_content[0]);
+	S1.set_not(PllSplit::split_len, &temporary_split_content[0]);
 	// B2 -> &split_buffer[split_len]
-	S2.set_not(split_len, &temporary_split_content[split_len]);
+	S2.set_not(PllSplit::split_len, &temporary_split_content[PllSplit::split_len]);
 	// A1 and A2 -> &split_buffer[2 * split_len]
-	S1.intersect(S2, split_len, &temporary_split_content[2 * split_len]);
+	S1.intersect(S2, PllSplit::split_len, &temporary_split_content[2 * PllSplit::split_len]);
 	// B1 and B2 -> &split_buffer[3 * split_len]
 	temporary_splits[0].intersect(
-	    temporary_splits[1], split_len, &temporary_split_content[3 * split_len]);
+	    temporary_splits[1], PllSplit::split_len, &temporary_split_content[3 * PllSplit::split_len]);
 	// A1 and B2 -> &split_buffer[4 * split_len]
-	S1.intersect(temporary_splits[1], split_len, &temporary_split_content[4 * split_len]);
+	S1.intersect(temporary_splits[1], PllSplit::split_len, &temporary_split_content[4 * PllSplit::split_len]);
 	// A2 and B1 -> &split_buffer[5 * split_len]
-	S2.intersect(temporary_splits[0], split_len, &temporary_split_content[5 * split_len]);
+	S2.intersect(temporary_splits[0], PllSplit::split_len, &temporary_split_content[5 * PllSplit::split_len]);
 }
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_info_content(const SplitList &S) {
 	Scalar sum = 0;
@@ -151,7 +149,6 @@ RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_info_content(const Spl
 void GeneralizedRfAlgo::calc_pairwise_tree_dist(const std::vector<FastSplitList> &trees,
                                                 RfMetricInterface::Results &res) {
 	std::vector<GeneralizedRfAlgo::Scalar> tree_info(trees.size());
-	auto taxa = trees[0].size() + 3;
 	for (size_t i = 0; i < trees.size(); ++i) {
 		tree_info[i] = calc_tree_info_content(trees[i]);
 	}
@@ -190,7 +187,6 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 
 	std::vector<FastSplitList> returnList(slow_split_list.size(),
 	                                      FastSplitList(slow_split_list.front().size()));
-	const auto taxa = slow_split_list.back().size() + 3;
 
 	// data used inside k-way merge
 	std::vector<size_t> currently_inPQ(slow_split_list.size(), 0);
@@ -267,11 +263,10 @@ GeneralizedRfAlgo::generateFastList(const std::vector<PllSplitList> &slow_split_
 	return returnList;
 }
 
-SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitScores(size_t taxa) {
+SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitScores() {
 	assert(!unique_pll_splits.empty());
 	factorials.reserve(taxa + taxa + 4);
 
-	const size_t split_len = PllSplit::split_len;
 	size_t split_num = unique_pll_splits.size();
 	SymmetricMatrix<Scalar> resMtx(split_num);
 	for (size_t row = 0; row < split_num; ++row) {
@@ -280,9 +275,9 @@ SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitS
 		rSplit.setIntersectionIdx(row);
 		for (size_t col = 0; col < row; ++col) {
 			auto &cSplit = unique_pll_splits[col];
-			resMtx.set_at(row, col, calc_split_score(rSplit, cSplit, taxa, split_len));
+			resMtx.set_at(row, col, calc_split_score(rSplit, cSplit));
 		}
-		resMtx.set_at(row, row, calc_split_score(rSplit, taxa));
+		resMtx.set_at(row, row, calc_split_score(rSplit));
 	}
 	return resMtx;
 }

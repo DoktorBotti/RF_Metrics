@@ -4,21 +4,21 @@ MciAlgo::MciAlgo(size_t split_len) : GeneralizedRfAlgo(split_len) {
 }
 // TODO: test boolean transformation to reduce operations
 double
-MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2, size_t taxa, size_t split_len) {
+MciAlgo::calc_split_score(const PllSplit &S1, const PllSplit &S2) {
 	const auto a1 = S1.getPrecalcPopcnt();
 	const auto a2 = S2.getPrecalcPopcnt();
 	const auto b1 = taxa - a1;
 	const auto b2 = taxa - a2;
 
-	compute_split_comparison(S1, S2, split_len);
-	const auto a1_a2 = temporary_splits[2].popcount(split_len); // A1_and_A2
-	const auto a1_b2 = temporary_splits[4].popcount(split_len); // A1_and_B2
-	const auto a2_b1 = temporary_splits[5].popcount(split_len); // B1_and_A2
+	compute_split_comparison(S1, S2);
+	const auto a1_a2 = temporary_splits[2].popcount(PllSplit::split_len); // A1_and_A2
+	const auto a1_b2 = temporary_splits[4].popcount(PllSplit::split_len); // A1_and_B2
+	const auto a2_b1 = temporary_splits[5].popcount(PllSplit::split_len); // B1_and_A2
 
 	// Account for the bits counted at the end because of both inversions!
 	// TODO: test whether bitmask is faster
 	const auto bits_too_many = GeneralizedRfAlgo::bits_too_many(taxa);
-	const auto b1_b2 = temporary_splits[3].popcount(split_len) - bits_too_many; // B1_and_B2
+	const auto b1_b2 = temporary_splits[3].popcount(PllSplit::split_len) - bits_too_many; // B1_and_B2
 
 	assert(b1_b2 == taxa - (a1_a2 + a1_b2 + a2_b1));
 
@@ -62,7 +62,7 @@ RfAlgorithmInterface::Scalar MciAlgo::calc_tree_info_content(const SplitList &S)
 	return sum;
 }
 
-RfAlgorithmInterface::Scalar MciAlgo::calc_split_score(const PllSplit &S1, size_t taxa) {
+RfAlgorithmInterface::Scalar MciAlgo::calc_split_score(const PllSplit &S1) {
 	return (to_prob(S1.getPrecalcPopcnt(), taxa, S1.getPrecalcPopcnt(), S1.getPrecalcPopcnt()) +
 	        to_prob(taxa - S1.getPrecalcPopcnt(),
 	                taxa,

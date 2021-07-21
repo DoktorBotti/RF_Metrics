@@ -26,7 +26,6 @@ MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
 }
 operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
 MatcherOrTools::parameterize_assignment(
-    const MatcherOrTools::Graph &graph,
     const RfAlgorithmInterface::SplitScores &scores,
     operations_research::LinearSumAssignment<MatcherOrTools::Graph> &a,
     const double lap_factor) { // tiny lambda helpers
@@ -42,9 +41,6 @@ MatcherOrTools::parameterize_assignment(
 			const long arc_cost = getScore(from, to);
 			const auto arc_idx = from * dim + to;
 			assign_permuted_cost(arc_idx, arc_cost, a, std::vector<int>());
-			// Debug:
-			assert(graph.Tail(static_cast<int>(arc_idx)) == static_cast<int>(from));
-			assert(graph.Head(static_cast<int>(arc_idx)) == static_cast<int>(to + dim));
 		}
 	}
 	return a;
@@ -103,7 +99,7 @@ double MatcherOrTools::parallel_calc(RfAlgorithmInterface::SplitScores &scores,
 	// Construct the LinearSumAssignment.
 	int num_left_nodes = static_cast<int>(scores.scores.size());
 	LinearSumAssignment<Graph> a(graph, num_left_nodes);
-	parameterize_assignment(graph, scores, a, lap_factor);
+	parameterize_assignment(scores, a, lap_factor);
 
 	// Compute the optimum assignment.
 	if (!a.FinalizeSetup()) {
@@ -111,6 +107,9 @@ double MatcherOrTools::parallel_calc(RfAlgorithmInterface::SplitScores &scores,
 	}
 	bool success = a.ComputeAssignment();
 	assert(success);
+	if (!success) {
+		throw std::logic_error("The Linear Assignment Calculator failed to calculate a result");
+	}
 
 	// Retrieve the cost of the optimum assignment.
 	MatcherOrTools::Scalar summed_cost = 0;

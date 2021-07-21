@@ -1,5 +1,4 @@
 add_library(rf_lib STATIC
-        Cacher.cpp
         FastSplitList.cpp
         GeneralizedRfAlgo.cpp
         LogDblFact.cpp
@@ -16,17 +15,11 @@ add_library(rf_lib STATIC
         SpiAlgo.cpp
         SplitList.cpp
         StandardRfAlgo.cpp
-        TwoSplitHashmapFunctor.cpp
-        TwoSplitHashmapKey.cpp
         helpers/Util.cpp
         helpers/Util.h
         include/FastSplitList.h
         include/GeneralizedRfAlgo.h
-        include/HashmapUtil/Cacher.h
         include/HashmapUtil/OneSplitHashingFunctor.hpp
-        include/HashmapUtil/OneSplitHashmapKey.hpp
-        include/HashmapUtil/TwoSplitHashmapFunctor.h
-        include/HashmapUtil/TwoSplitHashmapKey.h
         include/LogDblFact.h
         include/LoggingBackend.h
         include/Matcher.h
