@@ -24,9 +24,9 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	// TODO: make protected
     virtual Scalar
     calc_split_score(const PllSplit &S1, const PllSplit &S2) = 0;
+    RfAlgorithmInterface::Scalar calc_tree_score(const SplitList &A, const SplitList &B);
 
   protected:
-	std::future<Scalar> calc_tree_score(const SplitList &A, const SplitList &B);
 	/* Calculates the information content of a split with partition sizes a and b. */
 	virtual Scalar h_info_content(size_t a, size_t b);
 	[[maybe_unused]] SplitScores calc_pairwise_split_scores(const SplitList &S1, const SplitList &S2);
@@ -59,7 +59,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
     const size_t max_parallel_threads = 600;
     std::vector<PllSplit> unique_pll_splits;
     std::vector<pll_split_base_t> temporary_split_content; // DANGER! Not to be operated by fuckwits
-
+    static std::mutex pairwise_tree_score_mutex;
+    static std::atomic_size_t tree_idx;
 
     // logging stuff
     boost::log::sources::severity_logger<lg::SeverityLevel> logger;
@@ -71,14 +72,10 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	SymmetricMatrix<Scalar> calcPairwiseSplitScores();
 
 	// parallelization functions which compute max_parallel_threads many pairwise tree scores in parallel
-	inline std::pair<size_t, size_t> startAsyncTask(std::pair<size_t, size_t> start_indices,
-	                                                std::vector<std::future<Scalar>> &futures,
-	                                                size_t num_tasks,
-	                                                const std::vector<FastSplitList> &trees);
-	void awaitAsyncTask(RfMetricInterface::Results &results,
-	                    std::vector<std::future<Scalar>> &futures,
-	                    std::pair<size_t, size_t> start_indices,
-	                    size_t num_tasks);
+	static void calc_thread(GeneralizedRfAlgo &alg, const std::vector<FastSplitList> &trees,
+	                 size_t pairwise_tree_cnt,
+	                 SymmetricMatrix<Scalar> &sim);
+	//static void execute_bla(GeneralizedRfAlgo &alg )
 };
 
 #endif // INFORF_GENERALIZEDRFALGO_H

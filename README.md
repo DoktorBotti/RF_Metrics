@@ -1,11 +1,17 @@
 # Introduction
 
-Skeleton for the 2021 KIT bioinformatics practical. This repository contains the bare bones start for computing a
-distance function on trees using splits. To get started, first clone the repository:
+Written as part of the 2021 KIT bioinformatics practical. The program can calculate the RF distance and the [generalized RF distances][1].
+To get started clone the repository:
 
 ```
 git clone --recursive git@github.com:DoktorBotti/RF_Metrics.git
 ```
+
+# Building
+Prerequisites:
+ - boost [Version 1.76.0][2]
+ - OR-Tools Version 9.0.9048
+
 
 # Prequesites / External dependencies
 The following libraries should be findable by CMake or the installation should be pointed to with a TARGET_ROOT variable. (This variable is then added to the CMAKE_PREFIX_PATH.)
@@ -13,52 +19,10 @@ The following libraries should be findable by CMake or the installation should b
  - or-tools (v9.0.9048)
  - graph-lib ?
 
-After that, to build the code run `make && cd build && make`, which will generate the build directory, and then start
-building the code. The static library that is built is called `libinforf`, and is placed in `bin` after building.
+# Running the program
+`commandline_rf --metric [ RF | MCI | MSI | SPI ] -i [input-file-path] -o [output-file-path]`
+The input must be in the Newick format.
+The output contains the pairwise distances of all trees given in the input.
 
-I suggest that you take a look at the code itself, as you will be expected to modify it directly. The 2 header files,
-`src/PllSplits.hpp` and `src/PllTree.hpp` 
-
-# Splits Data Structure
-
-The individual splits are represented as bitvectors, which are stored as `pll_split_base_t` (which is an alias of
-`unsigned int`). The order of the bits in the bit vector is ensured by matching internal IDs. I have written a simple
-wrapper class around the splits, which can be used to implement the basic operations required. A non exhaustive list of
-suggested operations is:
-
-- popcount
-- bitextract
-- union (bitwise or)
-- intersect (bitwise and)
-- symmetric difference (bitwise xor)
-
-# Actually computing the splits
-
-To actually compute the splits, something like the following should be done
-
-```
-std::vector<PllTree> tree_list;
-for(auto t: tree_strings){
-    tree_list.emplace_back(t);
-}
-
-std::vector<PllSplits> splits_list;
-
-for(auto &t: tree_list){
-    t.alignNodeIndices(*tree_list.begin());
-    splits_list.emplace_back(t);
-}
-```
-
-The important function to apply is the `alignNodeIndices`. This makes sure that the bitvectors are ordered the proper
-way, so that the results make sense.
-
-This example can be found more fleshed out in `test/src/main.cpp`.
-
-# Possibly useful functions from libpll
-
-```
-void pllmod_utree_split_show(pll_split_t split, unsigned int tip_count)
-```
-
-Prints the split.
+[1]: https://doi.org/10.1093/bioinformatics/btaa614
+[2]: https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2

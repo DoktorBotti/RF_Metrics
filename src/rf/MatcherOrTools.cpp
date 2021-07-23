@@ -3,13 +3,11 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <climits>
 
-std::future<MatcherOrTools::Scalar>
-MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
+MatcherOrTools::Scalar MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
                       /*,std::vector<size_t> *best_matching_out*/) {
 	// initialize on first usage
 	if (!is_ready) {
 		init(scores.scores.size());
-		is_ready = true;
 	}
 	//
 	//	BOOST_LOG_SEV(logger, lg::normal) << "Total score result by summing: " << optimum_cost;
@@ -17,12 +15,7 @@ MatcherOrTools::solve(GeneralizedRfAlgo::SplitScores &scores
 	//	    << "Total score result by OrTools directly: " << optimum_cost
 	//	    << " difference: " << std::abs(static_cast<double>(summed_cost - optimum_cost));
 
-	return std::async(
-	    [](auto scores_v, const auto &graph_instance) {
-		    return parallel_calc(scores_v, graph_instance);
-	    },
-	    scores,
-	    graph);
+	return parallel_calc(scores, graph);
 }
 operations_research::LinearSumAssignment<MatcherOrTools::Graph> &
 MatcherOrTools::parameterize_assignment(
@@ -76,6 +69,7 @@ void MatcherOrTools::init(size_t num_matches) {
 	// Build the StaticGraph.
 	graph.Build(&arc_permutation);
 	BOOST_LOG_SEV(logger, lg::normal) << "Built static graph with " << num_nodes << " nodes.";
+    is_ready = true;
 }
 MatcherOrTools::Graph
 MatcherOrTools::getGraphCopy(const RectMatrix<MatcherOrTools::Scalar> &scores) {

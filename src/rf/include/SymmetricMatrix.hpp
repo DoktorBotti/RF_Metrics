@@ -13,20 +13,24 @@ class SymmetricMatrix {
 	explicit SymmetricMatrix(size_t num_elems);
 	/* Sets the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	void set_at(size_t row, size_t column, T val);
-	void set_at_move(size_t row, size_t column, T&& val);
+    void raw_set_at(size_t index, T val);
+    void set_at_move(size_t row, size_t column, T&& val);
 	/* Sets the value at row, column. Checked, behaves like a symmetric matrix. */
 	void checked_set_at(size_t row, size_t column, T val);
 	/* Retrieves the value at row, column. Unchecked, the caller must guarantee row >= column. */
 	const T &at(size_t row, size_t column) const;
     T &at(size_t row, size_t column);
+    const T &raw_at(size_t index) const;
+    T &raw_at(size_t index);
 
     /* Retrieves the value at row, column. Checked, behaves like a symmetric matrix. */
 	const T &checked_at(size_t row, size_t column) const;
 	[[nodiscard]] size_t size() const;
+    [[nodiscard]] size_t get_num_entries() const;
 	std::vector<std::vector<T>> to_vector() const;
 
 	[[nodiscard]] std::pair<T, T> get_min_max() const;
-	std::string print() const;
+	[[nodiscard]] std::string print() const;
 
 	SymmetricMatrix<T> operator-(const SymmetricMatrix<T> &other) const;
 
@@ -48,6 +52,10 @@ void SymmetricMatrix<T>::set_at(size_t row, size_t column, T val) {
 	size_t row_idx = row * (row + 1) / 2;
 	matrix[row_idx + column] = val;
 }
+template <typename T>
+void SymmetricMatrix<T>::raw_set_at(size_t index, T val) {
+    matrix[index] = val;
+}
 
 template <typename T>
 const T &SymmetricMatrix<T>::at(size_t row, size_t column) const {
@@ -60,6 +68,14 @@ T &SymmetricMatrix<T>::at(size_t row, size_t column) {
     assert(row >= column);
     size_t row_idx = row * (row + 1) / 2;
     return matrix[row_idx + column];
+}
+template <typename T>
+const T &SymmetricMatrix<T>::raw_at(size_t index) const {
+    return matrix[index];
+}
+template <typename T>
+T &SymmetricMatrix<T>::raw_at(size_t index) {
+    return matrix[index];
 }
 template <typename T>
 size_t SymmetricMatrix<T>::size() const {
@@ -95,6 +111,10 @@ template <typename T>
 std::pair<T, T> SymmetricMatrix<T>::get_min_max() const {
 	auto min_max = std::minmax_element(matrix.begin(), matrix.end());
 	return std::make_pair(*min_max.first, *min_max.second);
+}
+template <typename T>
+size_t SymmetricMatrix<T>::get_num_entries() const {
+	return matrix.size();
 }
 template <typename T>
 std::string SymmetricMatrix<T>::print() const {

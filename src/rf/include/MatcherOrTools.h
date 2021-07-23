@@ -15,9 +15,11 @@ class MatcherOrTools : public Matcher {
 	explicit MatcherOrTools();
 	~MatcherOrTools() override = default;
 	// double solve(const RectMatrix<Scalar> &scores /*,std::vector<size_t> *best_matching_out*/);
-	std::future<MatcherOrTools::Scalar> solve(RfAlgorithmInterface::SplitScores &scores) override;
+	MatcherOrTools::Scalar solve(RfAlgorithmInterface::SplitScores &scores) override;
 
 	Graph getGraphCopy(const RectMatrix<Scalar> &scores);
+
+    void init(size_t num_splits);
 
   private:
 	// important private members
@@ -27,7 +29,6 @@ class MatcherOrTools : public Matcher {
 
 	// used for init on first usage
 	bool is_ready = false;
-	void init(size_t num_splits);
 	// helper functions
 	static void assign_permuted_cost(size_t unpermuted_index,
 	                                 long cost,

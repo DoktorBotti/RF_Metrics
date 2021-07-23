@@ -8,6 +8,8 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <future>
 
+std::atomic_size_t GeneralizedRfAlgo::tree_idx = 0;
+
 LogDblFact GeneralizedRfAlgo::factorials = LogDblFact();
 GeneralizedRfAlgo::GeneralizedRfAlgo() : pairwise_split_scores(0) {
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("generalized_RF"));
@@ -31,6 +33,22 @@ size_t GeneralizedRfAlgo::bits_too_many(size_t taxa) {
 	return bits_too_many;
 }
 
+void GeneralizedRfAlgo::calc_thread(GeneralizedRfAlgo &alg,
+                                    const std::vector<FastSplitList> &trees,
+                                    size_t pairwise_tree_cnt,
+                                    SymmetricMatrix<Scalar> &sim) {
+	while (true) {
+		size_t index = tree_idx++;
+		if (index >= pairwise_tree_cnt) {
+			break;
+		}
+		auto row = static_cast<size_t>(std::sqrt(1 + 8 * index) / 2 - .5);
+		size_t col = (row * row + row) / 2;
+		auto score = alg.calc_tree_score(trees[row], trees[col]);
+		sim.raw_set_at(index, score);
+	}
+}
+
 RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
 	assert(trees.size() >= 2);
 	// extract splits. Each tree now identifies by its index in all_splits
@@ -41,9 +59,10 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 		all_splits.emplace_back(t);
 	}
 	PllSplit::split_len = all_splits.back().computeSplitLen();
-    taxa = all_splits.back().size() + 3;
+	taxa = all_splits.back().size() + 3;
 
 	BOOST_LOG_SEV(logger, lg::notification) << "Parsed trees. Starting calculations.";
+	factorials.reserve(4 * taxa + 8);
 	std::vector<FastSplitList> fast_trees = generateFastList(all_splits);
 	assert(PllSplit::split_len != std::numeric_limits<size_t>::max());
 	setup_temporary_storage(PllSplit::split_len);
@@ -52,14 +71,23 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	BOOST_LOG_SEV(logger, lg::notification)
 	    << "Calculated pairwise scores; Calculating pairwise tree scores.";
 	RfMetricInterface::Results res(trees.size());
-	std::pair<size_t, size_t> start_idx = std::make_pair(0, 0);
-	std::pair<size_t, size_t> end_idx =
-	    std::make_pair(std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max());
-	while (start_idx != end_idx) {
-		std::vector<std::future<Scalar>> async_res(max_parallel_threads);
-		auto new_start_idx = startAsyncTask(start_idx, async_res, max_parallel_threads, fast_trees);
-		awaitAsyncTask(res, async_res, start_idx, max_parallel_threads);
-		start_idx = new_start_idx;
+
+	size_t pairwise_tree_cnt = res.pairwise_similarities.get_num_entries();
+	int num_threads = 6; // params.threads == -1 ? std::thread::hardware_concurrency() :
+	                     // params.threads;
+	std::vector<std::thread> pool;
+	match_solver.init(all_splits.back().size());
+
+	for (int i = 0; i < num_threads; ++i) {
+		pool.emplace_back(calc_thread,
+		                  std::ref(*this),
+		                  std::ref(fast_trees),
+		                  std::ref(pairwise_tree_cnt),
+		                  std::ref(res.pairwise_similarities));
+	}
+
+	for (auto &thread : pool) {
+		thread.join();
 	}
 
 	// calc mean distance between trees
@@ -77,8 +105,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	factorials.printLog();
 	return res;
 }
-std::future<RfAlgorithmInterface::Scalar> GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
-                                                                             const SplitList &B) {
+RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_score(const SplitList &A,
+                                                                const SplitList &B) {
 	//	auto scores = calc_pairwise_split_scores(A, B);
 	SplitScores scores(A.size());
 	Scalar max_val = 0;
@@ -123,8 +151,7 @@ GeneralizedRfAlgo::calc_pairwise_split_scores(const SplitList &S1, const SplitLi
 	return scores;
 }
 
-void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
-                                                 const PllSplit &S2) {
+void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1, const PllSplit &S2) {
 	// B1 -> &split_buffer[0]
 	S1.set_not(PllSplit::split_len, &temporary_split_content[0]);
 	// B2 -> &split_buffer[split_len]
@@ -132,12 +159,17 @@ void GeneralizedRfAlgo::compute_split_comparison(const PllSplit &S1,
 	// A1 and A2 -> &split_buffer[2 * split_len]
 	S1.intersect(S2, PllSplit::split_len, &temporary_split_content[2 * PllSplit::split_len]);
 	// B1 and B2 -> &split_buffer[3 * split_len]
-	temporary_splits[0].intersect(
-	    temporary_splits[1], PllSplit::split_len, &temporary_split_content[3 * PllSplit::split_len]);
+	temporary_splits[0].intersect(temporary_splits[1],
+	                              PllSplit::split_len,
+	                              &temporary_split_content[3 * PllSplit::split_len]);
 	// A1 and B2 -> &split_buffer[4 * split_len]
-	S1.intersect(temporary_splits[1], PllSplit::split_len, &temporary_split_content[4 * PllSplit::split_len]);
+	S1.intersect(temporary_splits[1],
+	             PllSplit::split_len,
+	             &temporary_split_content[4 * PllSplit::split_len]);
 	// A2 and B1 -> &split_buffer[5 * split_len]
-	S2.intersect(temporary_splits[0], PllSplit::split_len, &temporary_split_content[5 * PllSplit::split_len]);
+	S2.intersect(temporary_splits[0],
+	             PllSplit::split_len,
+	             &temporary_split_content[5 * PllSplit::split_len]);
 }
 RfAlgorithmInterface::Scalar GeneralizedRfAlgo::calc_tree_info_content(const SplitList &S) {
 	Scalar sum = 0;
@@ -280,60 +312,4 @@ SymmetricMatrix<GeneralizedRfAlgo::Scalar> GeneralizedRfAlgo::calcPairwiseSplitS
 		resMtx.set_at(row, row, calc_split_score(rSplit));
 	}
 	return resMtx;
-}
-std::pair<size_t, size_t>
-GeneralizedRfAlgo::startAsyncTask(std::pair<size_t, size_t> start_indices,
-                                  std::vector<std::future<Scalar>> &futures,
-                                  size_t num_tasks,
-                                  const std::vector<FastSplitList> &trees) {
-	constexpr size_t max = std::numeric_limits<size_t>::max();
-	size_t tasks = 0;
-	for (size_t idx_a = start_indices.first; idx_a < trees.size(); ++idx_a) {
-		for (size_t idx_b = start_indices.second; idx_b <= idx_a; ++idx_b) {
-			futures[tasks] = calc_tree_score(trees[idx_a], trees[idx_b]);
-			if (++tasks >= num_tasks) {
-				// stop starting new threads
-				if (idx_b == idx_a && idx_a == trees.size()) {
-					// we already calculated everything
-					return std::make_pair(max, max);
-				}
-				// the next element is
-				if (idx_a == idx_b) {
-					return std::make_pair(idx_a + 1, 0l);
-				} else {
-					return std::make_pair(idx_a, idx_b + 1);
-				}
-			}
-		}
-		start_indices.second = 0;
-	}
-	// there was a rest smaller than num_tasks
-	return std::make_pair(max, max);
-}
-void GeneralizedRfAlgo::awaitAsyncTask(RfMetricInterface::Results &results,
-                                       std::vector<std::future<Scalar>> &futures,
-                                       std::pair<size_t, size_t> start_indices,
-                                       size_t num_tasks) {
-	size_t tasks = 0;
-	for (size_t idx_a = start_indices.first; idx_a < results.pairwise_similarities.size();
-	     ++idx_a) {
-		for (size_t idx_b = start_indices.second; idx_b <= idx_a; ++idx_b) {
-			auto tree_res = futures[tasks].get();
-			results.pairwise_similarities.set_at(idx_a, idx_b, tree_res);
-			++stat_calculated_trees;
-			++tasks;
-			if (stat_calculated_trees % 50 == 0) {
-				size_t num_tree_calcs = futures.size() * (futures.size() + 1) / 2;
-				// print update
-				BOOST_LOG_SEV(logger, lg::notification)
-				    << "Processed " << stat_calculated_trees << " of " << num_tree_calcs
-				    << " total tree calculations";
-			}
-			if (tasks >= num_tasks ||
-			    (idx_b == idx_a && idx_a == results.pairwise_similarities.size())) {
-				return;
-			}
-		}
-		start_indices.second = 0;
-	}
 }
