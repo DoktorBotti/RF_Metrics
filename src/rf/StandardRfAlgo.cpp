@@ -7,12 +7,11 @@
 // needed to add a tag
 #include <boost/log/attributes/constant.hpp>
 
-RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees) {
-
+RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees, const RfMetricInterface::Params& params) {
 	// extract splits
 	std::vector<PllSplitList> split_lists;
 	size_t curr_tree = 0;
-	if(trees.size() <= 1){
+	if (trees.size() <= 1) {
 		return RfMetricInterface::Results(0);
 	}
 	for (auto &t : trees) {
@@ -45,14 +44,20 @@ RfMetricInterface::Results StandardRfAlgo::calculate(std::vector<PllTree> &trees
 	    static_cast<double>((trees.size() * (trees.size() - 1) * max_pairwise_dst) >> 1);
 	BOOST_LOG_SEV(logger, lg::normal) << "Done. Mean distance: " << mean_dst;
 	RfMetricInterface::Results res(trees.size());
-	res.pairwise_distances_absolute = pairwise_dst;
-	for (size_t i = 0; i < res.pairwise_distances_absolute.size(); ++i) {
-		for (size_t j = 0; j < i; ++j) {
-			res.pairwise_similarities.set_at(
-			    i,
-			    j,
-			    static_cast<double>(res.pairwise_distances_absolute.at(i, j)) /
-			        static_cast<double>(max_pairwise_dst));
+	if (params.normalize_pairwise_scores) {
+		for (size_t i = 0; i < res.pairwise_distances.size(); ++i) {
+			for (size_t j = 0; j < i; ++j) {
+				res.pairwise_distances.set_at(i,
+				                              j,
+				                              static_cast<double>(pairwise_dst.at(i, j)) /
+				                                  static_cast<double>(max_pairwise_dst));
+			}
+		}
+	} else {
+		for (size_t i = 0; i < res.pairwise_distances.size(); ++i) {
+			for (size_t j = 0; j < i; ++j) {
+				res.pairwise_distances.set_at(i, j, static_cast<double>(pairwise_dst.at(i, j)));
+			}
 		}
 	}
 	res.mean_distance = mean_dst;
@@ -97,7 +102,8 @@ size_t StandardRfAlgo::calc_rf_and_unique_trees(const size_t tree_size,
 
 SymmetricMatrix<size_t> StandardRfAlgo::pairwise_occurences(
     const std::vector<PllTree> &trees,
-    const std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor> &map) {
+    const std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor>
+        &map) {
 	SymmetricMatrix<size_t> pairwise_dst(trees.size());
 	// Increments each matrix entry for each split which is in both trees.
 	for (const auto &el : map) {
@@ -128,7 +134,8 @@ StandardRfAlgo::insert_all_splits(const std::vector<PllSplitList> &split_lists) 
 	std::unordered_map<OneSplitHashmapKey, boost::dynamic_bitset<>, OneSplitHashingFunctor> map;
 	for (const auto &list_el : split_lists) {
 		for (size_t split_num = 0; split_num < num_inner_splits; ++split_num) {
-			OneSplitHashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit (and not
+			OneSplitHashmapKey key(list_el.getPtrToNthElem(split_num)); // TODO: Should be PllSplit
+			                                                            // (and not
 			// const *)
 			auto iter = map.find(key);
 			if (iter != map.end()) {

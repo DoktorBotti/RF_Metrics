@@ -49,7 +49,8 @@ void GeneralizedRfAlgo::calc_thread(GeneralizedRfAlgo &alg,
 	}
 }
 
-RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees) {
+RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &trees,
+                                                        const RfMetricInterface::Params &params) {
 	assert(trees.size() >= 2);
 	// extract splits. Each tree now identifies by its index in all_splits
 	std::vector<PllSplitList> all_splits;

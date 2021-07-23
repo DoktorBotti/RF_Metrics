@@ -16,7 +16,8 @@ class GeneralizedRfAlgo : public RfAlgorithmInterface {
 	explicit GeneralizedRfAlgo(size_t split_len);
 	GeneralizedRfAlgo(GeneralizedRfAlgo &&) = default;
 	~GeneralizedRfAlgo() override = default;
-	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
+	RfMetricInterface::Results calculate(std::vector<PllTree> &trees,
+	                                     const RfMetricInterface::Params &params) override;
 	// precomputes the logarithm and factorials
 	static LogDblFact factorials;
 

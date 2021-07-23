@@ -14,7 +14,7 @@ class StandardRfAlgo : public RfAlgorithmInterface {
 	StandardRfAlgo(const StandardRfAlgo &) = default;
 	StandardRfAlgo(StandardRfAlgo &&) = default;
 	~StandardRfAlgo() override = default;
-	RfMetricInterface::Results calculate(std::vector<PllTree> &trees) override;
+	RfMetricInterface::Results calculate(std::vector<PllTree> &trees, const RfMetricInterface::Params& params) override;
 
   private:
 	boost::log::sources::severity_logger<lg::SeverityLevel> logger;

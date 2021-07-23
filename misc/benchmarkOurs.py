@@ -1,18 +1,18 @@
 import os, subprocess, time
 import numpy as np
 # normal configuration variables
-test_files_dir = '/home/tbwsl/rf_stuff/practical_data/BS/'
+test_files_dir = '/rf_metrics/BS/'
 project_dir = os.path.pardir
 our_exe = project_dir + "/bin/commandline_rf"
 result_file_path = project_dir + '/benchmark_ours/'
 metrics = ["MCI", "MSI", "SPI"]
-timeout_in_secs = 60 * 12 # 12 minutes
+timeout_in_secs = 60 * 8 # 12 minutes
 test_names = [file for file in os.listdir(test_files_dir)]
 test_paths = [test_files_dir + a for a in test_names]
 
 # configure which testset to execute
-upper_taxa_bound = 1000000
-tree_counts  = [2,10,100, 300] # all measurements will be performed with these counts
+upper_taxa_bound = 1000
+tree_counts  = [2,10,50,100,130] # all measurements will be performed with these counts
 # test matrix dimensions [treeNum][taxa/testfile][metric]
 
 def writeToFile(file_names, ours_times):

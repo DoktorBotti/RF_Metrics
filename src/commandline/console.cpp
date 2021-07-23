@@ -62,8 +62,22 @@ const static std::vector<Flag> flags = {
      [](RfMetricInterface::Params &params, std::vector<std::string> args) {
 	     params.output_file_path = args[0];
      }},
-    {"-t", 1, "Thread count", [](RfMetricInterface::Params &params, std::vector<std::string> args) {
+    {"-t",
+     1,
+     "Thread count",
+     [](RfMetricInterface::Params &params, std::vector<std::string> args) {
 	     params.threads = std::stoul(args[0]);
+     }},
+    {"-n",
+     1,
+     "Normalize output; [true | false]",
+     [](RfMetricInterface::Params &params, std::vector<std::string> args) {
+	     std::transform(args[0].begin(), args[0].end(), args[0].begin(), ::tolower);
+	     if (args[0] == "true") {
+		     params.normalize_pairwise_scores = true;
+	     } else if (args[0] == "false") {
+		     params.normalize_pairwise_scores = false;
+	     }
      }}};
 
 int main(int argc, char **argv) {
@@ -72,7 +86,8 @@ int main(int argc, char **argv) {
 		BOOST_LOG_SEV(logger, lg::warning) << "did not specify any parameters arguments";
 		std::cout << "Please use the format: " << argv[0] << " --metric [ RF | MCI | MSI | SPI ]"
 		          << " -i [input-file-path]"
-		          << " -o [output-file-path]" << std::endl;
+		          << " -o [output-file-path]"
+		          << " -n [ true | false ]" << std::endl;
 		return 0;
 	}
 	RfMetricInterface::Params params = parseParams(argc, argv, logger);

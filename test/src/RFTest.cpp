@@ -71,6 +71,7 @@ static io::IOData calc_result(const std::string& in_file) {
 	RfMetricInterface::Params params;
 	params.input_file_path = in_file;
 	params.metric = RfMetricInterface::RF;
+	params.normalize_pairwise_scores = true;
 	params.threads = 1;
 	RfMetricInterface iface(params);
 	iface.do_magical_high_performance_stuff();

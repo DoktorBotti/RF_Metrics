@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.8)
 project(rf_metrics LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-
 set(LOCALDEPS_DIR ${PROJECT_BINARY_DIR}/localdeps)
 
+option(ENABLE_TESTS on)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-enable_testing()
+
+if(ENABLE_TESTS)
+    enable_testing()
+endif()
 
 add_subdirectory(libs)
 # need to set the module path in common top cmake file. Makes modules Catch available for automatic test recognition
@@ -17,6 +20,10 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 # find and configure boost in system
+if(NOT DEFINED BOOST_ROOT)
+    message("BOOST_ROOT not defined. Only looking in standard locations")
+endif()
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${ORTOOLS_ROOT})
 SET(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.76.0 COMPONENTS log REQUIRED)
 

@@ -29,33 +29,34 @@ void RfMetricInterface::do_magical_high_performance_stuff() {
 	switch (parameters.metric) {
 		case Metric::RF: {
 			StandardRfAlgo standardAlgo;
-			result_ptr = std::make_unique<Results>(standardAlgo.calculate(tree_list));
+			result_ptr = std::make_unique<Results>(standardAlgo.calculate(tree_list, parameters));
 			break;
 		}
 		case Metric::MCI: {
 			MciAlgo genAlgo;
-			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list, parameters));
 			break;
 		}
 		case Metric::MSI: {
 			MsiAlgo genAlgo;
-			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list, parameters));
 			break;
 		}
 		case Metric::SPI: {
 			SpiAlgo genAlgo;
-			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list));
+			result_ptr = std::make_unique<Results>(genAlgo.calculate(tree_list, parameters));
 			break;
 		}
 	}
+	result_ptr->metric = parameters.metric;
+	result_ptr->measure = parameters.measure;
 	BOOST_LOG_SEV(logger, lg::notification) << "Calculated results.";
 	has_calculated = true;
 }
 void RfMetricInterface::disable_logging() {
 	lg::LoggingBackend::disable_logging();
 }
-RfMetricInterface::RfMetricInterface(const RfMetricInterface::Params& params)
-    : parameters(params) {
+RfMetricInterface::RfMetricInterface(const RfMetricInterface::Params &params) : parameters(params) {
 	// optionally provide a tag
 	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("INTERFACE"));
 }
@@ -70,7 +71,7 @@ bool RfMetricInterface::write_result_to_file() {
 	std::ofstream out_stream(parameters.output_file_path);
 	if (out_stream.is_open()) {
 		io::IOData output = get_result_as_IOData();
-		nlohmann::json j = 0;
+		nlohmann::json j;
 		io::to_json(j, output);
 		std::string pretty_format = j.dump(2);
 
@@ -84,13 +85,28 @@ bool RfMetricInterface::write_result_to_file() {
 io::IOData RfMetricInterface::get_result_as_IOData() const {
 	assert(has_calculated); // WTF Clang Tidy
 	io::IOData output;
-	output.pairwise_distance_mtx = result_ptr->pairwise_similarities.to_vector();
-	output.mean_rf_dst = result_ptr->mean_distance;
-	output.number_of_unique_trees = result_ptr->num_unique_trees;
+
+	if(result_ptr->metric == Metric::RF){
+        output.mean = result_ptr->mean_distance;
+        output.number_of_unique_trees = result_ptr->num_unique_trees;
+        output.pairwise_tree_score = result_ptr->pairwise_distances.to_vector();
+    }else {
+		if (result_ptr->measure == Measure::SIMILARITY) {
+			output.measure = io::IOData::SIMILARITY;
+			output.mean = result_ptr->mean_similarity;
+			output.pairwise_tree_score = result_ptr->pairwise_similarities.to_vector();
+		} else {
+			output.measure = io::IOData::DISTANCE;
+			output.pairwise_tree_score = result_ptr->pairwise_distances.to_vector();
+			output.mean = result_ptr->mean_distance;
+		}
+	}
+    output.git_revision = Util::get_git_commit();
+	const std::string command = "lscpu";
+	output.cpuInformation = Util::get_output_of_bash_command(command);
 	return output;
 }
 
 RfMetricInterface::Results::Results(size_t num_trees)
-    : pairwise_distances_absolute(num_trees), pairwise_similarities(num_trees),
-      pairwise_distances(num_trees), pairwise_split_info(num_trees) {
+    : pairwise_distances(num_trees), pairwise_similarities(num_trees) {
 }

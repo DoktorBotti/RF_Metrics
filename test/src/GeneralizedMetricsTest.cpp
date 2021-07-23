@@ -134,20 +134,20 @@ TEST_CASE("Compare to other Team", "[other_team]") {
 		iface.do_magical_high_performance_stuff();
 		auto our_res = iface.get_result_as_IOData();
 		// compare results
-		CHECK(our_res.comparePairwiseDistances(res));
+		CHECK(our_res.compareScoreMatrix(res));
 
 		// report maximal total difference
 		double max_diff = 0.0;
 		double mean_diff = 0.;
 		size_t el_counter = 0;
-		size_t n_rows = our_res.pairwise_distance_mtx.size();
-		REQUIRE(n_rows == res.pairwise_distance_mtx.size());
+		size_t n_rows = our_res.pairwise_tree_score.size();
+		REQUIRE(n_rows == res.pairwise_tree_score.size());
 		for (size_t row = 0; row < n_rows; ++row) {
-			size_t n_cols = our_res.pairwise_distance_mtx[row].size();
-			REQUIRE(n_cols == res.pairwise_distance_mtx[row].size());
+			size_t n_cols = our_res.pairwise_tree_score[row].size();
+			REQUIRE(n_cols == res.pairwise_tree_score[row].size());
 			for (size_t col = 0; col < n_cols; ++col) {
 				auto diff =
-				    our_res.pairwise_distance_mtx[row][col] - res.pairwise_distance_mtx[row][col];
+				    our_res.pairwise_tree_score[row][col] - res.pairwise_tree_score[row][col];
 				if (std::abs(diff) > max_diff) {
 					max_diff = diff;
 				}

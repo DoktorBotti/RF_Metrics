@@ -125,7 +125,7 @@ size_t PllSplit::getScoreIndex() const {
 	return intersection_matrix_index;
 }
 double PllSplit::getHInfoContent() const {
-	assert(precalc_h_info_content > 0.);
+	//assert(precalc_h_info_content > 0.);
 	return precalc_h_info_content;
 }
 size_t PllSplit::getPrecalcPopcnt() const {

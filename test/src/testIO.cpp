@@ -7,10 +7,10 @@
 static io::IOData generateSampleData() {
 	constexpr size_t num_taxa = 8;
 	io::IOData data;
-	data.mean_rf_dst = 12.3;
+	data.mean = 12.3;
 	data.git_revision = "GIT_REVISION";
 	for (size_t taxon_row = num_taxa; taxon_row > 0; --taxon_row) {
-		auto &row = data.pairwise_distance_mtx.emplace_back();
+		auto &row = data.pairwise_tree_score.emplace_back();
 		for (size_t i = 0; i < taxon_row; ++i) {
 			row.emplace_back(taxon_row * 10 + i);
 		}

@@ -19,11 +19,14 @@ class RfMetricInterface {
   public:
 	typedef double Scalar;
 	enum Metric { RF, MCI, MSI, SPI };
+	enum Measure { SIMILARITY, DISTANCE};
 	struct Params {
-		size_t threads = 1;
+		int threads = 1;
 		std::string input_file_path;
 		std::string output_file_path;
 		Metric metric = Metric::RF;
+		Measure measure = SIMILARITY;
+		bool normalize_pairwise_scores = false;
 	};
 	explicit RfMetricInterface(const Params& params);
 	struct Results {
@@ -31,13 +34,14 @@ class RfMetricInterface {
 		Results(const Results& ) = default;
 		Results(Results&& ) = default;
 		~Results() = default;
+        Metric metric = Metric::RF;
+        Measure measure = SIMILARITY;
 
-		SymmetricMatrix<size_t> pairwise_distances_absolute;
-		SymmetricMatrix<Scalar> pairwise_similarities;
-		SymmetricMatrix<Scalar> pairwise_distances;
-		SymmetricMatrix<Scalar> pairwise_split_info;
+		SymmetricMatrix<double> pairwise_distances;
+		SymmetricMatrix<double> pairwise_similarities;
 		size_t num_unique_trees = 0;
 		double mean_distance = static_cast<Scalar>(NAN);
+		double mean_similarity = static_cast<Scalar>(NAN);
 	};
 	// This should be our class which we expose to others. Like our commandline
 	// module
