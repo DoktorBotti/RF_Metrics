@@ -43,7 +43,7 @@ void GeneralizedRfAlgo::calc_thread(GeneralizedRfAlgo &alg,
 			break;
 		}
 		auto row = static_cast<size_t>(std::sqrt(1 + 8 * index) / 2 - .5);
-		size_t col = (row * row + row) / 2;
+		size_t col = index - (row * row + row) / 2;
 		auto score = alg.calc_tree_score(trees[row], trees[col]);
 		sim.raw_set_at(index, score);
 	}
@@ -74,8 +74,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	RfMetricInterface::Results res(trees.size());
 
 	size_t pairwise_tree_cnt = res.pairwise_similarities.get_num_entries();
-	int num_threads = 6; // params.threads == -1 ? std::thread::hardware_concurrency() :
-	                     // params.threads;
+	int num_threads = params.threads == -1 ? static_cast<int>(std::thread::hardware_concurrency())
+	                                       : params.threads;
 	std::vector<std::thread> pool;
 	match_solver.init(all_splits.back().size());
 

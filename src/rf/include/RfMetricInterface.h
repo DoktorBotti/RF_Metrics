@@ -21,7 +21,7 @@ class RfMetricInterface {
 	enum Metric { RF, MCI, MSI, SPI };
 	enum Measure { SIMILARITY, DISTANCE};
 	struct Params {
-		int threads = 1;
+		int threads = -1;
 		std::string input_file_path;
 		std::string output_file_path;
 		Metric metric = Metric::RF;
