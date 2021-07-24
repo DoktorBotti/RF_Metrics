@@ -10,19 +10,20 @@ git clone --recursive git@github.com:DoktorBotti/RF_Metrics.git
 # Building
 Prerequisites:
  - boost [Version 1.76.0][2]
- - OR-Tools Version 9.0.9048
+   > The log and threading component need to be compiled:  
+   > `./bootstrap.sh --with-libraries=thread,log --with-toolset=<your-compiler-here> && ./b2`  
+   > then point to the created compilation or install the components with `./b2 install`
+ - OR-Tools Version 9.0.9048, [here][3] are the binary releases for most OSes.
 
-
-# Prequesites / External dependencies
-The following libraries should be findable by CMake or the installation should be pointed to with a TARGET_ROOT variable. (This variable is then added to the CMAKE_PREFIX_PATH.)
- - gmp (v6.2.1) with --enable-cxx
- - or-tools (v9.0.9048)
- - graph-lib ?
+These dependencies will be found in standard locations and by setting the ORTOOLS_ROOT / BOOST_ROOT CMake or environment variable.
 
 # Running the program
-`commandline_rf --metric [ RF | MCI | MSI | SPI ] -i [input-file-path] -o [output-file-path]`
+`commandline_rf --metric [ RF | MCI | MSI | SPI ] -i [input-file-path] -o [output-file-path] -n [true|false] -p [number of threads or -1 for auto]`
 The input must be in the Newick format.
 The output contains the pairwise distances of all trees given in the input.
+The normalization if turned on will divide all results by the maximum score in the current calculation.
+Parallelization is set to num_procs of your machine when no -p option is provided ( equivalent to -p -1)
 
 [1]: https://doi.org/10.1093/bioinformatics/btaa614
 [2]: https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2
+[3]: https://github.com/google/or-tools/releases/tag/v9.0

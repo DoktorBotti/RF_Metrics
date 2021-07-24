@@ -1,5 +1,6 @@
+option(CODE_QUALITY_CHECK "uses the softwipe command to run multiple analysis tools agains this project" ON)
 
-if(NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*")
+if((NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*") AND ${CODE_QUALITY_CHECK})
 # only defining the softwipe target if path does not contain "softwipe" to prevent accidental recursive builds
     add_custom_target(rf_softwipe
     DEPENDS
@@ -17,7 +18,7 @@ if(NOT "${CMAKE_CURRENT_BINARY_DIR}" MATCHES ".*softwipe.*")
 endif()
 
 # create target which spills out a header containing the current commit id
-IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
+IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git )
     FIND_PACKAGE(Git)
     IF(GIT_FOUND)
         EXECUTE_PROCESS(

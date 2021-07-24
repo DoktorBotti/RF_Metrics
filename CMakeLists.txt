@@ -4,7 +4,8 @@ project(rf_metrics LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(LOCALDEPS_DIR ${PROJECT_BINARY_DIR}/localdeps)
 
-option(ENABLE_TESTS on)
+option(ENABLE_TESTS "build testcases with catch2" on)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(ENABLE_TESTS)
@@ -55,6 +56,8 @@ add_subdirectory(src/commandline)
 add_subdirectory(src/rf)
 add_subdirectory(utils)
 
-add_subdirectory(test/src)
+if(ENABLE_TESTING)
+    add_subdirectory(test/src)
+endif()
 #adds automatic softwipe execution
 add_subdirectory(misc)
