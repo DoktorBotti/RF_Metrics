@@ -11,7 +11,7 @@ git clone --recursive git@github.com:DoktorBotti/RF_Metrics.git
 Prerequisites:
  - boost [Version 1.76.0][2]
    > The log and threading component need to be compiled:  
-   > `./bootstrap.sh --with-libraries=thread,log --with-toolset=<your-compiler-here> && ./b2`  
+   > `./bootstrap.sh --with-libraries=thread,log,date_time --with-toolset=<your-compiler-here> && ./b2`  
    > then point to the created compilation or install the components with `./b2 install`
  - OR-Tools Version 9.0.9048, [here][3] are the binary releases for most OSes.
 

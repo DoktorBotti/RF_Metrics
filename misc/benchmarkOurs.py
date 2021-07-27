@@ -3,16 +3,17 @@ import numpy as np
 # normal configuration variables
 test_files_dir = '/rf_metrics/BS/'
 project_dir = os.path.pardir
+tmp_dir = "/home/cme_practical_team_1/tmp/"
 our_exe = project_dir + "/bin/commandline_rf"
 result_file_path = project_dir + '/benchmark_ours/'
 metrics = ["MCI", "MSI", "SPI"]
-timeout_in_secs = 60 * 8 # 12 minutes
+timeout_in_secs = 60 * 60 # 1 hour
 test_names = [file for file in os.listdir(test_files_dir)]
 test_paths = [test_files_dir + a for a in test_names]
 
 # configure which testset to execute
-upper_taxa_bound = 1000
-tree_counts  = [2,10,50,100,130] # all measurements will be performed with these counts
+upper_taxa_bound = 1000000
+tree_counts  = [2,10,100,500,1000] # all measurements will be performed with these counts
 # test matrix dimensions [treeNum][taxa/testfile][metric]
 
 def writeToFile(file_names, ours_times):
@@ -64,7 +65,7 @@ try:
         # create temporary file which holds correct number of trees
         for trees_idx, num_trees in enumerate(tree_counts):
             with open(path, "r") as all_trees:
-                with open("/tmp/tmp.trees", "w") as out_trees:
+                with open(tmp_dir + "tmp.trees", "w") as out_trees:
                     head = [next(all_trees) for x in range(num_trees)]
                     out_trees.writelines(head)
             # temporaries which would not print into main array if something fails
@@ -72,7 +73,7 @@ try:
             for m_idx, metric in enumerate(metrics):
                 status_string = f"processing {metric} in {test_names[num]}, {num+1} of {len(test_paths)}, with {num_trees} trees. "
                 # run our script
-                ours_args = [our_exe, '--metric', metric, '-o', '/tmp/ourRes.txt', '-i', "/tmp/tmp.trees"]
+                ours_args = [our_exe, '--metric', metric, '-o', tmp_dir + 'ourRes.txt', '-i', tmp_dir + "tmp.trees"]
                 print(status_string+ "Running ours:")
                 runtime = 0
                 try:
@@ -99,6 +100,6 @@ try:
 
 except KeyboardInterrupt:
     print("\nexiting")
-    writeToFile(file_names, ours_times)
+    writeToFile(test_names, ours_times)
 
-writeToFile(file_names, ours_times)
+writeToFile(test_names, ours_times)
