@@ -42,6 +42,7 @@ void GeneralizedRfAlgo::calc_thread(GeneralizedRfAlgo &alg,
 		if (index >= pairwise_tree_cnt) {
 			break;
 		}
+		// Calculates the corresponding row from the index using the quadratic formula
 		auto row = static_cast<size_t>(std::sqrt(1 + 8 * index) / 2 - .5);
 		size_t col = index - (row * row + row) / 2;
 		auto score = alg.calc_tree_score(trees[row], trees[col]);
@@ -79,7 +80,8 @@ RfMetricInterface::Results GeneralizedRfAlgo::calculate(std::vector<PllTree> &tr
 	std::vector<std::thread> pool;
 	match_solver.init(all_splits.back().size());
 
-	for (int i = 0; i < num_threads; ++i) {
+	pool.reserve(num_threads);
+    for (int i = 0; i < num_threads; ++i) {
 		pool.emplace_back(calc_thread,
 		                  std::ref(*this),
 		                  std::ref(fast_trees),

@@ -19,15 +19,16 @@ These dependencies will be found in standard locations and by setting the ORTOOL
 
 # Running the program
 `commandline_rf --metric [ RF | MCI | MSI | SPI ] -i [input-file-path] -o [output-file-path] -n [true|false] -p [number of threads or -1 for auto]`
+
 The input must be in the Newick format.
 The output contains the pairwise distances of all trees given in the input.
 The normalization if turned on will divide all results by the maximum score in the current calculation.
 Parallelization is set to num_procs of your machine when no -p option is provided ( equivalent to -p -1)
 
 # Performance
-The benchmarks took place on a six core Ryzen 5 3600 with 16 GB of ram. 
-We evaluated our results with  2, 10, 50, 100, 130 trees respectively. 
-We also tested multiple problem configurations with up to 1000 taxa. 
+The benchmarks took place on a six core Ryzen 5 3600 with 16 GB of ram.
+We evaluated our results with  2, 10, 50, 100, 130 trees respectively.
+We also tested multiple problem configurations with up to 1000 taxa.
 However, our implementation could handle much more.  
 The first plot shows the average execution time per metric. We divided each measurement by its taxa count to counteract the influence of different problem sizes.
 ![Mean Exec time per metric](misc/plots/metricTimes.png)
